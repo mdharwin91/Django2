@@ -1,0 +1,44 @@
+--- a/schoolweb/views.py
++++ b/schoolweb/views.py
+@@ -345,7 +345,7 @@ def student_get(request):
+                 else:
+                     return JsonResponse({'success': False, 'error': 'Failed to fetch students'}, status=500)
+             elif val_01 == "bonafide_num":
+-                responseData = datacrud.get('bonafide_cert', 'latest')
++                responseData = datacrud.get('BonafideRequests', 'latest')
+                 current_num = 0
+                 if responseData and 'num' in responseData:
+                     try:
+@@ -1050,7 +1050,7 @@ def save_bonafide(request):
+             # Update Bonafide Counter
+             cert_num_int = data.get('cert_num_int')
+             if cert_num_int:
+-                datacrud.put_bill({
+-                    'planner_pk': 'bonafide_cert',
++                # Update BonafideRequests counter and save record
++                datacrud.put_bill({
++                    'planner_pk': 'BonafideRequests',
+                     'planner_sk': 'latest',
+                     'num': int(cert_num_int)
+-                })
++                })
++                
++                # Save to BonafideRequests with the incremented number as SK
++                req_id = "REQ" + str(int(cert_num_int)).zfill(5)
++                bonafide_data = {
++                    'profile': profile,
++                    'target_id': student_id,
++                    'name': data.get('name', 'N/A'),
++                    'cert_no': data.get('cert_no'),
++                    'date': data.get('date'),
++                    'emis': data.get('emis'),
++                    'std': data.get('std'),
++                    'doj': data.get('doj'),
++                    'dol': data.get('dol'),
++                    'status': 'Signed',
++                    'generated_by': user.get('user'),
++                    'generated_date': date.today().strftime('%Y-%m-%d')
++                }
++                datacrud.put_fee('BonafideRequests', req_id, bonafide_data)
+ 
+             return JsonResponse({'success': True, 'message': 'Bonafide certificate saved successfully'})
