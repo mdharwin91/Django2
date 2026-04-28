@@ -1,0 +1,157 @@
+{% load static %}
+<!-- Fee Adjustment Section -->
+<div id="feeAdjustment" style="display: none; width: 100%; height: 100%; overflow: auto;">
+    <div class="panel-header" style="background: var(--card-bg); margin: 0; padding: 15px; border-bottom: 1px solid var(--border-color);">
+        Fee Structure Management
+    </div>
+    <div class="fee-adjust-wrapper">
+        <!-- Left Side: Edit Specific Standard -->
+        <div class="fee-left-panel">
+            <div class="panel-header">Fee Adjustment</div>
+            <div class="control-row" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <select id="std_dropdown" name="std" class="textBoxClass" style="flex: 1; height: 40px !important;">
+                <option value="">Select Standard</option>
+                {% for s in standards %}
+                    <option value="{{ s.0 }}">{{ s.1 }}</option>
+                {% endfor %}
+                </select>
+                <button type="button" class="sidebar-link active" style="height: 40px !important; margin: 0; padding: 0 20px; font-size: 14px; flex-shrink: 0;" onclick="getFeeDetails()">Get Details</button>
+            </div>
+            
+            <div id="add-fee-section" style="display: none; margin-bottom: 15px; padding-bottom: 20px; border-bottom: 1px solid #ddd;">
+                <div class="control-row" style="display: flex; gap: 10px;">
+                     <select id="new_fee_key" class="textBoxClass" style="flex: 2; height: 40px !important;">
+                        <option value="">Select Fee</option>
+                        {% for key, value in feeNames.items %}
+                            <option value="{{ key }}">{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="number" id="new_fee_amount" class="textBoxClass" placeholder="Amt" style="flex: 1; text-align: center; height: 40px !important; min-width: 0;">
+                    <button type="button" class="sidebar-link active" style="height: 40px !important; margin: 0; padding: 0 15px; font-size: 14px; flex: 1;" onclick="addFeeField()">Add</button>
+                </div>
+            </div>
+            <div id="fee-edit-container" style="flex: 1; overflow-y: auto;"></div>
+        </div>
+
+        <!-- Right Side: View All Standards -->
+        <div class="fee-right-panel">
+            <div class="panel-header">All Standards Summary</div>
+            <div id="all-fees-container">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let originalFeeData = {};
+    const feeNamesMap = JSON.parse(document.getElementById('fee-names-data').textContent) || {};
+
+    function getFeeDetails() {
+        const std = document.getElementById('std_dropdown').value;
+        if (!std) { SchoolUtils.showPopup("Please select a standard.", "error"); return; }
+
+        fetch("{% url 'get_fee_details' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+            body: JSON.stringify({ std: std })
+        })
+        .then(response => response.ok ? response.json() : response.json().then(err => { throw err; }))
+        .then(data => {
+            if (data.success) {
+                const container = document.getElementById('fee-edit-container');
+                document.getElementById('add-fee-section').style.display = 'block';
+                originalFeeData = data.data;
+                
+                const existingDetails = document.getElementById('fee-details-container');
+                if (existingDetails) existingDetails.remove();
+
+                const detailsDiv = document.createElement('div');
+                detailsDiv.id = 'fee-details-container';
+
+                const sortedEntries = Object.entries(data.data).sort((a, b) => {
+                    const nameA = feeNamesMap[a[0]] || a[0];
+                    const nameB = feeNamesMap[b[0]] || b[0];
+                    return nameA.localeCompare(nameB);
+                });
+
+                for (const [key, value] of sortedEntries) {
+                    const displayName = feeNamesMap[key] || key;
+                    const row = document.createElement('div');
+                    row.className = 'fee-entry-row';
+                    row.innerHTML = `<label class="fee-label-styled" title="${displayName}">${displayName}</label>
+                                     <input type="number" class="textBoxClass fee-input fee-input-styled" name="${key}" value="${value}">`;
+                    detailsDiv.appendChild(row);
+                }
+                
+                const buttonDiv = document.createElement('div');
+                buttonDiv.className = 'action-buttons';
+                buttonDiv.innerHTML = `
+                    <button type="button" class="sidebar-link active" style="height: 40px; margin: 0;" onclick="updateFees()">Update</button>
+                    <button type="button" class="sidebar-link active" style="height: 40px; margin: 0; background-color: #f44336;" onclick="resetFees()">Reset</button>
+                `;
+                detailsDiv.appendChild(buttonDiv);
+                container.appendChild(detailsDiv);
+            } else SchoolUtils.showPopup("Error: " + data.error, "error");
+        })
+        .catch(error => SchoolUtils.showPopup("Error: " + (error.error || error.message || error), "error"));
+    }
+
+    function fetchAllFees() {
+        fetch("{% url 'get_all_fee_details' %}")
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                const container = document.getElementById('all-fees-container');
+                let html = '<table class="styled-table"><thead><tr>';
+                html += '<th style="padding: 5px;">Fee Particulars</th>';
+                data.data.forEach(stdRow => { html += `<th style="padding: 5px; text-align: center;">${stdRow.Standard}</th>`; });
+                html += '</tr></thead><tbody>';
+                data.columns.forEach(colKey => {
+                    const displayName = feeNamesMap[colKey] || colKey;
+                    html += '<tr>';
+                    html += `<td style="font-weight: bold;">${displayName}</td>`;
+                    data.data.forEach(stdRow => {
+                        const val = stdRow[colKey] !== undefined ? stdRow[colKey] : '-';
+                        html += `<td style="text-align: right;">${val}</td>`;
+                    });
+                    html += '</tr>';
+                });
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            } else document.getElementById('all-fees-container').innerHTML = 'Error loading fees.';
+        })
+        .catch(err => { document.getElementById('all-fees-container').innerHTML = 'Network Error.'; });
+    }
+
+    function updateFees() {
+        const std = document.getElementById('std_dropdown').value;
+        const inputs = document.querySelectorAll('.fee-input');
+        let fees = {};
+        inputs.forEach(input => { fees[input.name] = input.value; });
+
+        fetch("{% url 'update_fee_details' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+            body: JSON.stringify({ std: std, fees: fees })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) { SchoolUtils.showPopup(data.message, "success"); fetchAllFees(); }
+            else SchoolUtils.showPopup("Error: " + data.error, "error");
+        });
+    }
+
+    function resetFees() { document.querySelectorAll('.fee-input').forEach(input => { input.value = ""; }); }
+
+    function addFeeField() {
+        const keySelect = document.getElementById('new_fee_key');
+        const key = keySelect.value;
+        if (!key || !document.getElementById('new_fee_amount').value) { SchoolUtils.showPopup("Please select type and enter amount.", "error"); return; }
+        const detailsDiv = document.getElementById('fee-details-container');
+        if (detailsDiv.querySelector(`input[name="${key}"]`)) { SchoolUtils.showPopup("This fee type already exists.", "error"); return; }
+        const row = document.createElement('div');
+        row.className = 'fee-entry-row';
+        row.innerHTML = `<label class="fee-label-styled">${keySelect.options[keySelect.selectedIndex].text}</label><input type="number" class="textBoxClass fee-input fee-input-styled" name="${key}" value="${document.getElementById('new_fee_amount').value}">`;
+        detailsDiv.insertBefore(row, detailsDiv.lastElementChild);
+        keySelect.value = ""; document.getElementById('new_fee_amount').value = "";
+    }
+</script>

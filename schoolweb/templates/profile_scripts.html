@@ -1,0 +1,332 @@
+<script>
+    // --- Unified Profile Logic (Shared) ---
+    function profile_student_get() {
+        const pk = document.getElementById('fetch_planner_pk').value;
+        let sk = document.getElementById('fetch_planner_sk').value;
+        if (!pk || !sk) { SchoolUtils.showPopup("Select profile and enter ID", "error"); return; }
+
+        fetch("{% url 'student_get' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+            body: JSON.stringify({ planner_pk: pk, planner_sk: sk })
+        })
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(err => { throw new Error(err.error || "Server error"); });
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (data.user_info) {
+                const info = data.user_info;
+                document.getElementById('prof-placeholder').style.display = 'none';
+                document.getElementById('profile-form').style.display = 'block';
+                document.getElementById('profile-form').style.opacity = '1';
+                document.getElementById('profile-form').style.pointerEvents = 'none'; 
+                document.getElementById('profile-actions').style.display = 'block';
+                if (document.getElementById('edit-button')) document.getElementById('edit-button').style.display = 'inline-block';
+                document.getElementById('prof-save-container').style.display = 'none';
+                
+                document.getElementById('fetch_planner_pk').disabled = true;
+                document.getElementById('fetch_planner_sk').disabled = true;
+
+                const fields = ['planner_pk', 'planner_sk', 'name', 'std', 'dob', 'emis', 'doj', 'mobile', 'free_edu', 'age', 'dol', 'status', 'parent_name', 'address'];
+                fields.forEach(f => {
+                    const el = document.getElementById('prof-cell-' + f);
+                    if (el) el.value = info[f] || '';
+                });
+                
+                if (info.bonafide && info.bonafide.length > 0) {
+                    const bonafideContainer = document.getElementById('prof-bonafide-container');
+                    const bonafideList = document.getElementById('prof-bonafide-list');
+                    if (bonafideContainer && bonafideList) {
+                        bonafideContainer.style.display = 'block';
+                        document.getElementById('prof-bonafide-list').style.display = 'none';
+                        document.getElementById('prof-bonafide-toggle-icon').innerText = '+';
+                        let html = '';
+                        [...info.bonafide].reverse().forEach(cert => {
+                            const statusColor = cert.status && cert.status.toLowerCase().includes('signed') ? 'blue' : 
+                                               (cert.status && cert.status.toLowerCase().startsWith('in progress') ? '#ed8936' : 
+                                               (cert.status && cert.status.toLowerCase().includes('pending') ? '#FFD700' : '#a0aec0'));
+                            html += `
+                                <div style="border-bottom: 1px solid var(--border-color); padding: 10px 0; display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="font-weight: bold; color: var(--text-main);">${cert.cert_no || cert.req_id || 'N/A'}</div>
+                                        <div style="font-size: 0.85em; color: var(--text-main); opacity: 0.7;">${cert.dateIssued || cert.date || 'N/A'} | By: ${cert.generated_by || cert.requested_by || 'N/A'}</div>
+                                    </div>
+                                    <div>
+                                        <span style="font-size: 0.75em; background: ${statusColor}; color: white; padding: 3px 8px; border-radius: 12px; text-transform: uppercase;">${cert.status || 'N/A'}</span>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        bonafideList.innerHTML = html;
+                    }
+                } else {
+                    const bonafideContainer = document.getElementById('prof-bonafide-container');
+                    if (bonafideContainer) bonafideContainer.style.display = 'none';
+                }
+
+                document.getElementById('prof-cell-planner_sk').readOnly = true;
+                window.fetchedUserPassword = info.password || '';
+                SchoolUtils.showPopup("Profile fetched. Click 'Edit' to modify.", "success");
+                toggleTeacherFields();
+            } else {
+                SchoolUtils.showPopup("Profile not found", "error");
+                profile_reset_search();
+            }
+        })
+        .catch(err => {
+            SchoolUtils.showPopup(err.message, "error");
+            profile_reset_search();
+        });
+    }
+
+    function profile_edit_student() {
+        document.getElementById('profile-form').style.pointerEvents = 'auto';
+        document.getElementById('prof-save-container').style.display = 'flex';
+        document.getElementById('edit-button').style.display = 'none';
+        document.getElementById('prof-btn-update').style.display = 'inline-block';
+        document.getElementById('prof-btn-save').style.display = 'none';
+        
+        const inputs = document.querySelectorAll('#profile-form input, #profile-form select, #profile-form textarea');
+        inputs.forEach(input => {
+            input.addEventListener('change', () => {
+                const label = input.closest('.bonafide-form-row')?.querySelector('.fee-label-styled');
+                if (label) label.classList.add('edited-label');
+            });
+        });
+        SchoolUtils.showPopup("Editing enabled.", "success");
+    }
+
+    function profile_update_student(e) {
+        if(e) e.preventDefault();
+
+        const dob = document.getElementById('prof-cell-dob').value;
+        const doj = document.getElementById('prof-cell-doj').value;
+        if (dob && doj) {
+            const dobDate = new Date(dob);
+            const dojDate = new Date(doj);
+            const minDojDate = new Date(dobDate.getFullYear() + 3, dobDate.getMonth(), dobDate.getDate());
+            if (dojDate < minDojDate) {
+                SchoolUtils.showPopup("Error: Date of Joining must be at least 3 years after Date of Birth.", "error");
+                return;
+            }
+        }
+
+        const data = profile_get_form_data();
+        fetch("{% url 'student_update' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                SchoolUtils.showPopup("Profile updated successfully", "success");
+                document.querySelectorAll('.edited-label').forEach(l => l.classList.remove('edited-label'));
+                document.getElementById('profile-form').style.pointerEvents = 'none';
+                document.getElementById('prof-save-container').style.display = 'none';
+                document.getElementById('edit-button').style.display = 'inline-block';
+            } else SchoolUtils.showPopup("Error: " + data.error, "error");
+        });
+    }
+
+    function profile_save_new_student(e) {
+        if(e) e.preventDefault();
+        const form = document.getElementById('profile-form');
+
+        const dob = document.getElementById('prof-cell-dob').value;
+        const doj = document.getElementById('prof-cell-doj').value;
+        if (dob && doj) {
+            const dobDate = new Date(dob);
+            const dojDate = new Date(doj);
+            const minDojDate = new Date(dobDate.getFullYear() + 3, dobDate.getMonth(), dobDate.getDate());
+            if (dojDate < minDojDate) {
+                SchoolUtils.showPopup("Error: Date of Joining must be at least 3 years after Date of Birth.", "error");
+                return;
+            }
+        }
+
+        const formData = new FormData();
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(i => { if(i.name) formData.append(i.name, i.value); });
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+        const pk = document.getElementById('prof-cell-planner_pk').value;
+        const sk = document.getElementById('prof-cell-planner_sk').value;
+
+        fetch("{% url 'student_details' %}", {
+            method: "POST",
+            body: formData
+        })
+        .then(res => res.text())
+        .then(html => {
+            if (html.includes("successfully")) {
+                SchoolUtils.showPopup("New profile saved!", "success");
+                document.getElementById('fetch_planner_pk').value = pk;
+                document.getElementById('fetch_planner_sk').value = sk;
+                profile_student_get(); 
+            } else SchoolUtils.showPopup("Save failed. Check ID format.", "error");
+        });
+    }
+
+    function profile_reset_student() {
+        document.getElementById('prof-placeholder').style.display = 'none';
+        document.getElementById('profile-form').style.display = 'block';
+        document.getElementById('profile-form').style.opacity = '1';
+        document.getElementById('profile-form').style.pointerEvents = 'auto';
+        document.getElementById('profile-actions').style.display = 'none';
+        document.getElementById('prof-save-container').style.display = 'flex';
+        document.getElementById('edit-button').style.display = 'none';
+        document.getElementById('prof-btn-update').style.display = 'none';
+        document.getElementById('prof-btn-save').style.display = 'inline-block';
+        document.getElementById('profile-form').reset();
+        document.querySelectorAll('.edited-label').forEach(l => l.classList.remove('edited-label'));
+        document.getElementById('prof-cell-planner_sk').readOnly = false;
+        const bonafideContainer = document.getElementById('prof-bonafide-container');
+        if (bonafideContainer) bonafideContainer.style.display = 'none';
+        toggleTeacherFields();
+    }
+
+    function profile_get_form_data() {
+        const data = {};
+        const fields = ['planner_pk', 'planner_sk', 'name', 'std', 'dob', 'emis', 'doj', 'mobile', 'free_edu', 'age', 'dol', 'status', 'parent_name', 'address'];
+        fields.forEach(f => {
+            const el = document.getElementById('prof-cell-' + f);
+            if (el) data[f] = el.value;
+        });
+        return data;
+    }
+
+    function profile_clear_view() {
+        document.getElementById('profile-form').reset();
+        document.getElementById('profile-form').style.display = 'none';
+        document.getElementById('prof-placeholder').style.display = 'block';
+        document.getElementById('profile-actions').style.display = 'none';
+        document.getElementById('prof-save-container').style.display = 'none';
+        document.querySelectorAll('.edited-label').forEach(l => l.classList.remove('edited-label'));
+        const bonafideContainer = document.getElementById('prof-bonafide-container');
+        if (bonafideContainer) bonafideContainer.style.display = 'none';
+        profile_reset_search();
+    }
+
+    function profile_reset_search() {
+        document.getElementById('fetch_planner_pk').value = '';
+        document.getElementById('fetch_planner_sk').value = '';
+        document.getElementById('fetch_planner_pk').disabled = false;
+        document.getElementById('fetch_planner_sk').disabled = false;
+        updateSearchPlaceholder();
+    }
+
+    function updateSearchPlaceholder() {
+        const p = document.getElementById('fetch_planner_pk').value || "Profile";
+        document.getElementById('fetch_planner_sk').placeholder = p + " ID";
+    }
+
+    function toggleTeacherFields() {
+        const p = document.getElementById('prof-cell-planner_pk').value || "Student";
+        const lblSk = document.getElementById('prof-lbl-planner_sk');
+        const lblName = document.getElementById('prof-lbl-name');
+        if(lblSk) lblSk.innerText = p + " ID";
+        if(lblName) lblName.innerText = p + " Name";
+
+        const changePwdBtn = document.getElementById('change-password-btn');
+        const resetPwdBtn = document.getElementById('reset-password-btn');
+        const mfaButtonsRow = document.getElementById('mfa-buttons-row');
+
+        if (p === 'Student') {
+            if (changePwdBtn) changePwdBtn.style.display = 'none';
+            if (resetPwdBtn) resetPwdBtn.style.display = 'none';
+            if (mfaButtonsRow) mfaButtonsRow.style.display = 'none';
+        } else if (p === 'Teacher') {
+            if (changePwdBtn) changePwdBtn.style.display = 'block';
+            if (resetPwdBtn) resetPwdBtn.style.display = 'none';
+            if (mfaButtonsRow) mfaButtonsRow.style.display = 'none';
+        } else { // Admin
+            if (changePwdBtn) changePwdBtn.style.display = 'block';
+            if (resetPwdBtn) resetPwdBtn.style.display = 'block';
+            if (mfaButtonsRow) mfaButtonsRow.style.display = 'flex';
+        }
+    }
+
+    function openChangePasswordModal() {
+        document.getElementById('modal-title').innerText = "Change Password";
+        document.getElementById('row_current_password').style.display = 'flex';
+        document.getElementById('passwordModal').style.display = 'block';
+    }
+
+    function openResetPasswordModal() {
+        document.getElementById('modal-title').innerText = "Reset Password (Admin)";
+        document.getElementById('row_current_password').style.display = 'none';
+        document.getElementById('passwordModal').style.display = 'block';
+    }
+
+    function closeChangePasswordModal() {
+        document.getElementById('passwordModal').style.display = 'none';
+        document.getElementById('current_entered_password').value = '';
+        document.getElementById('new_password').value = '';
+        document.getElementById('confirm_password').value = '';
+    }
+
+    function submitNewPassword() {
+        const newP = document.getElementById('new_password').value;
+        const confP = document.getElementById('confirm_password').value;
+        if (!newP || newP !== confP) { SchoolUtils.showPopup("Passwords mismatch", "error"); return; }
+
+        const payload = {
+            planner_pk: document.getElementById('prof-cell-planner_pk').value,
+            planner_sk: document.getElementById('prof-cell-planner_sk').value,
+            password: newP
+        };
+
+        fetch("{% url 'change_password' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) { SchoolUtils.showPopup("Password updated", "success"); closeChangePasswordModal(); }
+            else SchoolUtils.showPopup("Error: " + data.error, "error");
+        });
+    }
+
+    function calculateAge(dobString) {
+        if (!dobString) return "";
+        const today = new Date();
+        const birthDate = new Date(dobString);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) { age--; }
+        return age >= 0 ? age : 0;
+    }
+
+    function initProfileScripts() {
+        const dobInput = document.getElementById('prof-cell-dob');
+        if (dobInput) {
+            const today = new Date();
+            const threeYearsAgo = new Date(today.getFullYear() - 3, today.getMonth(), today.getDate());
+            dobInput.setAttribute('max', threeYearsAgo.toISOString().split('T')[0]);
+            dobInput.addEventListener('change', function() {
+                const ageInput = document.getElementById('prof-cell-age');
+                if (ageInput) {
+                    ageInput.value = calculateAge(this.value);
+                    ageInput.dispatchEvent(new Event('change'));
+                }
+            });
+        }
+    }
+
+    function toggleBonafideHistory() {
+        const list = document.getElementById('prof-bonafide-list');
+        const icon = document.getElementById('prof-bonafide-toggle-icon');
+        if (list.style.display === 'none') {
+            list.style.display = 'block';
+            icon.innerText = '-';
+        } else {
+            list.style.display = 'none';
+            icon.innerText = '+';
+        }
+    }
+</script>

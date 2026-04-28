@@ -1,0 +1,392 @@
+{% load static %}
+<div id="feePaymentSection" style="display: none; width: 100%; height: 100%; padding: 20px; box-sizing: border-box; overflow-y: auto;">
+    <!-- UPI QR code moved outside printable area -->
+    <div id="upi-qr-container" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 2001; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 15px 50px rgba(0,0,0,0.3); border: 3px solid #667eea;">
+        <!-- UPI QR Code will be injected here -->
+    </div>
+    <div style="display: flow-root;"> <!-- Clearfix for floated children -->
+        <!-- Receipt Print Section (Floated Right) -->
+        <div id="feePrintDiv" style="border: 2px solid #667eea; width: 62%; min-width: 600px; float: right; padding: 15px; box-sizing: border-box; background-color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 8px; position: relative;">
+            <div class="block-content watermark-bg" style="margin-top: 3px; border: 3px solid #667eea; padding: 10px; width: 100%; box-sizing: border-box; border-radius: 8px;">
+                <div style="display: flex; width: 100%; border: 2px solid #667eea; height: 115px; background: linear-gradient(135deg, #f5f7fa 0%, #e8eaf6 100%); border-radius: 8px; overflow: hidden;">
+                    <div style="width: 120px; border-right: 2px solid #667eea; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: white;">
+                        <img src="{% static 'images/Glassed_LOGO_NOBG.png' %}" style="width: 105px; height: 105px;" alt="LOGO_NOBG">
+                    </div>
+                    <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 15px;">
+                        <h1 style="font-size: 32px; font-weight: bold; margin: 2px 0; color: #667eea; line-height: 1.1;">{{vasantham}}</h1>
+                        <h3 style="font-size: 18px; font-weight: bold; margin: 2px 0; color: #764ba2; line-height: 1.1;">{{nps}}</h3>
+                        <h3 style="font-size: 12px; font-weight: bold; margin: 2px 0; color: #555; line-height: 1.1;">{{schoolAddress}}</h3>
+                    </div>
+                </div>
+                <div style="margin-top: 15px;"></div>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
+                          <!-- Row 1: Bill No., Date, Student ID -->
+                    <tr>
+                        <td style="text-align: left; padding: 2px; width: 10%;"><label for="cell-bill_no" class="labelClass" style="font-weight: bold; color: #667eea; font-size: 13px;">Bill No:</label></td>
+                        <td style="padding: 2px; width: 23%;"><input type="text" id="cell-bill_no" name="bill_no" class="textBoxClass" style="width: 100%; text-align: center; padding-top: 8px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px;"></td>
+                        <td style="text-align: left; padding: 2px; width: 10%;"><label for="cell-date" class="labelClass" style="font-weight: bold; color: #667eea; font-size: 13px;">Date:</label></td>
+                        <td style="padding: 2px; width: 23%;"><input type="text" id="cell-date" name="date" readonly class="textBoxClass" value="{% now 'd/m/Y' %}" style="width: 100%; text-align: center; padding-top: 8px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9;"></td>
+                        <td style="text-align: left; padding: 2px; width: 10%;"><label for="cell-sid" class="labelClass" style="font-weight: bold; color: #667eea; font-size: 13px;">ID:</label></td>
+                        <td style="padding: 2px; width: 24%;"><input type="text" id="cell-sid" name="sid" readonly class="textBoxClass" style="width: 100%; text-align: center; padding-top: 8px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9;"></td>
+                    </tr>
+                    <!-- Row 2: Name and Standard -->
+                    <tr>
+                        <td style="text-align: left; padding: 2px;"><label for="cell-name" class="labelClass" style="font-weight: bold; color: #667eea; font-size: 13px;">Name:</label></td>
+                        <td colspan="3" style="padding: 2px;"><input type="text" id="cell-name" name="name" readonly class="textBoxClass" style="width: 100%; text-align: left; padding-left: 10px; padding-top: 8px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9;"></td>
+                        <td style="text-align: left; padding: 2px;"><label for="cell-std" class="labelClass" style="font-weight: bold; color: #667eea; font-size: 13px;">STD:</label></td>
+                        <td style="padding: 2px;"><input type="text" id="cell-std" name="std" readonly class="textBoxClass" style="width: 100%; text-align: center; padding-top: 8px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9;"></td>
+                    </tr>
+                    <!-- Row 3: FC/RTE, Mobile and Pay Mode -->
+                    <tr>
+                        <td style="text-align: left; padding: 2px;"><label for="cell-free_edu" class="labelClass" style="font-weight: bold; color: #667eea; font-size: 13px;">FC/RTE:</label></td>
+                        <td style="padding: 2px;"><input type="text" id="cell-free_edu" name="free_edu" readonly class="textBoxClass" style="width: 100%; text-align: center; padding-top: 8px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9;"></td>
+                        <td style="text-align: left; padding: 2px;"><label for="cell-mobile" class="labelClass" style="font-weight: bold; color: #667eea; font-size: 13px;">Mobile:</label></td>
+                        <td style="padding: 2px;"><input type="text" id="cell-mobile" name="mobile" readonly class="textBoxClass" style="width: 100%; text-align: center; padding-top: 8px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9;"></td>
+                        <td style="text-align: left; padding: 2px;"><label class="labelClass" style="font-weight: bold; color: #667eea; font-size: 13px;">Mode:</label></td>
+                        <td style="padding: 2px;"><input type="text" id="display-pay_mode" readonly class="textBoxClass" value="Cash" style="width: 100%; text-align: center; padding-top: 8px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9; font-weight: bold; color: #764ba2;"></td>
+                    </tr>
+                </table>
+                <div style="border-radius: 6px; border: 2px solid #667eea;">
+                    <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd; ">
+                        <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: sticky; top: 0; z-index: 1;">
+                            <th style="border: 1px solid #ddd; padding: 8px; color: white;">Fee Particulars</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; color: white;">Amount</th>
+                        </tr>
+                        <tbody id="fee-table-body"></tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 15px; border: 2px solid #667eea; background: linear-gradient(135deg, #f5f7fa 0%, #e8eaf6 100%); padding: 8px; box-sizing: border-box; display: flex; align-items: center; border-radius: 8px; min-height: 45px; flex-wrap: wrap;">
+                        <input type="text" id="amount_in_words" name="amount_in_words" readonly class="textBoxClass" style="flex: 1; text-align: left; padding: 4px; box-sizing: border-box; border: 1px solid var(--border-color); border-radius: 4px; background: #fff; color: #1a202c; min-width: 0;">
+                        <label for="billedBy" class="labelClass" style="margin-left: 15px; font-size: 14px; color: #667eea; font-weight: bold; display: flex; align-items: center; text-align: right;">Billed By: {{ first_name }}</label>
+                </div>
+            </div>
+        </div>
+        <!-- Fetch and History Form Section (Floated Left) -->
+        <div style="width: 35%; float: left; min-width: 350px;">
+            <form action="{% url 'teacher_fetch' %}" method="post">
+                <div id="fee-buttons-div" class="card" style="margin-bottom: 20px; border: 2px solid var(--border-color); background: var(--card-bg); padding: 15px;">
+                {% csrf_token %}
+                <div class="panel-header" style="font-size: 1em; margin-bottom: 15px; text-align: left;">FEE CONTROL</div>
+                <div class="fee-fetch-controls" style="margin-bottom: 12px; display: flex !important; flex-direction: row !important; gap: 10px !important;">
+                    <input type="text" id="student_id" name="student_id" placeholder="Enter Student ID" required class="textBoxClass" style="flex: 1 !important; width: 0 !important; min-width: 0 !important; border: 2px solid var(--border-color); border-radius: 6px; padding: 10px; font-size: 14px; background: var(--input-bg); color: var(--input-text); height: 40px !important; box-sizing: border-box !important;" >
+                    <button type="button" class="sidebar-link active" style="flex: 1 !important; width: 0 !important; min-width: 0 !important; margin: 0 !important; padding: 10px; font-size: 14px; height: 40px !important; box-sizing: border-box !important;" onclick="teacher_fetch(event)">Fetch</button>
+                </div>
+                <div id="fetch-name-display" style="display: none; margin: -8px 0 12px 5px; font-weight: bold; color: #764ba2; font-size: 0.95em;">
+                    <span style="opacity: 0.7;">Selected:</span> <span id="display-fetch-name"></span>
+                </div>
+
+                <div class="fee-fetch-controls" style="margin-bottom: 12px; display: flex !important; flex-direction: row !important; gap: 10px !important;">
+                <select id="student_type" name="student_type" class="textBoxClass" style="flex: 1 !important; width: 0 !important; min-width: 0 !important; border: 2px solid var(--border-color); border-radius: 6px; padding: 0 10px; font-size: 14px; background: var(--input-bg); color: var(--input-text); height: 40px !important; box-sizing: border-box !important;">
+                    <option value="NEW">NEW</option>
+                    <option value="OLD" selected>OLD</option>
+                </select>
+                <select id="cell-pay_mode" name="pay_mode" class="textBoxClass" onchange="document.getElementById('display-pay_mode').value = this.value; updateUPIQR();" style="flex: 1 !important; width: 0 !important; min-width: 0 !important; border: 2px solid var(--border-color); border-radius: 6px; padding: 0 10px; font-size: 14px; background: var(--input-bg); color: var(--input-text); height: 40px !important; box-sizing: border-box !important;">
+                    <option value="Cash">Cash</option>
+                    <option value="UPI">UPI</option>
+                    <option value="Card">Card</option>
+                </select>
+                <select id="term" name="term" class="textBoxClass" style="flex: 1 !important; width: 0 !important; min-width: 0 !important; border: 2px solid var(--border-color); border-radius: 6px; padding: 0 10px; font-size: 14px; background: var(--input-bg); color: var(--input-text); height: 40px !important; box-sizing: border-box !important;">
+                    <option value="">Select Term</option>
+                    {% for key, value in terms.items %}
+                        <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+                </div>
+                <div class="fee-fetch-controls" style="display: flex !important; flex-direction: row !important; gap: 10px !important;">
+                    <button type="button" class="sidebar-link active" style="flex: 1 !important; width: 0 !important; min-width: 0 !important; padding: 10px; font-size: 14px; height: 40px !important; box-sizing: border-box !important;" onclick="get_fees(event)">Get Fees</button>
+                    <button type="button" class="sidebar-link active" style="flex: 1 !important; width: 0 !important; min-width: 0 !important; padding: 10px; font-size: 14px; height: 40px !important; background: #6c757d; margin: 0 !important; box-sizing: border-box !important;" onclick="resetFeePage()">Clear</button>
+                </div>
+                
+                <div class="fee-buttons-group" style="margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 5px; background: var(--content-bg); padding: 10px; border-radius: 8px; border: 2px solid var(--border-color);">
+                    <button type="button" class="sidebar-link active" onclick="sendWhatsAppReceipt()" style="flex: 1; margin: 0; padding: 10px 2px; font-size: 10px; background: #28a745;">WhatsApp</button>
+                    <button type="button" class="sidebar-link active" onclick="downloadReceipt()" style="flex: 1; margin: 0; padding: 10px 2px; font-size: 10px; background: #4a5568;">Download IMG</button>
+                    <button type="button" class="sidebar-link active" onclick="downloadReceiptPDF()" style="flex: 1; margin: 0; padding: 10px 2px; font-size: 10px; background: #e53e3e;">Download PDF</button>
+                    <button id="save-fees-button" type="button" class="sidebar-link active" onclick="saveFees()" style="flex: 1; margin: 0; padding: 10px 2px; font-size: 10px; display: none; background: #2d3748;">Save Bill</button>
+                    <button type="button" class="sidebar-link active" onclick="thermalPrint()" style="flex: 1; margin: 0; padding: 10px 2px; font-size: 10px; background: #333;">Thermal Print</button>
+                </div>
+                </div>
+                <div id="fee-paid-details-div"></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentStudentFeesPaid = [];
+    let currentFetchedSID = "";
+    let isFeeSaved = false;
+
+    function teacher_fetch(event) {
+        event.preventDefault();
+        isFeeSaved = false;
+        const plannerSk = document.getElementById('student_id').value;
+
+        if (!plannerSk) { SchoolUtils.showPopup("Please enter Student ID", "error"); return; }
+
+        fetch("{% url 'teacher_fetch' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+            body: JSON.stringify({ planner_pk: "Student", planner_sk: plannerSk })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) { SchoolUtils.showPopup(data.error, "error"); return; }
+            if (data.user_info) {
+                const info = data.user_info;
+                currentStudentFeesPaid = info.fees_paid || [];
+                currentFetchedSID = info.planner_sk;
+
+                const paidTermsForCurrentStd = currentStudentFeesPaid.filter(f => f.STD === info.std).map(f => f.TERM);
+                const allTerms = ['term1', 'term2', 'term3'];
+                const isFullyPaid = allTerms.every(t => paidTermsForCurrentStd.includes(t));
+
+                if (isFullyPaid) {
+                    const standardsOrder = ['LKG', 'UKG', 'I', 'II', 'III', 'IV', 'V'];
+                    const curIdx = standardsOrder.indexOf(info.std);
+                    if (curIdx !== -1 && curIdx < standardsOrder.length - 1) {
+                        const nextStd = standardsOrder[curIdx + 1];
+                        if (confirm(`Student ${info.name} has paid all 3 terms for ${info.std}.\n\nPromote to ${nextStd}?`)) {
+                            promoteStudent(info, nextStd); return;
+                        } else { resetFeePage(); return; }
+                    }
+                }
+
+                if (info.status === 'Inactive' || info.free_edu === 'YES') {
+                    SchoolUtils.showPopup("Student is Inactive or Under Free Education", "error"); return;
+                }
+
+                document.getElementById('save-fees-button').style.display = 'none';
+                document.getElementById('cell-name').value = info.name || '';
+                document.getElementById('cell-std').value = info.std || '';
+                document.getElementById('cell-mobile').value = info.mobile || '';
+                document.getElementById('cell-free_edu').value = info.free_edu || '';
+                document.getElementById('cell-sid').value = info.planner_sk || '';
+                document.getElementById('fee-table-body').innerHTML = '';
+                document.getElementById('amount_in_words').value = '';
+                
+                document.getElementById('display-fetch-name').innerText = info.name || '';
+                document.getElementById('fetch-name-display').style.display = 'block';
+                updateUPIQR();
+
+                const historyDiv = document.getElementById('fee-paid-details-div');
+                if (info.fees_paid && info.fees_paid.length > 0) {
+                    historyDiv.style.cssText = "border: 1px solid var(--border-color); padding: 10px; width: 100%; box-sizing: border-box; margin-top: 10px; background: var(--card-bg); border-radius: 8px;";
+                    let tbl = '<div class="panel-header" style="text-align:left; font-size:1.1em; margin-bottom:10px;">Payment History</div>';
+                    tbl += '<div style="max-height: 350px; overflow-y: auto; border: 1px solid var(--border-color);"><table class="styled-table">';
+                    tbl += '<thead><tr><th>Date</th><th>Bill No</th><th>Std</th><th>Term</th><th>Type</th><th>Amount</th><th>Action</th></tr></thead><tbody>';
+                    
+                    [...info.fees_paid].reverse().forEach((fee, idx) => {
+                        const originalIndex = info.fees_paid.length - 1 - idx;
+                        tbl += `<tr><td>${fee.PAYMENT_DATE}</td><td>${fee.BILL_NO}</td><td>${fee.STD}</td><td>${fee.TERM}</td><td>${fee.PAYMENT_TYPE}</td><td style="font-weight:bold;">₹${fee.AMOUNT}</td><td><button type="button" class="sidebar-link active" style="padding: 2px 8px; font-size: 11px;" onclick="reprintBill(${originalIndex})">></button></td></tr>`;
+                    });
+                    tbl += '</tbody></table></div>';
+                    historyDiv.innerHTML = tbl;
+                } else historyDiv.innerHTML = '';
+            }
+        })
+        .catch(error => SchoolUtils.showPopup("Error fetching student: " + error, "error"));
+    }
+
+    function promoteStudent(studentInfo, nextStd) {
+        fetch("{% url 'student_update' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+            body: JSON.stringify({ planner_pk: "Student", planner_sk: studentInfo.planner_sk, name: studentInfo.name, std: nextStd, mobile: studentInfo.mobile, status: studentInfo.status, free_edu: studentInfo.free_edu })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) { SchoolUtils.showPopup(`Promoted to ${nextStd}!`, "success"); resetFeePage(); }
+            else SchoolUtils.showPopup("Promotion failed: " + data.error, "error");
+        });
+    }
+
+    function resetFeePage() {
+        document.getElementById('student_id').value = '';
+        document.getElementById('cell-name').value = '';
+        document.getElementById('cell-std').value = '';
+        document.getElementById('cell-mobile').value = '';
+        document.getElementById('cell-free_edu').value = '';
+        document.getElementById('cell-sid').value = '';
+        document.getElementById('cell-bill_no').value = '';
+        document.getElementById('fee-table-body').innerHTML = '';
+        document.getElementById('amount_in_words').value = '';
+        document.getElementById('display-fetch-name').innerText = '';
+        document.getElementById('fetch-name-display').style.display = 'none';
+        updateUPIQR();
+        document.getElementById('fee-paid-details-div').innerHTML = '';
+        document.getElementById('save-fees-button').style.display = 'none';
+        currentStudentFeesPaid = [];
+        currentFetchedSID = "";
+        isFeeSaved = false;
+    }
+
+    function get_fees(event) {
+        const sid = document.getElementById('cell-sid').value;
+        const std = document.getElementById('cell-std').value;
+        const term = document.getElementById('term').value;
+        if (!sid || !term) { SchoolUtils.showPopup("Please fetch student and select term.", "error"); return; }
+        
+        const currentYear = new Date().getFullYear();
+        if (currentStudentFeesPaid.some(fee => fee.STD === std && fee.TERM === term && fee.PAYMENT_DATE.includes(currentYear))) {
+            SchoolUtils.showPopup("Duplicate Fee Alert: Term already billed.", "error"); return;
+        }
+
+        fetch("{% url 'get_fees' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+            body: JSON.stringify({ sid: sid, std: std, term: term, student_type: document.getElementById('student_type').value })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.fees) {
+                isFeeSaved = false;
+                document.getElementById('save-fees-button').style.display = 'inline-block';
+                const tableBody = document.getElementById('fee-table-body');
+                tableBody.innerHTML = '';
+                for (const [p, amt] of Object.entries(data.fees)) {
+                    tableBody.insertAdjacentHTML('beforeend', `<tr><td style="padding:8px;">${p}</td><td style="text-align:right;">${amt}</td></tr>`);
+                }
+                tableBody.insertAdjacentHTML('beforeend', `<tr style="font-weight:bold; background:var(--table-even-row);"><td style="padding:8px;">Total Amount</td><td style="text-align:right;">${data.total_amount}</td></tr>`);
+                document.getElementById('amount_in_words').value = data.amount_in_words;
+                document.getElementById('cell-bill_no').value = data.bill_no;
+                updateUPIQR();
+            }
+        })
+        .catch(err => SchoolUtils.showPopup("Error retrieving fees.", "error"));
+    }
+
+    function saveFees() {
+        if (isFeeSaved) return;
+        const tableRows = document.querySelectorAll('#fee-table-body tr');
+        let particulars = []; let total = 0;
+        tableRows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells[0].innerText.trim() === "Total Amount") total = parseFloat(cells[1].innerText);
+            else particulars.push(`${cells[0].innerText}: ${cells[1].innerText}`);
+        });
+
+        const data = {
+            sid: document.getElementById('cell-sid').value,
+            std: document.getElementById('cell-std').value,
+            term: document.getElementById('term').value,
+            bill_no: document.getElementById('cell-bill_no').value,
+            fee_particulars: particulars.join(', '),
+            payment_type: document.getElementById('cell-pay_mode').value,
+            amount_paid: total,
+            payment_date: document.getElementById('cell-date').value,
+            billed_by: "{{ first_name }}"
+        };
+
+        fetch("{% url 'save_fees' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) { SchoolUtils.showPopup(data.message, "success"); isFeeSaved = true; document.getElementById('save-fees-button').style.display = 'none'; }
+            else SchoolUtils.showPopup(data.error, "error");
+        });
+    }
+
+    function updateUPIQR() {
+        const payMode = document.getElementById('cell-pay_mode').value;
+        const qrContainer = document.getElementById('upi-qr-container');
+        let total = 0;
+        document.querySelectorAll('#fee-table-body tr').forEach(r => { if(r.innerText.includes('Total')) total = r.cells[1].innerText; });
+
+        if (payMode === 'UPI' && total > 0) {
+            const upiUri = `upi://pay?pa=9443508833@okbizaxis&pn=Vasantham&am=${total}&cu=INR`;
+            qrContainer.innerHTML = `
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(upiUri)}" style="width:340px; border-radius:8px;">
+                <div style="font-size:20px; font-weight:bold; color:#667eea; margin:15px 0;">SCAN TO PAY (₹${total})</div>
+                <button type="button" onclick="document.getElementById('upi-qr-container').style.display='none'" style="background:#e53e3e; color:white; border:none; padding:12px 20px; border-radius:8px; font-size:14px; font-weight:bold; cursor:pointer; width:100%;">Close QR</button>
+            `;
+            qrContainer.style.display = 'block';
+        } else qrContainer.style.display = 'none';
+    }
+
+    function sendWhatsAppReceipt() {
+        if (!isFeeSaved) { SchoolUtils.showPopup("Please save fee first.", "error"); return; }
+        const mobile = document.getElementById('cell-mobile').value;
+        let total = 0; document.querySelectorAll('#fee-table-body tr').forEach(r => { if(r.innerText.includes('Total')) total = r.cells[1].innerText; });
+        const term = document.getElementById('term').options[document.getElementById('term').selectedIndex].text;
+        let message = `*_Fee receipt for ${document.getElementById('cell-name').value} (${document.getElementById('cell-bill_no').value}):_* \n Dear Parent, ${term} Fee: ₹${total} received on ${document.getElementById('cell-date').value}.\nThank you,\n*{{ schoolName|safe }}*`;
+        
+        html2canvas(document.getElementById("feePrintDiv"), { scale: 2, useCORS: true }).then(canvas => {
+            const link = document.createElement("a");
+            link.download = `RECEIPT_${document.getElementById("cell-sid").value}.png`;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+
+            fetch("{% url 'send_whatsapp' %}", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+                body: JSON.stringify({ mobile: mobile, message: message })
+            }).then(r => r.json()).then(d => { if(d.success) window.open(d.whatsapp_url, '_blank'); });
+        });
+    }
+
+    function downloadReceipt() {
+        if (!isFeeSaved) return;
+        html2canvas(document.getElementById("feePrintDiv"), { scale: 2, useCORS: true }).then(canvas => {
+            const link = document.createElement("a");
+            link.download = `RECEIPT_${document.getElementById("cell-sid").value}.png`;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        });
+    }
+
+    function downloadReceiptPDF() {
+        if (!isFeeSaved) return;
+        const { jsPDF } = window.jspdf;
+        html2canvas(document.getElementById("feePrintDiv"), { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+            const pdf = new jsPDF('l', 'mm', 'a5');
+            pdf.addImage(canvas.toDataURL('image/jpeg', 0.7), 'JPEG', 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
+            pdf.save(`RECEIPT_${document.getElementById("cell-sid").value}.pdf`);
+        });
+    }
+
+    function reprintBill(index) {
+        const fee = currentStudentFeesPaid[index];
+        if(!fee) return;
+        document.getElementById('cell-bill_no').value = fee.BILL_NO + " (COPY)";
+        document.getElementById('cell-date').value = fee.PAYMENT_DATE;
+        document.getElementById('cell-std').value = fee.STD;
+        document.getElementById('cell-pay_mode').value = fee.PAYMENT_TYPE;
+        document.getElementById('display-pay_mode').value = fee.PAYMENT_TYPE;
+        
+        const tableBody = document.getElementById('fee-table-body'); tableBody.innerHTML = '';
+        fee.FEE_PART.split(', ').forEach(part => {
+            const [k, v] = part.split(': ');
+            tableBody.insertAdjacentHTML('beforeend', `<tr><td style="padding:8px;">${k}</td><td style="text-align:right;">${v}</td></tr>`);
+        });
+        tableBody.insertAdjacentHTML('beforeend', `<tr style="font-weight:bold; background:var(--table-even-row);"><td style="padding:8px;">Total Amount</td><td style="text-align:right;">${fee.AMOUNT}</td></tr>`);
+        document.getElementById('amount_in_words').value = numToWords(fee.AMOUNT);
+        isFeeSaved = true;
+        SchoolUtils.showPopup("Bill Loaded. Ready to Print.", "success");
+    }
+
+    function thermalPrint() {
+        const printDiv = document.getElementById('feePrintDiv');
+        printDiv.querySelectorAll('input').forEach(i => i.setAttribute('value', i.value));
+        const win = window.open('', '_blank');
+        win.document.write(`<html><head><style>@page { size: 108mm auto; margin: 0; } body { width: 108mm; padding: 3mm; } .block-content { border: 1px solid black; padding: 5px; } img { max-width: 80px; filter: grayscale(100%); } h1 { font-size: 20pt; text-align: center; } table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid black; padding: 2px; font-size: 8pt; } .textBoxClass, input { border: none !important; font-size: 8pt; background: transparent !important; outline: none !important; }</style></head><body onload="window.print(); setTimeout(()=>window.close(), 500);">${printDiv.innerHTML}</body></html>`);
+        win.document.close();
+    }
+
+    function numToWords(n) {
+        const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+        const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+        n = parseInt(n); if (n === 0) return 'Zero Only';
+        function convert(n) {
+            if (n < 20) return units[n];
+            if (n < 100) return tens[Math.floor(n/10)] + (n%10 ? ' ' + units[n%10] : '');
+            if (n < 1000) return units[Math.floor(n/100)] + " Hundred" + (n%100 ? ' and ' + convert(n%100) : '');
+            if (n < 100000) return convert(Math.floor(n/1000)) + " Thousand" + (n%1000 ? ' ' + convert(n%1000) : '');
+            if (n < 10000000) return convert(Math.floor(n/100000)) + " Lakh" + (n%100000 ? ' ' + convert(n%100000) : '');
+            return convert(Math.floor(n/10000000)) + " Crore" + (n%10000000 ? ' ' + convert(n%10000000) : '');
+        }
+        return (convert(n) + " Only").replace(/\s+/g, ' ').trim();
+    }
+</script>

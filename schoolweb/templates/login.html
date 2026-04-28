@@ -1,0 +1,208 @@
+{% load static %}
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+        <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
+        <link rel="apple-touch-icon" href="{% static 'images/favicon.ico' %}">
+        {% block css %}
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        {% endblock %}
+        <style>
+            :root {
+                --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                --card-bg: white;
+                --text-main: #333;
+            }
+
+            [data-theme="dark"] {
+                --bg-gradient: #000000;
+                --card-bg: #2d3748;
+                --text-main: #f7fafc;
+            }
+
+            body { background: var(--bg-gradient) !important; color: var(--text-main); }
+            .OuterBox { background-color: var(--card-bg) !important; color: var(--text-main) !important; border-radius: 12px; }
+            .labelClass { color: var(--text-main) !important; }
+
+            .sidebar-link {
+                display: block;
+                padding: 12px 15px;
+                color: #fff;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                text-decoration: none;
+                font-weight: bold;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+                margin-bottom: 8px;
+                border: none;
+                cursor: pointer;
+                width: 100%;
+            }
+            .sidebar-link:hover {
+                background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            }
+            .sidebar-link.active {
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            }
+
+            @media (max-width: 768px) {
+                .login-container { flex-direction: column; }
+                .login-split-left { display: none; }
+                .login-split-right { 
+                    width: 100% !important; 
+                    margin-right: 0 !important; 
+                    display: flex; 
+                    justify-content: center;
+                }
+                .OuterBox { width: 90% !important; float: none !important; }
+            }
+
+            /* 2FA OTP Styles */
+            .otp-container {
+                display: flex;
+                gap: 8px;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                justify-content: flex-start;
+            }
+            .otp-input {
+                width: 42px;
+                height: 50px;
+                text-align: center;
+                font-size: 24px;
+                font-weight: 600;
+                border: 2px solid #e2e8f0;
+                border-radius: 8px;
+                background-color: var(--card-bg);
+                color: var(--text-main);
+                transition: all 0.2s ease-in-out;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            .otp-input:focus {
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+                outline: none;
+                transform: translateY(-1px);
+            }
+            .otp-input::placeholder {
+                color: #cbd5e0;
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- COMMON HEADER -->
+     {% include "header.html" %} 
+     {% include "navigation.html" %} 
+        <div class="login-container" style="width: 100%; display: flex; align-items: center; min-height: 60vh;">
+            <div class="login-split-left" style="width: 50%;">
+
+            </div>
+            <div class="login-split-right" style="width: 50%; float: right; margin-right: 10%;">
+                <div class="OuterBox" style="height: 25%; width: 70%; float:right;">
+                    <br>
+                    <form action = "" method = "post" style="margin-left: 5%;">
+                        {% csrf_token %}
+                        <table>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <td><label for="username01" class="labelClass">Identification No. </label></td>
+                            <td style="width: 5%;"></td>
+                            <td>{{login_info.username}}</td>
+                        </tr>
+                        <tr>
+                            <td><label for="passworde01" class="labelClass">Password </label></td>
+                            <td style="width: 5%;"></td>
+                            <td>{{login_info.password}}</td>
+                        </tr>
+                        {% if show_otp %}
+                        <tr>
+                            <td><label class="labelClass">2FA OTP Code</label></td>
+                            <td style="width: 5%;"></td>
+                            <td>
+                                <div class="otp-container">
+                                    <input type="text" class="otp-input" maxlength="1" pattern="\d" inputmode="numeric" required autofocus>
+                                    <input type="text" class="otp-input" maxlength="1" pattern="\d" inputmode="numeric" required>
+                                    <input type="text" class="otp-input" maxlength="1" pattern="\d" inputmode="numeric" required>
+                                    <input type="text" class="otp-input" maxlength="1" pattern="\d" inputmode="numeric" required>
+                                    <input type="text" class="otp-input" maxlength="1" pattern="\d" inputmode="numeric" required>
+                                    <input type="text" class="otp-input" maxlength="1" pattern="\d" inputmode="numeric" required>
+                                </div>
+                                <input type="hidden" name="otp_token" id="otp_token_hidden">
+                            </td>
+                        </tr>
+                        {% endif %}
+                        </table>
+                        <br>
+                        <label for="result01">{{result}}</label><br>
+                        <!-- <input type=submit value=Clear class="buttonClass" style="margin-left: 10%; text-align: center;"> -->
+                        <input type="submit" value="Login" class="sidebar-link active" style="width: 170px;">
+                    </form>
+                    <br>
+                </div>
+            </div>
+
+        </div>
+        {% if result == "Login Failed" %}
+        <script>
+            alert("ACCESS DENIED");
+        </script>
+        {% endif %}
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const otpInputs = document.querySelectorAll('.otp-input');
+                const hiddenInput = document.getElementById('otp_token_hidden');
+
+                if (otpInputs.length > 0) {
+                    otpInputs.forEach((input, index) => {
+                        // Handle typing digits
+                        input.addEventListener('input', (e) => {
+                            // Ensure only numbers
+                            input.value = input.value.replace(/[^0-9]/g, '');
+                            
+                            if (input.value.length === 1 && index < otpInputs.length - 1) {
+                                otpInputs[index + 1].focus();
+                            }
+                            updateHiddenInput();
+                        });
+
+                        // Handle backspace
+                        input.addEventListener('keydown', (e) => {
+                            if (e.key === 'Backspace' && input.value === '' && index > 0) {
+                                otpInputs[index - 1].focus();
+                            }
+                        });
+
+                        // Handle paste
+                        input.addEventListener('paste', (e) => {
+                            e.preventDefault();
+                            const pasteData = e.clipboardData.getData('text').slice(0, 6).split('');
+                            pasteData.forEach((char, i) => {
+                                if (otpInputs[i] && /^\d$/.test(char)) {
+                                    otpInputs[i].value = char;
+                                }
+                            });
+                            updateHiddenInput();
+                            const nextIndex = Math.min(pasteData.length, otpInputs.length - 1);
+                            otpInputs[nextIndex].focus();
+                        });
+                    });
+
+                    function updateHiddenInput() {
+                        let code = '';
+                        otpInputs.forEach(input => code += input.value);
+                        hiddenInput.value = code;
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>

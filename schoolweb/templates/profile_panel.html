@@ -1,0 +1,105 @@
+{% load static %}
+<div id="profileSection" style="display: none; height: 100%;">
+    <div style="display: flex; height: 100%;">
+        <!-- Left Sidebar: Search & Actions -->
+        <div class="profile-left-panel">
+            <div style="background: var(--card-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 20px;">
+                <div class="panel-header" style="font-size: 1em; margin-bottom: 15px;">Find Profile</div>
+                <div class="control-row">
+                    <select id="fetch_planner_pk" class="textBoxClass" style="flex:1; background: var(--input-bg); color: var(--input-text);" onchange="updateSearchPlaceholder()">
+                        <option value="">Select Type</option>
+                        {% for p in profiles %}{% if request.session.user.pk == 'Admin' or p.0 != 'Admin' %}<option value="{{ p.0 }}">{{ p.1 }}</option>{% endif %}{% endfor %}
+                    </select>
+                    <input id="fetch_planner_sk" placeholder="Enter ID" type="text" class="textBoxClass" style="flex:1; min-width: 0; background: var(--input-bg); color: var(--input-text);">
+                </div>
+                <div class="control-row">
+                    <button type="button" class="sidebar-link active" style="margin:0; padding: 10px 10px; flex: 1; white-space: nowrap;" onclick="profile_student_get()">Fetch</button>
+                    <button type="button" class="sidebar-link active" style="margin:0; padding: 10px 10px; flex: 1; white-space: nowrap; background: #6c757d;" onclick="profile_reset_search()">Reset</button>
+                </div>
+                <div style="font-size: 0.8em; color: var(--text-main); opacity: 0.6; margin-top: -5px; font-style: italic;">* Default pwd: first 4 char name (CAPS) + YOB <span style="color: var(--panel-header); opacity: 1; font-weight: bold;">(Ex: DHAR1991)</span></div>
+            </div>
+            
+            <div id="profile-actions" style="display: none;">
+                <div class="panel-header" style="font-size: 1em; margin-bottom: 15px;">Management</div>
+                <div style="display: flex; gap: 5px; margin-bottom: 8px;">
+                    <button id="change-password-btn" type="button" class="sidebar-link active" onclick="openChangePasswordModal()" style="flex: 1; margin: 0; font-size: 11px; padding: 12px 2px;">Change Password</button>
+                    {% if request.session.user.pk == 'Admin' %}<button id="reset-password-btn" type="button" class="sidebar-link active" onclick="openResetPasswordModal()" style="flex: 1; margin: 0; font-size: 11px; padding: 12px 2px;">Reset Password</button>{% endif %}
+                </div>
+                {% if request.session.user.pk == 'Admin' %}
+                <div id="mfa-buttons-row" style="display: flex; gap: 5px; margin-bottom: 8px;">
+                    <button id="mfa-setup-btn" type="button" class="sidebar-link active" onclick="setupMFA()" style="flex: 1; margin: 0; font-size: 11px; padding: 12px 2px; background: #48bb78;">Setup MFA</button>
+                    <button id="mfa-verify-btn" type="button" class="sidebar-link active" onclick="verifyMFA()" style="flex: 1; margin: 0; font-size: 11px; padding: 12px 2px; background: #4a5568;">Verify MFA</button>
+                    <button id="mfa-remove-btn" type="button" class="sidebar-link active" onclick="removeMFA()" style="flex: 1; margin: 0; font-size: 11px; padding: 12px 2px; background: #e53e3e;">Remove MFA</button>
+                </div>
+                {% endif %}
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 10px;">
+                <button type="button" class="sidebar-link active" style="flex: 1; margin: 0; font-size: 13px;" onclick="profile_reset_student()">Add New</button>
+                <button type="button" class="sidebar-link active" style="flex: 1; margin: 0; background: #6c757d; font-size: 13px;" onclick="profile_clear_view()">Clear</button>
+            </div>
+        </div>
+
+        <!-- Right Main: Detailed Information -->
+        <div class="profile-right-panel">
+            <div id="prof-header-sticky" style="position: sticky; top: -20px; background: var(--content-bg); z-index: 100; margin: -20px -20px 15px -20px; padding: 12px 20px; border-bottom: 3px solid #667eea; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                <div style="font-weight: bold; font-size: 1.1em; color: var(--panel-header); text-transform: uppercase; letter-spacing: 1px;">Profile Details</div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button id="edit-button" type="button" class="sidebar-link active" onclick="profile_edit_student()" style="display: none; margin: 0; padding: 8px 15px; font-size: 13px; width: auto;">Edit Profile</button>
+                    <div id="prof-save-container" style="display: none; margin: 0; gap: 10px; align-items: center;">
+                    <button id="prof-btn-update" type="button" class="sidebar-link active" onclick="profile_update_student(event)" style="margin: 0; padding: 8px 15px; font-size: 13px; width: auto;">Update Profile</button>
+                    <button id="prof-btn-save" type="button" class="sidebar-link active" onclick="profile_save_new_student(event)" style="margin: 0; padding: 8px 15px; font-size: 13px; display: none; width: auto;">Save New Record</button>
+                    </div>
+                </div>
+            </div>
+            <form id="profile-form" style="display: none; pointer-events: none; opacity: 0.8; background: var(--card-bg); padding: 15px 20px; border-radius: 15px; border: 1px solid var(--border-color); color: var(--text-main);">
+                <div class="form-grid">
+                    <div class="bonafide-form-row"><label class="fee-label-styled">Profile Type <span style="color:red;">*</span></label>
+                        <select id="prof-cell-planner_pk" name="planner_pk" class="textBoxClass" onchange="toggleTeacherFields()" style="background: var(--input-bg); color: var(--input-text);">
+                            {% for p in profiles %}{% if request.session.user.pk == 'Admin' or p.0 != 'Admin' %}<option value="{{ p.0 }}">{{ p.1 }}</option>{% endif %}{% endfor %}
+                        </select></div>
+                    <div class="bonafide-form-row"><label class="fee-label-styled" id="prof-lbl-planner_sk">ID <span style="color:red;">*</span></label>
+                        <input id="prof-cell-planner_sk" name="planner_sk" class="textBoxClass" readonly style="background: var(--input-bg); color: var(--input-text);"></div>
+                    <div class="bonafide-form-row"><label class="fee-label-styled">Status</label>
+                        <select id="prof-cell-status" name="status" class="textBoxClass" style="background: var(--input-bg); color: var(--input-text);">
+                            {% for status in statuses %}<option value="{{ status.0 }}">{{ status.1 }}</option>{% endfor %}
+                        </select></div>
+                    <div class="bonafide-form-row full-width-row"><label class="fee-label-styled" id="prof-lbl-name">Full Name <span style="color:red;">*</span></label>
+                        <input id="prof-cell-name" name="name" class="textBoxClass" style="font-weight: bold; background: var(--input-bg); color: var(--input-text);"></div>
+                    <div class="bonafide-form-row full-width-row"><label class="fee-label-styled">Parent/Guardian Name</label>
+                        <input id="prof-cell-parent_name" name="parent_name" class="textBoxClass" style="background: var(--input-bg); color: var(--input-text);"></div>
+                    <div class="bonafide-form-row full-width-row"><label class="fee-label-styled">Address</label>
+                        <textarea id="prof-cell-address" name="address" class="textBoxClass" style="height: 60px; background: var(--input-bg); color: var(--input-text);"></textarea></div>
+                    <div class="bonafide-form-row"><label class="fee-label-styled">Standard / Grade</label>
+                        <select id="prof-cell-std" name="std" class="textBoxClass" style="background: var(--input-bg); color: var(--input-text);">
+                            <option value="">Select</option>{% for s in standards %}<option value="{{ s.0 }}">{{ s.1 }}</option>{% endfor %}
+                        </select></div>
+                    <div class="bonafide-form-row"><label class="fee-label-styled">EMIS Number</label><input id="prof-cell-emis" name="emis" class="textBoxClass" style="background: var(--input-bg); color: var(--input-text);"></div>
+                    <div class="bonafide-form-row"><label class="fee-label-styled">Mobile No. <span style="color:red;">*</span></label>
+                        <input type="tel" id="prof-cell-mobile" name="mobile" class="textBoxClass" maxlength="10" placeholder="10 Digits" style="background: var(--input-bg); color: var(--input-text);"></div>
+                    <div class="bonafide-form-row"><label class="fee-label-styled">Date of Birth</label><input type="date" id="prof-cell-dob" name="dob" class="textBoxClass" style="background: var(--input-bg); color: var(--input-text);"></div>
+                    <div class="bonafide-form-row"><label class="fee-label-styled">Age</label><input id="prof-cell-age" name="age" class="textBoxClass" style="width: 80px; background: var(--input-bg); color: var(--input-text);"></div>
+                    <div class="bonafide-form-row"><label class="fee-label-styled">Date of Joining</label><input type="date" id="prof-cell-doj" name="doj" class="textBoxClass" style="background: var(--input-bg); color: var(--input-text);"></div>
+                    <div class="bonafide-form-row"><label class="fee-label-styled">Free Education</label>
+                        <select id="prof-cell-free_edu" name="free_edu" class="textBoxClass" style="background: var(--input-bg); color: var(--input-text);">
+                            {% for f in free_edu_choices %}<option value="{{ f.0 }}" {% if f.0 == 'NO' %}selected{% endif %}>{{ f.1 }}</option>{% endfor %}
+                        </select></div>
+                    <div class="bonafide-form-row"><label class="fee-label-styled">Date of Leaving</label><input type="date" id="prof-cell-dol" name="dol" class="textBoxClass" style="background: var(--input-bg); color: var(--input-text);"></div>
+                </div>
+            </form>
+
+            <div id="prof-bonafide-container" style="display: none; margin-top: 15px; background: var(--card-bg); padding: 15px 20px; border-radius: 12px; border: 1px solid var(--border-color);">
+                <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleBonafideHistory()">
+                    <div style="font-weight: bold; color: var(--panel-header); font-size: 1.05em;">Bonafide History</div>
+                    <div id="prof-bonafide-toggle-icon" style="font-weight: bold; font-size: 1.2em; color: var(--panel-header);">+</div>
+                </div>
+                <div id="prof-bonafide-list" style="display: none; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+                </div>
+            </div>
+
+            <div id="prof-placeholder" style="text-align: center; margin-top: 80px; color: var(--text-main); opacity: 0.5;">
+                <img src="{% static 'images/Glassed_LOGO_NOBG.png' %}" style="width: 100px; opacity: 0.2; margin-bottom: 20px;"><br>
+                <p style="font-size: 1.1em;">Fetch a profile from the left sidebar to view details,<br>or click <b>Add New</b> to create a new record.</p>
+            </div>
+        </div>
+    </div>
+</div>

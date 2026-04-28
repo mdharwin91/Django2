@@ -1,0 +1,39 @@
+{% load static %}
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+        <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
+        <link rel="apple-touch-icon" href="{% static 'images/favicon.ico' %}">
+        {% block css %}
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        {% endblock %}
+    </head>
+
+    <body>
+        <!-- COMMON HEADER -->
+     {% include "header.html" %} 
+     {% include "navigation.html" %} 
+    <!-- <div class="block-title"><b>About</b></br></div> -->
+    <br>
+     <div class="paragraph">
+     <p><br>&emsp;{{schoolInformation.trustName}} is a benevolent institution committed to fostering academic excellence and social welfare. With a vision to enlighten and elevate the lives of individuals, Vasanatham Trust invests in educational initiatives, offering scholarships and learning materials to underprivileged students. It also extends its charitable hand through healthcare drives, community upliftment programs, and emergency relief efforts, embodying the spirit of giving and community service.</p>
+     </div>
+<br>
+     <div class="paragraph">
+        <b>&emsp;{{schoolInformation.name}}</b> is managed by {{schoolInformation.trustName}}. 
+        <h2>Founder: {{schoolInformation.founder}}</h2> 
+        who has the vision of serving the people with good and quality education founded 
+        {{schoolInformation.name}}.
+        <ul class="unordered-list">
+            &emsp;<li>{{schoolInformation.shotName}} provides quality education </li>
+            &emsp;<li>School employee 12 Teachers and 1 Non Teaching member</li>
+            &emsp;<li>200+ Students in the school</li>
+            &emsp;<li>It has bigger play ground</li>
+            &emsp;<li>purified RO drinking water</li>
+            &emsp;<li>Full campus CCTV coverage</li>
+            &emsp;<li>Secured walls and many more...</li>
+        </ul>
+     </div>
+    </body>
+</html>

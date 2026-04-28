@@ -1,0 +1,25 @@
+{% load static %}
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+        <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
+        <link rel="apple-touch-icon" href="{% static 'images/favicon.ico' %}">
+        {% block css %}
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        {% endblock %}
+    </head>
+
+    <body>
+        <!-- COMMON HEADER -->
+     {% include "header.html" %} 
+     {% include "navigation.html" %} 
+     <div class="block-title"><b>Contact Information</b></br></div>
+     <br>
+     <div class="OuterBox">
+        <p><b>Mobile: </b>+91 94435 08833</p><br>
+        <p><b>Email ID:</b> vasantham.ectrust@gmail.com</p><br>
+        <p><b>Address:</b> 1/227, Main Road, Maruthakulam, Tirunelveli - 627151</p>
+    </div>
+    </body>
+</html>

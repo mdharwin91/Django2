@@ -1,0 +1,30 @@
+{% load static %}
+        <style>
+            .nav-container {
+                display: flex;
+                background-color: var(--panel-header, #014458);
+                padding: 0 20px;
+                border-bottom: 2px solid var(--border-color, #667eea);
+            }
+            .nav-item {
+                color: white;
+                text-decoration: none;
+                padding: 10px 20px;
+                font-size: 12px;
+                font-weight: bold;
+                transition: background 0.3s;
+                border-right: 1px solid rgba(255,255,255,0.1);
+            }
+            .nav-item:hover {
+                background: rgba(255,255,255,0.1);
+            }
+            [data-theme="dark"] .nav-container {
+                background-color: var(--sidebar-bg, #2d3748) !important;
+            }
+        </style>
+        <div class="nav-container">
+            <a href="/login" class="nav-item">Login</a>
+            <a href="/donation" class="nav-item">Donation</a>
+            <a href="/about" class="nav-item">About</a>
+            <a href="/contact" class="nav-item">Contact Us</a>
+        </div>

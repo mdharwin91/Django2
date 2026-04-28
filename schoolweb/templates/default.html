@@ -1,0 +1,29 @@
+{% load static %}
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+        <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
+        <link rel="apple-touch-icon" href="{% static 'images/favicon.ico' %}">
+        {% block css %}
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        {% endblock %}
+    </head>
+
+    <body>
+      <!-- COMMON HEADER -->
+    {% include "header.html" %} 
+    <div class="block-title"><b>Main Page</b></br></div>
+        <br><br>
+    <div class="OuterBox">
+        <form action = "" method = "post">
+            {% csrf_token %}
+            <table>
+                {{form.as_table }}
+            </table>
+            <input type="clear" value=Clear class="buttonClass">
+            <input type="submit" value=Submit class="buttonClass">
+        </form>
+    </div>
+    </body>
+</html>

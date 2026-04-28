@@ -1,0 +1,619 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.header {
+    
+    height: 50px;
+    font-size: 50px;
+    display: block;
+    position: fixed;
+    font-family: 'Cooper Black Regular';
+    src: url('../fonts/Cooper\ Black\ Regular.ttf') format('truetype');
+}
+.header-middle {
+    height: 40px;
+    font-size: 25px;
+    display: block;
+    position: fixed;
+    background-color: white;
+    font-family: 'Cooper Black Regular';
+    src: url('../fonts/Cooper\ Black\ Regular.ttf') format('truetype');
+}
+
+.header-line2{
+    height: 25px;
+    display: block;
+    position: fixed;
+    background-color: white;
+}
+
+.Sec-header {
+    font-family: 'Bauhaus93Regular';
+    src: url('Bauhaus93Regular.woff') format('woff');
+    width: 100%;
+    height: 130px;
+    display: block;
+    position: fixed;
+    margin-top: 0px;
+    background-color: rgb(197, 12, 12);
+    border-bottom-style: double;
+}
+
+.navigation {
+    margin-left: 25%;
+    background-color: #c6161c;
+    width: 75%;
+    float:right;
+    display: block;
+    position: fixed;
+    margin-bottom: 30px; 
+}
+    .navigation a {
+        font-size: 12px;
+        float: left;
+    }
+
+.nav-button{
+    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    width: 25%;
+    float:left;
+    color: #2cf036;
+}
+    .nav-button:hover {
+        background: linear-gradient(White, White);
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        color: black;
+    }
+    .nav-button a {
+        margin-left: 5%;
+        color:burlywood;
+        text-decoration: none;
+        font-size: 12px;
+    }
+
+.Sec-logo {
+    width: 7%;
+    height: 100px;
+    float: left;
+}
+
+.Sec-logo2 {
+    width: 6%;
+    height: 100px;
+    float: right;
+}
+
+.Sec-title {
+    font-family:Cambria;
+    font-size: 26px;
+    text-align: center;
+    font-weight:700;
+    color:navy ;
+    width: 87%;
+    height: 100px;
+    float: left;
+}
+
+
+.Sec-titlebar {
+    width: 100%;
+    text-align: center;
+    font-family: 'Bauhaus93Regular';
+    src: url('Bauhaus93Regular.woff') format('woff');
+    color: aquamarine;
+}
+
+@font-face {
+    font-family: 'Bauhaus93Regular';
+    src: url('Bauhaus93Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.Sec-tbusername {
+    width: 20%;
+    float: right;
+    color: green;
+    font-size: x-large;
+    font-family: 'Bauhaus93Regular';
+    src: url('Bauhaus93Regular.woff') format('woff');
+}
+
+.Sec-tb-nav {
+    width: 15%;
+    float: left;
+    color: red;
+    font-family: 'Bauhaus93Regular';
+    src: url('Bauhaus93Regular.woff') format('woff');
+}
+
+.header-admin {
+    width: 100%;
+    height: 130px;
+    display: block;
+    position: fixed;
+    margin-top: 0px;
+    background-color: Black;
+    border-bottom-style: double;
+    border-bottom-color: White;
+}
+
+.header-nobg {
+    width: 100%;
+    height: 130px;
+    display: block;
+    position: fixed;
+    background-color: Transparent;
+}
+
+.header-nologin {
+    width: 100%;
+    height: 130px;
+    display: block;
+    position: fixed;
+    margin-top: 0px;
+    background-color: White;
+    border-bottom-style: double;
+}
+
+.title {
+    float: left;
+    margin-top: 0px;
+    width: 80%;
+    height: 0px;
+}
+
+.title-default {
+    font-family: 'Bauhaus93Regular';
+    src: url('Bauhaus93Regular.woff') format('woff');
+    font-size: 72px;
+    color: Navy;
+    text-align: center;
+    margin-top: 5px;
+    width: 100%;
+    height: 30px;
+}
+
+.title-default-1 {
+    font-family: 'Bauhaus93Regular';
+    src: url('.\Bauhaus93Regular.woff') format('woff');
+    font-size: 22px;
+    color: White;
+    text-align: center;
+    margin-top: 0px;
+    margin-left: 85px;
+    width: 93%;
+    height: 0px;
+}
+
+@font-face {
+    font-family: 'Bauhaus93Regular';
+    src: url('.\Bauhaus93Regular.woff') format('woff');
+}
+
+.tab-selected {
+    color: Aqua;
+}
+
+.username {
+    float: left;
+    font-family: 'Bauhaus93Regular';
+    src: url('.\Bauhaus93Regular.woff') format('woff');
+    color: Green;
+    margin-left: 10px;
+    width: 20%;
+}
+
+.Sec-tb-nav a {
+    font-size: x-large;
+    color: Red;
+    float: left;
+    display: table;
+    padding: 0px 15px;
+}
+
+.navigation-def {
+    float: right;
+    font-family: 'Bauhaus93Regular';
+    src: url('.\Bauhaus93Regular.woff') format('woff');
+    width: 60%;
+}
+
+    .navigation-def a {
+        font-size: medium;
+        color: Red;
+        float: left;
+        display: table;
+        padding: 0px 15px;
+    }
+
+.navigation-admin {
+    float: right;
+    font-family: 'Bauhaus93Regular';
+    src: url('.\Bauhaus93Regular.woff') format('woff');
+    width: 60%;
+}
+
+    .navigation-admin a {
+        font-size: medium;
+        color: Red;
+        float: left;
+        display: table;
+        padding: 0px 10px;
+    }
+
+.logo {
+    height: 0px;
+    margin-top: 0px;
+    margin-left: 5px;
+    margin-right: 0px;
+    width: 10%;
+}
+
+.schoolname {
+    width: 90%;
+    height: 100px;
+    line-height: 20px;
+}
+
+.logo2 {
+    float: right;
+    width: 10%;
+}
+
+.style_img {
+    width: 90px;
+    height: 100px;
+}
+
+.body-content {
+    margin-top: 4px;
+}
+
+.body-left {
+    margin-top: inherit;
+    width: 80%;
+}
+
+.empty {
+    height: 150px;
+    width: 100%;
+}
+
+.img_div {
+    width: 50%;
+}
+
+.details {
+    float: right;
+    width: 50%;
+    margin-left: 250px;
+    font-size: x-large;
+}
+
+.body-full {
+    width: 100%;
+    height: 150px;
+}
+
+.body-right {
+    margin-left: 10px;
+    float: left;
+    width: 20%;
+}
+
+.button-cp {
+    float: right;
+}
+
+.body-leftFull {
+    width: 100%;
+}
+
+.footer {
+    width: 100%;
+    background-color: Transparent;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.body-common {
+    width: 100%;
+}
+
+.buttonClass {
+    font-size: 16px;
+    font-family: Cambria;
+    width: 100px;
+    min-height: 40px;
+    border-width: 1px;
+    color: #fff;
+    border-color: #599bb3;
+    font-weight: bold;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    box-shadow: 0px 10px 14px -7px #276873;
+    text-shadow: 0px 1px 0px #3d768a;
+    background: linear-gradient(#599bb3, #1c45e5);
+}
+    .buttonClass:hover {
+        background: linear-gradient(White, White);
+        color: black;
+    }
+.buttonClassWithVisibleChanges {
+    font-size: 20px;
+    font-family: Cambria;
+    width: 100px;
+    height: 40px;
+    border-width: 1px;
+    border-color: #599bb3;
+    font-weight: bold;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    box-shadow: 0px 10px 14px -7px #276873;
+    text-shadow: 0px 1px 0px #3d768a;
+    background: linear-gradient(#599bb3, #1c45e5);
+}
+    .buttonClassWithVisibleChanges:hover {
+        background: linear-gradient(White, White);
+        color: black;
+    }
+
+.buttonClassDisabled {
+    font-size: 20px;
+    font-family: Cambria;
+    width: 100px;
+    height: 40px;
+    border-width: 1px;
+    color: #fff;
+    border-color: #599bb3;
+    font-weight: bold;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    box-shadow: 0px 10px 14px -7px #276873;
+    text-shadow: 0px 1px 0px #3d768a;
+    background: linear-gradient(White, #808080);
+}
+
+        
+.buttonClassAdmin {
+    font-size: 20px;
+    font-family: Cambria;
+    width: 100px;
+    height: 40px;
+    border-width: 1px;
+    color: #fff;
+    border-color: #599bb3;
+    font-weight: bold;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    box-shadow: 0px 10px 14px -7px #276873;
+    text-shadow: 0px 1px 0px #3d768a;
+    background: linear-gradient(red, Black);
+}
+
+    .buttonClassAdmin:hover {
+        background: linear-gradient(Black, White);
+        color: white;
+    }
+
+.textBoxClass {
+    min-height: 40px;
+    border: 1px solid black;
+    border-radius: 10px;
+    text-indent: 10px;
+    font-size: 16px;
+    font-family: Cambria;
+    text-align: left;
+}
+    .textBoxClass:hover{
+        border-color: #2cf036;
+        border-style: solid;
+    }
+
+
+
+.radio-buttonClass {
+    font-family: Cambria;
+    list-style-type: none; 
+    display : inline;
+}
+
+.labelClass {
+    min-height: 40px;
+    width: 100px;
+    font-size: 18px;
+    font-family: Cambria;
+}
+
+.labelClassSmall {
+    min-height: 30px;
+    width: 100px;
+    font-size: 16px;
+    font-family: Cambria;
+}
+
+.textBoxClassCentered {
+    min-height: 40px;
+    width: 170px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    text-align: center;
+    font-size: 16px;
+    font-family: Cambria;
+}
+
+.textBoxClassMini {
+    height: 30px;
+    width: 60px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    text-align: center;
+    font-size: 20px;
+    font-family: Cambria;
+}
+
+.labelClassBill {
+    min-height: 40px;
+    width: 100px;
+    font-size: 16px;
+    font-family: Cambria;
+}
+
+.textBoxClassBillCentered {
+    height: 20px;
+    width: 100px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    text-align: center;
+    font-size: 16px;
+    font-family: Cambria;
+    border-style: none;
+}
+
+.paragraph {
+    border-style: solid;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    text-align: justify;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    
+}
+
+.OuterBox{
+    width: 95%;
+    max-width: 800px;
+    border-style: solid;
+    border-radius: 12px;
+    margin: 20px auto;
+    padding: 15px;
+    box-sizing: border-box;
+    text-align: left;
+
+}
+
+.unordered-list{
+    margin-left: 40px;
+}
+
+.block-title{
+    font-size: 12px;
+    background-color: chocolate;
+    width: 25%;
+    display: block;
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 2px 8px;
+    box-sizing: border-box;
+    height: 30px;
+}
+
+.table-view{
+    width: 30%;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: larger;
+    border-style: solid;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+
+}
+
+.left-view{
+    width: 50%;
+    float: left;
+}
+.right-view{
+    width: 50%;
+    float: right;
+}
+
+/* HEADER STYLES */
+.fixed-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: antiquewhite;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    padding: 10px 40px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    border-bottom: 3px solid #014458;
+}
+.header-logoImg {
+    width: 110px;
+    height: 110px;
+    flex-shrink: 0;
+}
+.header-text {
+    flex-grow: 1;
+    text-align: center;
+    padding-right: 110px; /* Compensate for logo width to center text on screen */
+}
+.header-title { font-size: 26px; color: #014458; margin: 0; line-height: 1.2; }
+.header-sub { font-size: 16px; color: #333; margin: 5px 0; }
+.header-reg { font-size: 16px; color: #666; font-weight: bold; }
+.header-spacer { height: 132px; }
+
+.sidebar-link {
+    display: block;
+    padding: 12px 15px;
+    color: #fff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    text-decoration: none;
+    font-weight: bold;
+    font-size: large;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    margin-bottom: 8px;
+    border: none;
+}
+.sidebar-link:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+.sidebar-link.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* Global Responsive Overrides */
+@media (max-width: 768px) {
+    .left-view, .right-view, .OuterBox {
+        width: 100% !important;
+        float: none !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+}
