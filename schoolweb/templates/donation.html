@@ -1,0 +1,25 @@
+{% load static %}
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+        <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
+        <link rel="apple-touch-icon" href="{% static 'images/favicon.ico' %}">
+        {% block css %}
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        {% endblock %}
+    </head>
+
+    <body>
+        <!-- COMMON HEADER -->
+     {% include "header.html" %} 
+     {% include "navigation.html" %} 
+     <div class="block-title"><b>Donation</b></br></div>
+     <br>
+     <div style="display: flex; justify-content: center; padding: 20px;">
+        <img src="{% static 'images/DONATION_QR.jpg' %}" 
+             style="width: 100%; max-width: 400px; height: auto; border: 1px solid #0d0101; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" 
+             alt="Donation QR Code">
+     </div>
+    </body>
+</html>

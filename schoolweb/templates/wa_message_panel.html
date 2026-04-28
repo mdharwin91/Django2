@@ -1,0 +1,193 @@
+{% load static %}
+<!-- WhatsApp Message Section -->
+<div id="waMessageSection" style="display: none; width: 100%; height: 100%; overflow: auto; padding: 20px; box-sizing: border-box;">
+    <div class="bonafide-header">WhatsApp Custom Message</div>
+    
+    <div class="wa-tabs">
+        <button class="wa-tab-btn active" onclick="switchWATab('single')">Single Message</button>
+        <button class="wa-tab-btn" onclick="switchWATab('bulk')">Bulk Message</button>
+    </div>
+
+    <!-- Single Message View -->
+    <div id="wa-single-view">
+        <div style="max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color);">
+            <div class="control-row">
+                <input type="text" id="wa_student_id" class="textBoxClass" placeholder="Student ID" style="flex: 1;">
+                <button type="button" class="sidebar-link active" onclick="getStudentMobile()">Fetch Mobile</button>
+            </div>
+            <div class="bonafide-form-row">
+                <label class="fee-label-styled" style="width: 120px;">Mobile Number</label>
+                <input type="text" id="wa_mobile" class="textBoxClass" placeholder="Mobile Number" style="flex: 1;">
+            </div>
+            <div class="bonafide-form-row" style="align-items: flex-start;">
+                <label class="fee-label-styled" style="width: 120px; margin-top: 10px;">Message</label>
+                <textarea id="wa_custom_msg" class="textBoxClass" rows="6" style="flex: 1; height: auto; padding: 10px;" placeholder="Compose your message here..."></textarea>
+            </div>
+            <div class="action-buttons">
+                <button type="button" class="sidebar-link active" onclick="sendCustomWA()">Send Message</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Message View -->
+    <div id="wa-bulk-view" style="display: none; max-width: 800px; margin: 0 auto; background: var(--card-bg); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color);">
+        <div class="bonafide-search-row">
+            <select id="wa_bulk_std" class="textBoxClass" style="flex: 1;">
+                <option value="">Select Standard for Bulk Message</option>
+                {% for s in standards %}
+                    <option value="{{ s.0 }}">{{ s.1 }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" class="sidebar-link active" onclick="getBulkStudents()">Fetch Students</button>
+        </div>
+        <div id="wa-bulk-list-container" style="max-height: 250px; overflow-y: auto; background: var(--card-bg); border: 1px solid var(--border-color); padding: 10px; margin-bottom: 20px; display: none;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">
+                <b>Recipients</b>
+                <label style="font-size: 0.9em; cursor: pointer;"><input type="checkbox" onchange="toggleAllWA(this)"> Select All</label>
+            </div>
+            <div id="wa-bulk-list"></div>
+        </div>
+        <div class="bonafide-form-row" style="align-items: flex-start;">
+            <label class="fee-label-styled" style="width: 120px; margin-top: 10px;">Bulk Message</label>
+            <textarea id="wa_bulk_msg" class="textBoxClass" rows="6" style="flex: 1; height: auto; padding: 10px;" placeholder="Compose message for multiple students..."></textarea>
+        </div>
+        <div class="action-buttons">
+            <button type="button" class="sidebar-link active" onclick="sendBulkWA()">Send Bulk Message</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchWATab(tab) {
+        const singleView = document.getElementById('wa-single-view');
+        const bulkView = document.getElementById('wa-bulk-view');
+        const btns = document.querySelectorAll('.wa-tab-btn');
+        
+        if (tab === 'single') {
+            singleView.style.display = 'block';
+            bulkView.style.display = 'none';
+            btns[0].classList.add('active');
+            btns[1].classList.remove('active');
+        } else {
+            singleView.style.display = 'none';
+            bulkView.style.display = 'block';
+            btns[0].classList.remove('active');
+            btns[1].classList.add('active');
+        }
+    }
+
+    function getBulkStudents() {
+        const std = document.getElementById('wa_bulk_std').value;
+        if (!std) { SchoolUtils.showPopup("Please select a standard", "error"); return; }
+        
+        fetch("{% url 'student_get' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+            body: JSON.stringify({ planner_pk: "Bulk", planner_sk: std })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.students) {
+                const listDiv = document.getElementById('wa-bulk-list');
+                const container = document.getElementById('wa-bulk-list-container');
+                listDiv.innerHTML = '';
+                
+                if (data.students.length === 0) {
+                    SchoolUtils.showPopup("No students found for this standard.", "error");
+                    container.style.display = 'none';
+                    return;
+                }
+
+                data.students.forEach(student => {
+                    if (student.mobile) {
+                        const row = document.createElement('div');
+                        row.className = 'fee-entry-row';
+                        row.style.justifyContent = 'flex-start';
+                        row.style.gap = '15px';
+                        row.innerHTML = `
+                            <input type="checkbox" class="wa-bulk-check" value="${student.mobile}">
+                            <div style="flex: 1; text-align: left;">
+                                <b>${student.name}</b> (${student.planner_sk})
+                            </div>
+                            <div style="color: #666; font-size: 0.9em;">${student.mobile}</div>
+                        `;
+                        listDiv.appendChild(row);
+                    }
+                });
+                container.style.display = 'block';
+            } else {
+                SchoolUtils.showPopup("Error: " + (data.error || "Failed to fetch students"), "error");
+            }
+        })
+        .catch(err => SchoolUtils.showPopup("Error: " + err, "error"));
+    }
+
+    function toggleAllWA(master) {
+        document.querySelectorAll('.wa-bulk-check').forEach(c => c.checked = master.checked);
+    }
+
+    function sendBulkWA() {
+        const message = document.getElementById('wa_bulk_msg').value;
+        const selected = document.querySelectorAll('.wa-bulk-check:checked');
+        
+        if (selected.length === 0 || !message) {
+            SchoolUtils.showPopup("Please select recipients and enter a message.", "error");
+            return;
+        }
+
+        if (!confirm(`This will attempt to open ${selected.length} WhatsApp tabs. Continue?`)) return;
+
+        selected.forEach((cb, index) => {
+            setTimeout(() => {
+                const encoded = encodeURIComponent(message);
+                const url = `https://wa.me/91${cb.value}?text=${encoded}`;
+                window.open(url, '_blank');
+            }, index * 1500); // 1.5s delay to avoid browser popup blocking
+        });
+    }
+
+    function getStudentMobile() {
+        const sid = document.getElementById('wa_student_id').value;
+        if (!sid) { SchoolUtils.showPopup("Please enter a Student ID", "error"); return; }
+        
+        fetch("{% url 'student_get' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+            body: JSON.stringify({ planner_pk: "Student", planner_sk: sid })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.user_info) {
+                document.getElementById('wa_mobile').value = data.user_info.mobile || '';
+            } else {
+                SchoolUtils.showPopup("Student not found.", "error");
+            }
+        })
+        .catch(err => SchoolUtils.showPopup("Error fetching student: " + err, "error"));
+    }
+
+    function sendCustomWA() {
+        const mobile = document.getElementById('wa_mobile').value;
+        const message = document.getElementById('wa_custom_msg').value;
+        
+        if (!mobile || !message) {
+            SchoolUtils.showPopup("Please provide both mobile number and message.", "error");
+            return;
+        }
+
+        fetch("{% url 'send_whatsapp' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+            body: JSON.stringify({ mobile: mobile, message: message })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if(data.success) {
+                window.open(data.whatsapp_url, '_blank');
+            } else {
+                SchoolUtils.showPopup("Error: " + data.error, "error");
+            }
+        })
+        .catch(err => SchoolUtils.showPopup("An error occurred: " + err, "error"));
+    }
+</script>

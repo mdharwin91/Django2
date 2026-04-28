@@ -1,0 +1,549 @@
+{% load static %}
+<!-- Bonafide Section -->
+<div id="bonafideSection" style="display: none; width: 100%; height: 100%; overflow: auto;">
+    <style>
+        .letterhead-bonafide {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Center the letterhead content */
+            padding-bottom: 20px;
+            border-bottom: 1px solid #014458; /* Thin horizontal line */
+            margin-bottom: 30px;
+        }
+        .letterhead-logo-bonafide {
+            width: 110px;
+            height: 110px;
+            flex-shrink: 0;
+            object-fit: contain;
+            margin-right: 20px;
+        }
+        .letterhead-text-bonafide {
+            text-align: center;
+        }
+        .letterhead-title-bonafide {
+            font-size: 24pt;
+            margin: 0;
+            color: #014458; /* Professional dark teal to match the ERP theme */
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .letterhead-sub-bonafide {
+            font-size: 12px;
+            color: #4a5568;
+            margin: 5px 0;
+            font-style: italic;
+        }
+        .letterhead-reg-bonafide {
+            font-size: 9px;
+            color: #718096;
+            opacity: 0.9;
+            font-weight: normal;
+            float: left;
+        }
+        .letterhead-contact-bonafide {
+            font-size: 8px;
+            float: right;
+            color: #718096;
+            opacity: 0.9;
+            font-weight: normal;
+        }
+        .watermark-bg {
+            position: relative;
+            z-index: 1;
+        }
+        .watermark-bg::after {
+            content: "";
+            background: url('{% static "images/Glassed_LOGO_NOBG.png" %}') no-repeat center;
+            background-size: 100%; /* Doubled from the standard 50% for high visibility */
+            opacity: 0.08;
+            top: 0; left: 0; bottom: 0; right: 0;
+            position: absolute;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .selected-card {
+            background-color: var(--table-hover-row) !important;
+            border-color: var(--panel-header) !important;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2) !important;
+        }
+        /* Smooth expansion styles */
+        .bonafide-expand-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            margin-top: 0;
+            padding-top: 0;
+        }
+        .bonafide-expand-details.expanded {
+            max-height: 1500px; /* High enough to fit the review form */
+            opacity: 1;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+        }
+        .preview-header-modern {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 16px 18px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+        .preview-header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+        .preview-header-icon {
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .preview-header-text h3 {
+            margin: 0;
+            color: white;
+            font-size: 1.05em;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        .preview-header-text p {
+            margin: 2px 0 0 0;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.75em;
+            font-weight: 400;
+        }
+        .preview-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .zoom-control {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 10px;
+            border-radius: 8px;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+        }
+        .zoom-control img {
+            width: 18px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .zoom-control img:hover {
+            transform: scale(1.1);
+        }
+        .zoom-level {
+            font-weight: 600;
+            font-size: 12px;
+            color: white;
+            min-width: 35px;
+            text-align: center;
+        }
+        .header-divider {
+            width: 1px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .action-btn {
+            padding: 7px 12px;
+            font-size: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            color: white;
+        }
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .btn-save {
+            background: #10b981;
+        }
+        .btn-save:hover {
+            background: #059669;
+        }
+        .btn-pdf {
+            background: #f59e0b;
+        }
+        .btn-pdf:hover {
+            background: #d97706;
+        }
+        .btn-reset {
+            background: #6b7280;
+        }
+        .btn-reset:hover {
+            background: #4b5563;
+        }
+        .btn-signed {
+            background: #06b6d4;
+        }
+        .btn-signed:hover {
+            background: #0891b2;
+        }
+    </style>
+    <div class="bonafide-wrapper" style="display: flex; gap: 20px;">
+        <div id="bonafide-left" class="bonafide-left" style="flex: 1;">
+            <div class="panel-header" style="margin-bottom: 20px;">Bonafide Manager</div>
+            
+            <!-- Section 1 & 3: Pending Requests + Review/Form Area (Inline) -->
+            <div style="display: flex; gap: 20px;">
+                <!-- Pending Requests List -->
+                <div id="bonafide-requests-container" style="flex: 0 0 35%; display: none;">
+                    <div style="font-size: 0.85em; font-weight: bold; color: var(--panel-header); margin-bottom: 10px; text-transform: uppercase;">Incoming Requests</div>
+                    <div id="pending-bonafides-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 400px; overflow-y: auto; padding: 2px;"></div>
+                </div>
+
+                <!-- Review/Form Area -->
+                <div id="bonafide-details-form" style="flex: 1; display: flex; flex-direction: column; gap: 15px;">
+                    <div style="text-align: center; padding: 40px 20px; color: #a0aec0; background: var(--card-bg); border-radius: 12px; border: 2px dashed var(--border-color);">
+                        <p style="font-size: 0.9em;">Select a request or search by ID to review details.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="bonafide-preview" class="bonafide-right" style="flex: 0 0 35%; display: flex; flex-direction: column; border-radius: 12px; overflow: hidden; background: var(--card-bg);">
+            <div class="preview-header-modern no-print">
+                <div class="preview-header-title">
+                    <div class="preview-header-icon">📄</div>
+                    <div class="preview-header-text">
+                        <h3>Document Preview</h3>
+                        <p>Live certificate view</p>
+                    </div>
+                </div>
+                <div class="preview-controls" id="bonafide-zoom-controls" style="display: none;">
+                    <div class="zoom-control">
+                        <img src="{% static 'images/ZOOM_OUT.jpeg' %}" onclick="zoomOut()" alt="Zoom Out" title="Zoom Out">
+                        <span class="zoom-level" id="zoom-level">100%</span>
+                        <img src="{% static 'images/ZOOM_IN.jpeg' %}" onclick="zoomIn()" alt="Zoom In" title="Zoom In">
+                    </div>
+                </div>
+            </div>
+            <div id="bonafide-generated-content" class="preview-container" style="flex: 1; overflow-y: auto;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Bonafide Logic & State
+    const baseFitZoom = 0.45; 
+    let displayZoomPercent = 100;
+    let currentZoom = baseFitZoom; 
+    let currentBonafideCertNum = null;
+    let currentBonafideYear = null;
+    let currentBonafideDate = null;
+    let currentBonafideRequestId = null;
+    let currentBonafideStatus = "";
+
+    function getBonafideDetails() {
+        const profile = document.getElementById('bonafide_profile').value;
+        const id = document.getElementById('bonafide_id').value;
+        const container = document.getElementById('bonafide-left');
+
+        if (!profile || !id) {
+            SchoolUtils.showPopup("Please select a profile and enter an ID.", "error");
+            return;
+        }
+        
+        window.pendingBonafideCertNo = null;
+        window.pendingBonafideCertNumInt = null;
+        window.pendingBonafideDate = null;
+        currentBonafideRequestId = null;
+
+        fetch("{% url 'student_get' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+            body: JSON.stringify({ planner_pk: profile, planner_sk: id })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.user_info) {
+                const info = data.user_info;
+                let form = document.getElementById('bonafide-details-form');
+                const inputClass = "textBoxClass fee-input-styled"; 
+                const inputStyle = "flex: 1; text-align: left; width: auto;";
+
+                form.innerHTML = `
+                    <input type="hidden" id="bonafide_res_profile" value="${profile}">
+                    <div class="fee-entry-row">
+                        <label class="fee-label-styled" style="width: 60px;">Name</label>
+                        <input type="text" id="bonafide_name" class="${inputClass}" value="${info.name || ''}" readonly style="${inputStyle}">
+                    </div>
+                    <div class="fee-entry-row">
+                        <label class="fee-label-styled" style="width: 60px;">ID</label>
+                        <input type="text" id="bonafide_sk" class="${inputClass}" value="${info.planner_sk || ''}" readonly style="${inputStyle}">
+                    </div>
+                    <div class="fee-entry-row">
+                        <label class="fee-label-styled" style="width: 60px;">EMIS No</label>
+                        <input type="text" id="bonafide_emis" class="${inputClass}" value="${info.emis || ''}" readonly style="${inputStyle}">
+                    </div>
+                    <div class="fee-entry-row">
+                        <label class="fee-label-styled" style="width: 60px;">Standard</label>
+                        <input type="text" id="bonafide_std" class="${inputClass}" value="${info.std || ''}" readonly style="${inputStyle}">
+                    </div>
+                    <div class="fee-entry-row">
+                        <label class="fee-label-styled" style="width: 60px;">DOJ</label>
+                        <input type="text" id="bonafide_doj" class="${inputClass}" value="${info.doj || ''}" readonly style="${inputStyle}">
+                    </div>
+                    <div class="fee-entry-row">
+                        <label class="fee-label-styled" style="width: 60px;">DOL</label>
+                        <input type="text" id="bonafide_dol" class="${inputClass}" value="${info.dol || ''}" readonly style="${inputStyle}">
+                    </div>
+                    <div class="action-buttons">
+                        <button type="button" class="sidebar-link active" id="btn-prepare-b" onclick="generateBonafide()">Generate</button>
+                        <div id="bonafide-btns" style="display:none; flex-direction:column; gap:10px; width:100%;">
+                            <div style="display:flex; gap:15px; width:100%;">
+                                <button class="sidebar-link active" onclick="saveBonafide()" id="btn-save-record-b" style="flex:1; margin:0; background: #10b981;" title="Save Record">Save</button>
+                                <button class="sidebar-link active" onclick="saveBonafidePDF()" id="btn-pdf-b" style="display:none; flex:1; margin:0; background: #f59e0b;" title="Download PDF">Print</button>
+                            </div>
+                            <div style="display:flex; gap:15px; width:100%;">
+                                <button class="sidebar-link active" onclick="markBonafideSigned()" id="btn-signed-b" style="display:none; flex:1; margin:0; background: #06b6d4;" title="Mark as Signed">Signed</button>
+                                <button class="sidebar-link active" onclick="resetBonafidePage()" id="btn-reset-b" style="flex:1; margin:0; background: #6b7280;" title="Reset">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                if (info.bonafide && info.bonafide.length > 0) {
+                    let historyHtml = '<div style="margin-top: 20px;"><div class="panel-header" style="font-size: 1em; border-bottom: 1px solid #014458;">History</div>';
+                    historyHtml += '<table class="styled-table" style="font-size: 0.8em;"><thead><tr>';
+                    historyHtml += '<th style="padding: 5px;">Cert Num</th><th style="padding: 5px;">Date Issued</th><th style="padding: 5px;">Generated By</th><th style="padding: 5px;">Std</th></tr></thead><tbody>';
+                    
+                    [...info.bonafide].reverse().forEach(cert => {
+                        historyHtml += `<tr>
+                            <td style="padding: 4px;">${cert.cert_no || '-'}</td>
+                            <td style="padding: 4px;">${cert.dateIssued || cert.date || '-'}</td>
+                            <td style="padding: 4px;">${cert.generated_by || '-'}</td>
+                            <td style="padding: 4px;">${cert.std || '-'}</td>
+                        </tr>`;
+                    });
+                    historyHtml += '</tbody></table></div>';
+                    form.innerHTML += historyHtml;
+                }
+            } else {
+                SchoolUtils.showPopup("User not found.", "error");
+            }
+        })
+        .catch(error => SchoolUtils.showPopup("An error occurred while fetching details.", "error"));
+    }
+
+    function generateBonafide() {
+        displayZoomPercent = 100;
+        currentZoom = baseFitZoom;
+
+        const msgs = JSON.parse(document.getElementById('bonafide-msg-data').textContent) || {};
+        const profile = document.getElementById('bonafide_res_profile').value;
+        
+        if (!profile || !msgs[profile]) {
+            SchoolUtils.showPopup("Message template not found for selected profile.", "error");
+            return;
+        }
+
+        if (window.pendingBonafideCertNumInt) {
+            renderBonafide(window.pendingBonafideCertNumInt, window.pendingBonafideDate);
+        } else {
+            fetch("{% url 'student_get' %}", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+                body: JSON.stringify({ planner_pk: "bonafide_num" })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const certNum = (data.success && data.next_num) ? data.next_num : 1;
+                renderBonafide(certNum, null);
+            })
+            .catch(err => SchoolUtils.showPopup("Error retrieving certificate number: " + err, "error"));
+        }
+        
+        function renderBonafide(certNum, savedDate) {
+            currentBonafideCertNum = certNum;
+            
+            let msg = msgs[profile];
+            const name = document.getElementById('bonafide_name').value;
+            const id = document.getElementById('bonafide_sk').value;
+            const emis = document.getElementById('bonafide_emis').value;
+            const std = document.getElementById('bonafide_std').value;
+            const doj = document.getElementById('bonafide_doj').value;
+            const dol = document.getElementById('bonafide_dol').value;
+            const schoolName = "{{ schoolInformation.schoolName }}";
+            
+            const today = new Date();
+            const curMonth = today.getMonth() + 1;
+            const curYear = today.getFullYear();
+            const acYear = curMonth >= 6 ? `${curYear}-${curYear + 1}` : `${curYear - 1}-${curYear}`;
+            
+            let formattedDate = savedDate;
+            if (!formattedDate) {
+                const dd = String(today.getDate()).padStart(2, '0');
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
+                formattedDate = `${dd}/${mm}/${curYear}`;
+            }
+            
+            currentBonafideDate = formattedDate;
+            currentBonafideYear = curYear;
+
+            msg = msg.replace('[Name]', `<b>${name}</b>`).replace('[SID]', id).replace('[TID]', id);
+            msg = msg.replace('[EMIS No: ]', emis ? `EMIS No: <b>${emis}</b>` : '').replace('[School Name]', schoolName);
+            msg = msg.replace('[Class]', `<b>${std}</b>`).replace('[Year]', acYear);
+            
+            if (dol && dol.trim() !== '') {
+                msg = msg.replace('since [Joining Date]', `from ${doj} to ${dol}`).replace('[Joining Date]', `${doj} to ${dol}`);
+            } else {
+                msg = msg.replace('[Joining Date]', doj);
+            }
+
+            document.getElementById('bonafide-generated-content').innerHTML = `
+                <div id="certificate-view" class="watermark-bg" style="
+                    background-color: white; padding: 60px 80px; padding-top: 80px; 
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.15); 
+                    font-size: 14pt; line-height: 1.6; width: 210mm; min-height: 297mm;
+                    position: relative; margin: 40px auto; zoom: ${currentZoom};">
+                    <div class="letterhead-bonafide">
+                        <img src="{% static 'images/Glassed_LOGO_NOBG.png' %}" class="letterhead-logo-bonafide" alt="Trust Logo">
+                        <div class="letterhead-text-bonafide">
+                            <h1 class="letterhead-title-bonafide"><b>{{schoolInformation.schoolName}}</b></h1>
+                            <p class="letterhead-sub-bonafide">{{schoolInformation.schoolAddress}}</p>
+                            <div class="letterhead-reg-bonafide">{{schoolInformation.schoolRegistrationNumber}}</div>
+                            <div class="letterhead-contact-bonafide">Mobile: {{schoolInformation.trustMobile}} | Email: {{schoolInformation.trustEmail}}</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 30px; margin-top: 80px; font-size: 12pt;">
+                        <div>Cert. No. : VSBC/${certNum}/${curYear}</div>
+                        <div>Date : ${formattedDate}</div>
+                    </div>
+                    <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 100px;">TO WHOMSOEVER IT MAY CONCERN</div>
+                    <div style="text-align: justify; line-height: 2.0;"><p>${msg}</p></div>
+                    <div style="margin-top: 150px; text-align: right; font-weight: bold; font-size: 12px; margin-right: 20px;">Correspondent / Principal</div>
+                </div>`;
+            
+            document.getElementById('zoom-level').innerText = displayZoomPercent + '%';
+            if (document.getElementById('bonafide-zoom-controls')) document.getElementById('bonafide-zoom-controls').style.display = 'flex';
+            if (document.getElementById('bonafide-btns')) document.getElementById('bonafide-btns').style.display = 'flex';
+            if (document.getElementById('btn-prepare-b')) document.getElementById('btn-prepare-b').style.display = 'none';
+            if (document.getElementById('btn-save-record-b')) document.getElementById('btn-save-record-b').style.display = 'block';
+            if (document.getElementById('btn-pdf-b')) document.getElementById('btn-pdf-b').style.display = 'none';
+            if (document.getElementById('btn-signed-b')) document.getElementById('btn-signed-b').style.display = 'none';
+        }
+    }
+
+    function saveBonafide() {
+        if (!currentBonafideCertNum) { SchoolUtils.showPopup("Please generate a certificate first.", "error"); return; }
+        const payload = {
+            profile: document.getElementById('bonafide_res_profile').value,
+            id: document.getElementById('bonafide_sk').value,
+            name: document.getElementById('bonafide_name').value,
+            emis: document.getElementById('bonafide_emis').value,
+            std: document.getElementById('bonafide_std').value,
+            doj: document.getElementById('bonafide_doj').value,
+            dol: document.getElementById('bonafide_dol').value,
+            date: currentBonafideDate,
+            cert_num_int: currentBonafideCertNum,
+            cert_no: `VSBC/${currentBonafideCertNum}/${currentBonafideYear}`,
+            generated_by: "{{ request.session.user.user }}",
+            req_id: currentBonafideRequestId
+        };
+
+        fetch("{% url 'save_bonafide' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                SchoolUtils.showPopup(data.message, "success");
+                if (document.getElementById('btn-save-record-b')) document.getElementById('btn-save-record-b').style.display = 'none';
+                if (document.getElementById('btn-pdf-b')) document.getElementById('btn-pdf-b').style.display = 'block';
+                if (currentBonafideRequestId) {
+                    fetch("{% url 'approve_voucher' %}", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+                        body: JSON.stringify({ item_id: currentBonafideRequestId, action: 'Saved', type: 'Bonafide' })
+                    }).then(() => { if (typeof fetchPendingVouchers === "function") fetchPendingVouchers(); });
+                }
+            } else SchoolUtils.showPopup("Error saving: " + data.error, "error");
+        })
+        .catch(err => SchoolUtils.showPopup("Network Error: " + err, "error"));
+    }
+
+    function saveBonafidePDF() {
+        const { jsPDF } = window.jspdf;
+        const element = document.getElementById("certificate-view");
+        if (!element) return;
+        html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+            const imgData = canvas.toDataURL('image/jpeg', 0.8);
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            pdf.addImage(imgData, 'JPEG', 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
+            pdf.save(`${currentBonafideCertNum ? `VSBC_${currentBonafideCertNum}` : "BONAFIDE"}.pdf`);
+            if (currentBonafideRequestId && document.getElementById('btn-signed-b')) document.getElementById('btn-signed-b').style.display = 'block';
+            SchoolUtils.showPopup("After saving the PDF, please click the 'Signed' button to finalize the record.", "success");
+        });
+    }
+
+    function markBonafideSigned() {
+        if (!currentBonafideRequestId) return;
+        if(!confirm("Once marked as Signed, this record cannot be modified or downloaded again. Continue?")) return;
+        fetch("{% url 'approve_voucher' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+            body: JSON.stringify({ item_id: currentBonafideRequestId, action: 'Signed', type: 'Bonafide' })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                SchoolUtils.showPopup("Bonafide record successfully marked as Signed", "success");
+                if (typeof fetchPendingVouchers === "function") fetchPendingVouchers();
+                if (document.getElementById('bonafide-btns')) document.getElementById('bonafide-btns').style.display = 'none';
+                if (document.getElementById('bonafide-zoom-controls')) document.getElementById('bonafide-zoom-controls').style.display = 'none';
+                document.getElementById('bonafide-generated-content').innerHTML = '';
+            } else SchoolUtils.showPopup(data.error, "error");
+        })
+        .catch(err => SchoolUtils.showPopup("Error updating status", "error"));
+    }
+
+    function resetBonafidePage() {
+        const idSearch = document.getElementById('bonafide_id');
+        if (idSearch) idSearch.value = '';
+        document.getElementById('bonafide-details-form').innerHTML = `
+            <div style="text-align: center; padding: 40px 20px; color: #a0aec0; background: var(--card-bg); border-radius: 12px; border: 2px dashed var(--border-color);">
+                <p style="font-size: 0.9em;">Select a request or search by ID to review details.</p>
+            </div>`;
+        document.getElementById('bonafide-generated-content').innerHTML = '';
+        if (document.getElementById('bonafide-btns')) document.getElementById('bonafide-btns').style.display = 'none';
+        if (document.getElementById('bonafide-zoom-controls')) document.getElementById('bonafide-zoom-controls').style.display = 'none';
+        currentBonafideCertNum = null; currentBonafideRequestId = null;
+        window.pendingBonafideCertNo = null;
+        window.pendingBonafideCertNumInt = null;
+        window.pendingBonafideDate = null;
+        SchoolUtils.showPopup("Bonafide Manager Reset.", "success");
+    }
+
+    function zoomIn() {
+        displayZoomPercent += 10;
+        currentZoom = baseFitZoom * (displayZoomPercent / 100);
+        const view = document.getElementById('certificate-view');
+        if(view) view.style.zoom = currentZoom;
+        document.getElementById('zoom-level').innerText = displayZoomPercent + '%';
+    }
+    function zoomOut() {
+        if (displayZoomPercent > 10) {
+            displayZoomPercent -= 10;
+            currentZoom = baseFitZoom * (displayZoomPercent / 100);
+            const view = document.getElementById('certificate-view');
+            if(view) view.style.zoom = currentZoom;
+            document.getElementById('zoom-level').innerText = displayZoomPercent + '%';
+        }
+    }
+</script>

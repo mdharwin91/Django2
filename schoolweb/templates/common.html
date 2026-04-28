@@ -1,0 +1,99 @@
+{% load static %}
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+        <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
+        <link rel="apple-touch-icon" href="{% static 'images/favicon.ico' %}">
+        {% block css %}
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        {% endblock %}
+        <style>
+            :root {
+                --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                --card-bg: #ffffff;
+                --text-main: #333;
+                --header-gradient: linear-gradient(135deg, #014458 0%, #016b8a 100%);
+                --border-color: #eaeaea;
+            }
+
+            [data-theme="dark"] {
+                --bg-gradient: #000000;
+                --card-bg: #2d3748;
+                --text-main: #f7fafc;
+                --header-gradient: linear-gradient(135deg, #000000 0%, #1a202c 100%);
+                --border-color: #4a5568;
+            }
+
+            body { background: var(--bg-gradient) !important; color: var(--text-main); }
+
+            .profile-card {
+                background: var(--card-bg);
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                max-width: 800px;
+                margin: 40px auto;
+                border: 1px solid var(--border-color);
+                overflow: hidden;
+            }
+            .profile-header {
+                background: var(--header-gradient);
+                color: #fff;
+                padding: 25px;
+                text-align: center;
+                font-size: 22px;
+                font-weight: 600;
+            }
+            .profile-content { padding: 30px; display: flex; gap: 20px; }
+            .profile-info-list { flex: 1; }
+            .info-item { display: flex; padding: 15px 0; border-bottom: 1px solid var(--border-color); align-items: center; }
+            .info-item:last-child { border-bottom: none; }
+            .info-label { width: 140px; font-weight: 600; color: var(--text-main); opacity: 0.7; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+            .info-value { flex: 1; color: var(--text-main); font-size: 16px; font-weight: 500; }
+
+            @media (max-width: 600px) {
+                .profile-card { margin: 20px 10px; }
+                .info-item { flex-direction: column; align-items: flex-start; gap: 5px; }
+                .info-label { width: 100%; }
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- COMMON HEADER -->
+        {% include "header.html" %} 
+        {% include "logout.html" %} 
+        {% include "navig2.html" %} 
+
+    <div style="text-align: center; margin-top: 60px; color: var(--text-main);">
+        <h2 style="font-weight: 600; font-size: 28px; margin-bottom: 10px;">Welcome, {{ request.session.user.user }}!</h2>
+        <p style="opacity: 0.8; font-size: 16px;">You are now logged into the school portal. Your profile details are listed below.</p>
+    </div>
+
+    <div class="profile-card">
+        <div class="profile-header">My Profile Information</div>
+        <div class="profile-content">
+            <div class="profile-info-list">
+                <div class="info-item">
+                    <div class="info-label">Name</div><div class="info-value">: {{ profile_info.name|default:"N/A" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">User ID</div><div class="info-value">: {{ profile_info.planner_sk|default:"N/A" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Standard</div><div class="info-value">: {{ profile_info.std|default:"N/A" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Date of Birth</div><div class="info-value">: {{ profile_info.dob|default:"N/A" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">EMIS Number</div><div class="info-value">: {{ profile_info.emis|default:"N/A" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Mobile Number</div><div class="info-value">: {{ profile_info.mobile|default:"N/A" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </body>
+</html>

@@ -1,0 +1,739 @@
+{% load static %}
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+        <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
+        <link rel="apple-touch-icon" href="{% static 'images/favicon.ico' %}">
+        {% block css %}
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        {% endblock %}
+        <script src="{% static 'js/utils.js' %}"></script>
+        <style>
+            :root {
+                --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                --card-bg: #f9f9f9;
+                --text-main: #333;
+                --panel-header: #014458;
+                --border-color: #ccc;
+            }
+
+            [data-theme="dark"] {
+                --bg-gradient: #1a202c;
+                --card-bg: #2d3748;
+                --text-main: #f7fafc;
+                --panel-header: #81e6d9;
+                --border-color: #4a5568;
+                --input-bg: #374151;
+                --input-text: #e2e8f0;
+                --input-border: #4a5568;
+            }
+
+            body { background: var(--bg-gradient) !important; color: var(--text-main); }
+
+            .profile-container {
+                display: flex;
+                gap: 20px;
+                padding: 0 2%;
+                align-items: flex-start;
+            }
+            .left-view, .right-view {
+                padding: 20px;
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                background-color: var(--card-bg);
+                color: var(--text-main);
+            }
+            .textBoxClass {
+                background-color: var(--input-bg, white);
+                color: var(--input-text, #333);
+                border: 1px solid var(--input-border, #ccc);
+            }
+            .left-view {
+                flex: 2; /* Takes 2/3 of the space */
+            }
+            .left-view form {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px 4%;
+            }
+            .right-view {
+                flex: 1; /* Takes 1/3 of the space */
+            }
+            .form-row {
+                display: flex;
+                align-items: center;
+                width: 48%;
+                margin-bottom: 0;
+            }
+            .form-row.full-width {
+                width: 100%;
+            }
+            .form-row .labelClass {
+                width: 130px;
+                flex-shrink: 0;
+                margin-right: 10px;
+                text-align: left;
+                font-weight: bold;
+                color: var(--text-main);
+                white-space: nowrap;
+            }
+            .form-row .textBoxClass, .form-row select {
+                flex-grow: 1;
+                width: auto;
+                box-sizing: border-box; /* Important for padding and border */
+            }
+            .button-group {
+                width: 100%;
+                margin-top: 25px;
+                padding-top: 15px;
+                border-top: 1px solid #eee;
+                text-align: center;
+            }
+            .button-group .sidebar-link.active {
+                margin: 0 8px;
+            }
+            .right-view .control-group {
+                margin-bottom: 20px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #eee;
+            }
+            .right-view .control-group h3 {
+                text-align: center;
+                margin-top: 0;
+                margin-bottom: 15px;
+            }
+            .right-view .control-group .textBoxClass, .right-view .control-group select, .right-view .control-group .sidebar-link.active {
+                width: 100%;
+                margin-bottom: 10px;
+                box-sizing: border-box;
+            }
+            .right-view .action-buttons .sidebar-link.active {
+                display: block;
+                width: 100%;
+                margin: 10px 0;
+                box-sizing: border-box;
+            }
+            #passwordModal .form-row {
+                align-items: baseline;
+            }
+            #passwordModal .form-row div {
+                flex-grow: 1;
+            }
+            #passwordModal .textBoxClass {
+                width: 100%;
+                box-sizing: border-box;
+            }
+            #edit-message {
+                position: fixed;
+                top: 15%;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 15px 25px;
+                border-radius: 8px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+                z-index: 3000;
+            }
+            .edited-label {
+                color: #28a745 !important; /* Green */
+            }
+            .sidebar-link {
+                display: block;
+                padding: 12px 15px;
+                color: #fff;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                text-decoration: none;
+                font-weight: bold;
+                font-size: large;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+                margin-bottom: 8px;
+                border: none;
+            }
+            .sidebar-link:hover {
+                background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            }
+            .sidebar-link.active {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            }
+            .button-group {
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+                margin-top: 20px;
+            }
+            .button-group button {
+                flex: 1;
+                max-width: 120px;
+                white-space: nowrap;
+            }
+
+            @media (max-width: 768px) {
+                .profile-container { flex-direction: column; }
+                .left-view, .right-view { width: 100%; flex: none; margin-bottom: 20px; box-sizing: border-box; }
+                .left-view form { flex-direction: column; }
+                .form-row { width: 100% !important; flex-direction: column; align-items: flex-start; }
+                .form-row .labelClass { width: 100%; margin-bottom: 5px; }
+                .button-group { flex-wrap: wrap; }
+                .button-group button { flex: 1 1 100px; max-width: none; }
+                #img-preview-row { flex-direction: column; align-items: center; gap: 10px; }
+            }
+        </style>
+    </head>
+
+    <body>
+    <!-- COMMON HEADER -->
+    {% include "header.html" %} 
+    {% include "logout.html" %} 
+    {% include "navig2.html" %} 
+    <div class="block-title"><b>Profile:</b></br></div>
+
+    <div class="profile-container" style="margin-top: 50px;">
+        <div class="left-view">
+        <form action = "" method = "post">
+            {% csrf_token %}
+            <div id="edit-message" style="display:none; font-weight: bold; text-align: center;"></div>
+            
+            <div class="form-row">
+                <label class="labelClass">Profile</label>
+                <select id="cell-planner_pk" name="planner_pk" class="textBoxClass" onchange="toggleTeacherFields()">
+                    <option value="Student" {% if not user_info.planner_pk or user_info.planner_pk == 'Student' %}selected{% endif %}>Student</option>
+                    {% for p in profiles %}
+                        <option value="{{ p.0|escape }}" {% if user_info.planner_pk == p.0 %}selected{% endif %}>{{ p.1|escape }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label id="lbl-planner_sk" class="labelClass">Student ID</label>
+                <input id="cell-planner_sk" name="planner_sk" class="textBoxClass" value="{{ user_info.planner_sk|default:''|escape }}" >
+            </div>
+            <div class="form-row">
+                <label id="lbl-name" class="labelClass">Student Name</label>
+                <input id="cell-name" name="name" class="textBoxClass" value="{{ user_info.name|default:''|escape }}">
+            </div>
+            <div class="form-row">
+                <label class="labelClass">Standard</label>
+                <select id="cell-std" name="std" class="textBoxClass">
+                    <option value="">Standard</option>
+                    {% for s in standards %}
+                        <option value="{{ s.0|escape }}" {% if user_info.std == s.0 %}selected{% endif %}>{{ s.1|escape }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label class="labelClass">Date of Birth</label>
+                <input type="date" id="cell-dob" name="dob" class="textBoxClass" value="{{ user_info.dob|default:''|escape }}">
+            </div>
+            <div class="form-row">
+                <label class="labelClass">Emis</label>
+                <input id="cell-emis" name="emis" class="textBoxClass" value="{{ user_info.emis|default:''|escape }}">
+            </div>
+            <div class="form-row">
+                <label class="labelClass">Date of Join</label>
+                <input type="date" id="cell-doj" name="doj" class="textBoxClass" value="{{ user_info.doj|default:''|escape }}">
+            </div>
+            <div class="form-row">
+                <label class="labelClass">Mobile</label>
+                <input type="tel" id="cell-mobile" name="mobile" class="textBoxClass" value="{{ user_info.mobile|default:''|escape }}" pattern="\d{10}" maxlength="10" title="Please enter exactly 10 digits">
+            </div>
+            <div class="form-row">
+                <label class="labelClass">Free Edu</label>
+                <select id="cell-free_edu" name="free_edu" class="textBoxClass">
+                    <option value="">Select</option>
+                    {% for f in free_edu_choices %}
+                        <option value="{{ f.0|escape }}" {% if user_info.free_edu == f.0 %}selected{% endif %}>{{ f.1|escape }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label class="labelClass">Age</label>
+                <input id="cell-age" name="age" class="textBoxClass" value="{{ user_info.age|default:''|escape }}">
+            </div>
+            <div class="form-row">
+                <label class="labelClass">Date of Leaving</label>
+                <input type="date" id="cell-dol" name="dol" class="textBoxClass" value="{{ user_info.dol|default:''|escape }}">
+            </div>
+            <div class="form-row">
+                <label class="labelClass">Status</label>
+                <select id="cell-status" name="status" class="textBoxClass">
+                    <option value="">Status</option>
+                    {% for status in statuses %}
+                        <option value="{{ status.0|escape }}" {% if user_info.status == status.0 %}selected{% endif %}>{{ status.1|escape }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="button-group">
+                <button id="btn-update" type="button" class="sidebar-link active" onclick="update_student(event)" style="display:none">Update</button>
+                <button id="btn-save" type="submit" class="sidebar-link active">Save</button>
+                <button type="button" class="sidebar-link active" onclick="reset_student()">Reset</button>
+            </div>
+            </form>
+        </div>
+        <div class="right-view">
+            <form action = "{% url 'student_get' %}" method = "post">
+                {% csrf_token %}
+                <div class="control-group">
+                    <h3>Fetch Profile</h3>
+                    <select id="planner_pk" class="textBoxClass" onchange="updateSearchPlaceholder()">
+                        <option value="" >Profile</option>
+                        {% for p in profiles %}
+                            <option value="{{ p.0|escape }}" {% if user_info.planner_pk == p.0 %}selected{% endif %}>{{ p.1|escape }}</option>
+                        {% endfor %}
+                    </select>
+                    <input id="planner_sk" placeholder="Student ID" value="" type="text" class="textBoxClass">
+                    <button type="button" class="sidebar-link active" onclick="student_get(event)">Fetch</button>
+                </div>
+                <div class="action-buttons">
+                    <button id="edit-button" type="button" class="sidebar-link active" onclick="edit_student(event)" style="display:none">Edit</button>
+                    <button id="change-password-btn" type="button" class="sidebar-link active" onclick="openChangePasswordModal()" style="display:none;">Change Password</button>
+                    {% if current_user_role == "Admin" %}
+                    <button id="reset-password-btn" type="button" class="sidebar-link active" onclick="openResetPasswordModal()" style="display:none;">Reset Password</button>
+                    {% endif %}
+                </div>
+
+                        <script>
+                            let editMessageTimeout;
+                            function showPopup(message, type) {
+                                const el = document.getElementById('edit-message');
+                                el.innerText = message;
+                                el.style.display = 'block';
+                                if (type === 'success') {
+                                    el.style.backgroundColor = '#d4edda';
+                                    el.style.color = '#155724';
+                                    el.style.border = '1px solid #c3e6cb';
+                                } else {
+                                    el.style.backgroundColor = '#f8d7da';
+                                    el.style.color = '#721c24';
+                                    el.style.border = '1px solid #f5c6cb';
+                                }
+                                if (editMessageTimeout) clearTimeout(editMessageTimeout);
+                                editMessageTimeout = setTimeout(() => { el.style.display = 'none'; }, 3000);
+                            }
+
+                            function student_get(event) {
+                                event.preventDefault(); // Prevent default form submission
+
+                                // Get the values from the fields
+                                const plannerPk = document.getElementById('planner_pk').value;
+                                const plannerSk = document.getElementById('planner_sk').value;
+
+                                // Validate inputs
+                                if (!plannerPk || !plannerSk) {
+                                    showPopup("Please enter both Profile ID and Student ID", "error");
+                                    return;
+                                }
+
+                                // Send the data using fetch
+                                fetch("{% url 'student_get' %}", {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                        "X-CSRFToken": "{{ csrf_token }}", // Include CSRF token
+                                    },
+                                    body: JSON.stringify({
+                                        planner_pk: plannerPk,
+                                        planner_sk: plannerSk.padStart(4, '0'),
+                                    }),
+                                })
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('Network response was not ok');
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    // Update only the left-view with student data
+                                    console.log("Received data:", data);
+                                    if (data.user_info) {
+                                        const info = data.user_info;
+                                        console.log("Student info:", info);
+                                        // Update input fields by ID using .value
+
+                                        showPopup("This is NOT editable, click Edit button to make changes.", "error");
+                                        if (document.getElementById('cell-planner_pk')) document.getElementById('cell-planner_pk').value = info.planner_pk || '';
+                                        if (document.getElementById('cell-planner_sk')) document.getElementById('cell-planner_sk').value = info.planner_sk || '';
+                                        // Also pre-select the Profile dropdown used for fetching
+                                        if (document.getElementById('planner_pk')) document.getElementById('planner_pk').value = info.planner_pk || '';
+                                        if (document.getElementById('cell-name')) document.getElementById('cell-name').value = info.name || '';
+                                        if (document.getElementById('cell-std')) document.getElementById('cell-std').value = info.std || '';
+                                        if (document.getElementById('cell-std')) document.getElementById('cell-std').readOnly = true;
+                                        if (document.getElementById('cell-dob')) document.getElementById('cell-dob').value = info.dob || '';
+                                        if (document.getElementById('cell-emis')) document.getElementById('cell-emis').value = info.emis || '';
+                                        if (document.getElementById('cell-doj')) document.getElementById('cell-doj').value = info.doj || '';
+                                        if (document.getElementById('cell-mobile')) document.getElementById('cell-mobile').value = info.mobile || '';
+                                        if (document.getElementById('cell-free_edu')) document.getElementById('cell-free_edu').value = info.free_edu || '';
+                                        if (document.getElementById('cell-age')) document.getElementById('cell-age').value = info.age || '';
+                                        if (document.getElementById('cell-dol')) document.getElementById('cell-dol').value = info.dol || '';
+                                        if (document.getElementById('cell-status')) document.getElementById('cell-status').value = info.status || '';
+
+                                        if (document.getElementById('stored_current_password')) document.getElementById('stored_current_password').value = info.password || '';
+                                        document.getElementById('cell-planner_pk').readOnly = true;
+                                        document.getElementById('cell-planner_sk').readOnly = true;
+                                        document.getElementById('cell-name').readOnly = true;
+                                        document.getElementById('cell-emis').readOnly = true;
+                                        document.getElementById('cell-doj').readOnly = true;
+                                        document.getElementById('cell-mobile').readOnly = true;
+                                        document.getElementById('cell-free_edu').readOnly = true;
+                                        document.getElementById('cell-age').readOnly = true;
+                                        document.getElementById('cell-dol').readOnly = true;
+                                        document.getElementById('cell-status').readOnly = true; 
+                                        document.getElementById('cell-std').readOnly = true;
+                            SchoolUtils.showPopup(document.getElementById('planner_pk').value + " data fetched successfully!", "success");
+                                        // Show Edit button after successful fetch
+                                        var editBtn = document.getElementById('edit-button');
+                                        if (editBtn) editBtn.style.display = 'inline-block';
+                                        var changePassBtn = document.getElementById('change-password-btn');
+                                        if (changePassBtn) changePassBtn.style.display = 'inline-block';
+                                        var resetPassBtn = document.getElementById('reset-password-btn');
+                                        if (resetPassBtn) resetPassBtn.style.display = 'inline-block';
+                                        document.getElementById('btn-save').style.display = 'none';
+                                    } else {
+                                        console.error("No user_info in response");
+                            SchoolUtils.showPopup("Failed to fetch "+document.getElementById('planner_pk').value + " data", "error");
+                                    }
+                                    toggleTeacherFields();
+                                })
+                                .catch(error => {
+                                    console.error("Error:", error);
+                        SchoolUtils.showPopup("Error fetching "+document.getElementById('planner_pk').value + " data: " + error, "error");
+                                });
+                            }
+
+                            function toggleTeacherFields() {
+                                const profile = document.getElementById('cell-planner_pk').value;
+                                
+                                // Dynamic Label Logic
+                                const labelId = document.getElementById('lbl-planner_sk');
+                                const labelName = document.getElementById('lbl-name');
+                                const prefix = profile || "Student";
+                                if (labelId) labelId.innerText = prefix + " ID ";
+                                if (labelName) labelName.innerText = prefix + " Name ";
+                            }
+
+                            function updateSearchPlaceholder() {
+                                const profile = document.getElementById('planner_pk').value || "Student";
+                                document.getElementById('planner_sk').placeholder = profile + " ID";
+                            }
+
+                            function edit_student(event) {
+                                showPopup("This is editable now, edit & click Update to save changes.", "success");
+                                
+                                // Add listeners to track changes and highlight labels
+                                const inputs = document.querySelectorAll('.left-view input, .left-view select');
+                                inputs.forEach(input => {
+                                    const highlight = () => {
+                                        const row = input.closest('.form-row');
+                                        if (row) {
+                                            const label = row.querySelector('.labelClass');
+                                            if (label) label.classList.add('edited-label');
+                                        }
+                                    };
+                                    input.addEventListener('change', highlight);
+                                    if (input.tagName === 'INPUT' && input.type !== 'file' && input.type !== 'hidden') {
+                                        input.addEventListener('input', highlight);
+                                    }
+                                });
+
+                                document.getElementById('cell-planner_pk').readOnly = false;
+                                document.getElementById('cell-planner_sk').readOnly = false;
+                                document.getElementById('cell-name').readOnly = false;
+                                document.getElementById('cell-std').readOnly = false;
+                                document.getElementById('cell-dob').readOnly = false;
+                                document.getElementById('cell-emis').readOnly = false;
+                                document.getElementById('cell-doj').readOnly = false;
+                                document.getElementById('cell-mobile').readOnly = false;
+                                document.getElementById('cell-free_edu').readOnly = false;
+                                document.getElementById('cell-age').readOnly = false;
+                                document.getElementById('cell-dol').readOnly = false;
+                                document.getElementById('cell-status').readOnly = false;
+                                var updBtn = document.getElementById('btn-update');
+                                if (updBtn) updBtn.style.display = 'inline-block';
+                                // Show Edit button after successful fetch
+                                var editBtn = document.getElementById('edit-button');
+
+                                if (editBtn) editBtn.style.display = 'inline-block';
+                            }
+
+                            function update_student(event) {
+                                event.preventDefault();
+
+                                // Validate Date of Birth (must be >= 3 years ago)
+                                const dobValue = document.getElementById('cell-dob').value;
+                                if (dobValue) {
+                                    const dobDate = new Date(dobValue);
+                                    const today = new Date();
+                                    const threeYearsAgo = new Date(today.getFullYear() - 3, today.getMonth(), today.getDate());
+                                    
+                                    if (dobDate > threeYearsAgo) {
+                                        SchoolUtils.showPopup("Error: Date of Birth must be at least 3 years ago.", "error");
+                                        return;
+                                    }
+                                }
+
+                                // Validate Mobile (must be exactly 10 digits)
+                                const mobileValue = document.getElementById('cell-mobile').value;
+                                const mobileRegex = /^\d{10}$/;
+                                if (mobileValue && !mobileRegex.test(mobileValue)) {
+                                    SchoolUtils.showPopup("Error: Mobile number must be exactly 10 digits.", "error");
+                                    return;
+                                }
+
+                                // Validate Joining Date vs Date of Birth
+                                const dojValue = document.getElementById('cell-doj').value;
+                                if (dobValue && dojValue) {
+                                    const dobDate = new Date(dobValue);
+                                    const dojDate = new Date(dojValue);
+                                    const minDojDate = new Date(dobDate.getFullYear() + 3, dobDate.getMonth(), dobDate.getDate());
+                                    if (dojDate < minDojDate) {
+                                        SchoolUtils.showPopup("Error: Date of Joining must be at least 3 years after Date of Birth.", "error");
+                                        return;
+                                    }
+                                }
+
+                                // Get all the updated values
+                                const updatedData = {
+                                    planner_pk: document.getElementById('cell-planner_pk').value,
+                                    planner_sk: document.getElementById('cell-planner_sk').value,
+                                    name: document.getElementById('cell-name').value,
+                                    std: document.getElementById('cell-std').value,
+                                    dob: document.getElementById('cell-dob').value,
+                                    emis: document.getElementById('cell-emis').value,
+                                    doj: document.getElementById('cell-doj').value,
+                                    mobile: document.getElementById('cell-mobile').value,
+                                    free_edu: document.getElementById('cell-free_edu').value,
+                                    age: document.getElementById('cell-age').value,
+                                    dol: document.getElementById('cell-dol').value,
+                                    status: document.getElementById('cell-status').value
+                                };
+
+                                // Gather list of edited labels
+                                const editedLabels = Array.from(document.querySelectorAll('.edited-label'))
+                                                      .map(label => label.innerText.replace(':', '').trim());
+                                const successMsg = editedLabels.length > 0 
+                                    ? "Updated " + editedLabels.join(", ") 
+                                    : document.getElementById('planner_pk').value + " data updated successfully!";
+
+                                console.log("Updating with data:", updatedData);
+
+                                // Send the update request
+                                fetch("{% url 'student_update' %}", {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                        "X-CSRFToken": "{{ csrf_token }}",
+                                    },
+                                    body: JSON.stringify(updatedData),
+                                })
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('Network response was not ok');
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    console.log("Update response:", data);
+                                    var editBtn = document.getElementById('edit-button');
+                                    if (editBtn) editBtn.style.display = 'none';
+                                    var updBtn = document.getElementById('btn-update');
+                                    if (updBtn) updBtn.style.display = 'none';
+                                    SchoolUtils.showPopup(successMsg, "success");
+                                    // Reset edited labels color
+                                    document.querySelectorAll('.edited-label').forEach(l => l.classList.remove('edited-label'));
+                                })
+                                .catch(error => {
+                                    console.error("Error:", error);
+                                    SchoolUtils.showPopup("Error updating " + document.getElementById('planner_pk').value + " data: " + error, "error");
+                                });
+                            }
+
+                            var isResetMode = false;
+
+                            function openChangePasswordModal() {
+                                // Populate hidden fields with the current user's identifiers
+                                isResetMode = false;
+                                const plannerPk = document.getElementById('cell-planner_pk').value;
+                                const plannerSk = document.getElementById('cell-planner_sk').value;
+
+                                if (!plannerPk || !plannerSk) {
+                                    SchoolUtils.showPopup("Please fetch a user profile first.", "error");
+                                    return;
+                                }
+
+                                document.getElementById('current_entered_password').required = true;
+                                document.getElementById('row_current_password').style.display = 'flex';
+                                document.getElementById('modal_planner_pk').value = plannerPk;
+                                document.getElementById('modal_planner_sk').value = plannerSk;
+                                
+                                // Show the modal
+                                document.getElementById('passwordModal').style.display = 'block';
+                            }
+
+                            function openResetPasswordModal() {
+                                isResetMode = true;
+                                const plannerPk = document.getElementById('cell-planner_pk').value;
+                                const plannerSk = document.getElementById('cell-planner_sk').value;
+
+                                if (!plannerPk || !plannerSk) {
+                                    SchoolUtils.showPopup("Please fetch a user profile first.", "error");
+                                    return;
+                                }
+
+                                document.getElementById('modal_planner_pk').value = plannerPk;
+                                document.getElementById('modal_planner_sk').value = plannerSk;
+                                document.getElementById('current_entered_password').required = false;
+                                document.getElementById('row_current_password').style.display = 'none';
+                                document.getElementById('passwordModal').style.display = 'block';
+                            }
+
+                            function verifyCurrentPassword() {
+                                const entered = document.getElementById('current_entered_password').value;
+                                const stored = document.getElementById('stored_current_password').value;
+                                const tick = document.getElementById('verification_tick');
+                                
+                                if (entered && entered === stored) {
+                                    tick.style.display = 'inline-block';
+                                } else {
+                                    tick.style.display = 'none';
+                                }
+                            }
+
+                            function closeChangePasswordModal() {
+                                // Hide the modal and clear fields
+                                document.getElementById('passwordModal').style.display = 'none';
+                                document.getElementById('current_entered_password').value = '';
+                                document.getElementById('verification_tick').style.display = 'none';
+                                document.getElementById('new_password').value = '';
+                                document.getElementById('confirm_password').value = '';
+                            }
+
+                            function submitNewPassword() {
+                                const currentPassword = document.getElementById('current_entered_password').value;
+                                const storedPassword = document.getElementById('stored_current_password').value;
+                                const newPassword = document.getElementById('new_password').value;
+                                const confirmPassword = document.getElementById('confirm_password').value;
+
+                                if (!isResetMode && currentPassword !== storedPassword) {
+                                    SchoolUtils.showPopup("Current password does not match.", "error");
+                                    return;
+                                }
+
+                                if (!newPassword || newPassword !== confirmPassword) {
+                                    SchoolUtils.showPopup("Passwords do not match or are empty.", "error");
+                                    return;
+                                }
+
+                                const data = {
+                                    planner_pk: document.getElementById('modal_planner_pk').value,
+                                    planner_sk: document.getElementById('modal_planner_sk').value,
+                                    password: newPassword,
+                                };
+
+                                fetch("{% url 'change_password' %}", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+                                    body: JSON.stringify(data),
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        SchoolUtils.showPopup("Password changed successfully!", "success");
+                                        closeChangePasswordModal();
+                                    } else {
+                                        SchoolUtils.showPopup("Error changing password: " + data.error, "error");
+                                    }
+                                })
+                                .catch(error => SchoolUtils.showPopup("An error occurred: " + error, "error"));
+                            }
+
+                            function reset_student() {
+                                 document.getElementById('edit-message').style.display = 'none';
+                                 document.getElementById('edit-button').style.display = 'none';
+                                 document.getElementById('btn-update').style.display = 'none';
+                                 document.getElementById('change-password-btn').style.display = 'none'; 
+                                 if(document.getElementById('reset-password-btn')) document.getElementById('reset-password-btn').style.display = 'none';
+                                 document.getElementById('btn-save').style.display = 'inline-block';
+
+                                // Reset label colors
+                                document.querySelectorAll('.edited-label').forEach(l => l.classList.remove('edited-label'));
+
+                                // Clear fields and remove readOnly
+                                const ids = [
+                                    'cell-planner_pk', 'cell-planner_sk', 'cell-name', 
+                                    'cell-std', 'cell-dob', 'cell-emis', 'cell-doj', 'cell-mobile', 
+                                    'cell-free_edu', 'cell-age', 'cell-dol', 'cell-status'
+                                ];
+                                ids.forEach(id => {
+                                    const el = document.getElementById(id);
+                                    if (el) {
+                                        if (el.tagName === 'SELECT') {
+                                            el.selectedIndex = 0;
+                                        } else {
+                                            el.value = '';
+                                        }
+                                        el.readOnly = false;
+                                    }
+                                });
+                                // Set default profile to student
+                                if(document.getElementById('cell-planner_pk')) document.getElementById('cell-planner_pk').value = 'Student';
+                                toggleTeacherFields();
+                            }
+
+                            // Initialize Date Picker restriction
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const dobInput = document.getElementById('cell-dob');
+                                if (dobInput) {
+                                    const today = new Date();
+                                    const threeYearsAgo = new Date(today.getFullYear() - 3, today.getMonth(), today.getDate());
+                                    // Format to YYYY-MM-DD for the 'max' attribute
+                                    const formattedDate = threeYearsAgo.toISOString().split('T')[0];
+                                    dobInput.setAttribute('max', formattedDate);
+                                }
+                                toggleTeacherFields();
+                            });
+                        </script>
+            </form>
+        </div>
+    </div>
+        <script> document.getElementById('edit-button').style.display = 'none';</script>
+        <!-- Change Password Modal -->
+        <div id="passwordModal" style="display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6);">
+            <div style="background-color: var(--card-bg); margin: 15% auto; padding: 20px; border: 1px solid var(--border-color); width: 450px; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); border-radius: 8px;">
+                <span onclick="closeChangePasswordModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+                <h2 style="color: var(--panel-header);">Change Password</h2>
+                <form id="changePasswordForm" onsubmit="event.preventDefault(); submitNewPassword();">
+                    <input type="hidden" id="modal_planner_pk">
+                    <input type="hidden" id="modal_planner_sk">
+                    <input type="hidden" id="stored_current_password">
+                    <div id="row_current_password" class="form-row">
+                        <label for="current_entered_password" class="labelClass">Current Password</label>
+                        <div>
+                                <input type="password" id="current_entered_password" name="current_entered_password" class="textBoxClass" oninput="verifyCurrentPassword()" required>
+                                <span id="verification_tick" style="display:none; color: green; font-weight: bold; font-size: 20px; margin-left: 5px;">&#10004;</span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label for="new_password" class="labelClass">New Password</label>
+                        <input type="password" id="new_password" name="new_password" class="textBoxClass" required>
+                    </div>
+                    <div class="form-row">
+                        <label for="confirm_password" class="labelClass">Confirm Password</label>
+                        <input type="password" id="confirm_password" name="confirm_password" class="textBoxClass" required>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="sidebar-link active">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% if result %}
+        <script>
+            var res = "{{ result }}";
+            SchoolUtils.showPopup(res, res.toLowerCase().includes("success") ? "success" : "error");
+        </script>
+        {% endif %}
+    </body>
+</html>

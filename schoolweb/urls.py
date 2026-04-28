@@ -1,0 +1,37 @@
+from django.urls import path
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from . import views
+
+urlpatterns = [
+    path('', views.login_page),
+    path('donation/', views.donation_page),
+    path('about/', views.say_sec_hello),
+    path('default/', views.default_page, name='default'),
+    path('contact/', views.contact_us),
+    path('login/', views.login_page, name='login'),
+    path('logout/', views.logout_page, name='logout'),
+    path('common/', views.common_page),    
+    path('adminpage/', views.admin_page, name='adminpage'),
+    path('studentprofile/', views.student_details, name='studentprofile'),
+    path('student_get/', views.student_get, name='student_get'),
+    path('student_update/', views.student_update, name='student_update'),
+    path('teacher/', views.teacher, name='teacher'),
+    path('teacher_fetch/', views.teacher_fetch, name='teacher_fetch'),
+    path('get_fees/', views.get_fees, name='get_fees'),
+    path('change_password/', views.change_password, name='change_password'),
+    path('send_whatsapp/', views.send_whatsapp, name='send_whatsapp'),
+    path('save_fees/', views.save_fees, name='save_fees'),
+    path('get_fee_details/', views.get_fee_details, name='get_fee_details'),
+    path('update_fee_details/', views.update_fee_details, name='update_fee_details'),
+    path('get_all_fee_details/', views.get_all_fee_details, name='get_all_fee_details'),
+    path('save_bonafide/', views.save_bonafide, name='save_bonafide'),
+    path('enquiry_save/', views.enquiry_save, name='enquiry_save'),
+    path('enquiry_delete/', views.enquiry_delete, name='enquiry_delete'),
+    path('voucher_save/', views.voucher_save, name='voucher_save'),
+    path('get_pending_vouchers/', views.get_pending_vouchers, name='get_pending_vouchers'),
+    path('approve_voucher/', views.approve_voucher, name='approve_voucher'),
+    path('get_vouchers_by_mobile/', views.get_vouchers_by_mobile, name='get_vouchers_by_mobile'),
+    path('bonafide_request_save/', views.bonafide_request_save, name='bonafide_request_save'),
+    path('get_my_requests/', views.get_my_requests, name='get_my_requests'),
+]
+urlpatterns += staticfiles_urlpatterns()
