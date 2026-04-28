@@ -24,17 +24,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-_$3-5wsms6g)p_gll*@h-9*+99=wz#p-xuy4d6*txnimu@dwyx')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
+DEBUG = False#os.environ.get('DEBUG', 'True').lower() == 'true'
 
 ALLOWED_HOSTS = ['*']
 
 # CSRF Trusted Origins for Intranet Access
 # Add your machine's local IP address here (e.g., "http://192.168.1.5:8000")
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:8000",
-    # Add your Lightsail public IP or domain after deployment:
-    # "http://<your-lightsail-ip>",
-    # "https://<your-domain.com>",
+    "http://localhost:8000"
 ]
 
 # Application definition
@@ -51,7 +48,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
