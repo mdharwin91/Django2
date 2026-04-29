@@ -1,59 +1,11 @@
 {% load static %}
-        <style>
-            .internal-nav {
-                display: flex;
-                background-color: var(--panel-header, #014458);
-                padding: 0 20px;
-                border-bottom: 2px solid var(--border-color, #667eea);
-                position: fixed;
-                top: 157px; /* Calculated: 132px (Header) + 25px (Logout Bar) */
-                left: 0;
-                width: 100%;
-                z-index: 1998;
-                box-sizing: border-box;
-            }
-            .internal-nav-item {
-                color: white;
-                text-decoration: none;
-                padding: 8px 20px;
-                font-size: 12px;
-                font-weight: bold;
-                transition: all 0.3s;
-                border-right: 1px solid rgba(255,255,255,0.1);
-            }
-            .internal-nav-item:hover {
-                background: rgba(255,255,255,0.1);
-                color: var(--panel-header, #81e6d9);
-            }
-            .internal-nav-item.active {
-                background: rgba(255,255,255,0.15);
-                color: #fbd38d !important; /* Gold/Orange for active dashboard */
-                border-bottom: 2px solid #fbd38d;
-            }
-            [data-theme="dark"] .internal-nav {
-                background-color: var(--sidebar-bg, #2d3748) !important;
-            }
-            [data-theme="dark"] .internal-nav-item {
-                color: #fff;
-            }
-            .internal-nav-spacer { height: 32px; }
-
-            @media (max-width: 768px) {
-                .internal-nav { 
-                    top: 145px; /* Increased to account for potential wrapping in the logout/utility bar */
-                    overflow-x: auto;
-                    white-space: nowrap;
-                    -webkit-overflow-scrolling: touch;
-                }
-                .internal-nav::-webkit-scrollbar { display: none; } /* Hide scrollbar for cleaner mobile look */
-                .internal-nav-spacer { height: 32px; }
-                .internal-nav-item { padding: 8px 12px; font-size: 11px; }
-            }
-        </style>
-        <div class="internal-nav">
-            <a href="/teacher" class="internal-nav-item {% if '/teacher' in request.path %}active{% endif %}">Teacher Dashboard</a>
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        <div class="teach-admin-nav">
+            <a href="/common" class="teach-admin-item {% if '/common' in request.path %}active{% endif %}">Home</a>
+            <a href="/teacher" class="teach-admin-item {% if '/teacher' in request.path %}active{% endif %}">Teacher Dashboard</a>
             {% if request.session.user.pk == 'Admin' %}
-            <a href="/adminpage" class="internal-nav-item {% if '/adminpage' in request.path %}active{% endif %}">Admin Control Panel</a>
+            {% url 'adminpage' as admin_url %}
+            <a href="{{ admin_url }}" class="teach-admin-item {% if admin_url in request.path %}active{% endif %}">Admin Control Panel</a>
             {% endif %}
         </div>
         <div class="internal-nav-spacer"></div>
