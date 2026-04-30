@@ -726,7 +726,7 @@
     <div id="passwordModal" style="display: none; position: fixed; z-index: 10001; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6);">
         <div style="background-color: var(--card-bg); margin: 10% auto; padding: 25px; border: 1px solid var(--border-color); width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-radius: 12px;">
             <span onclick="closeChangePasswordModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1;">&times;</span>
-            <h2 id="modal-title" style="color: #014458; margin-top: 0;">Change Password</h2>
+            <h2 id="modal-title" style="color: var(--panel-header); margin-top: 0;">Change Password</h2>
             <div id="row_current_password" class="bonafide-form-row">
                 <label class="fee-label-styled" style="width: 140px;">Current Password</label>
                 <input type="password" id="current_entered_password" class="textBoxClass" style="flex:1;" oninput="verifyCurrentPassword()">
@@ -905,5 +905,6 @@
             initProfileScripts();
         });
     </script>
+    {% include "footer.html" %}
     </body>
 </html>

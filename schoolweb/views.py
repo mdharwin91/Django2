@@ -37,6 +37,10 @@ def donation_page(request):
     schoolInformation = models.schoolInformation
     return render (request, 'donation.html', {'schoolInformation' : schoolInformation})
 
+def main_page(request):
+    schoolInformation = models.schoolInformation
+    return render(request, 'main.html', {'schoolInformation': schoolInformation})
+
 def common_page(request):
     user_session = request.session.get('user')
     if not user_session or user_session == "ACCESS DENIED" or (isinstance(user_session, dict) and (user_session.get('user') == "ACCESS DENIED" or not user_session.get('user'))):

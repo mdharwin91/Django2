@@ -13,7 +13,8 @@ schoolInformation = {
     "trustExt":"Educational & Charitable Trust",
     "nps": "Nursery & Primary School", 
     "trustEmail": "vasantham.ectrust@gmail.com",
-    "trustMobile": "+91 94435 08833"
+    "trustMobile": "+91 94435 08833",
+    "school":"SCHOOL"
 }
 
 SchoolStandard = [

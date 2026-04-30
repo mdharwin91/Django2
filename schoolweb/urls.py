@@ -3,7 +3,8 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from . import views
 
 urlpatterns = [
-    path('', views.login_page),
+    # path('', views.login_page),
+    path('', views.main_page),
     path('donation/', views.donation_page),
     path('about/', views.say_sec_hello),
     path('default/', views.default_page, name='default'),

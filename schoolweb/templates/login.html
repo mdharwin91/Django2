@@ -105,6 +105,7 @@
             <div class="login-split-right" style="width: 50%; float: right; margin-right: 10%;">
                 <div class="OuterBox" style="height: 25%; width: 70%; float:right;">
                     <br>
+                    <h3 style="text-align: center; color: #e53e3e; margin-top: 0; margin-bottom: 15px;">Official Use Only</h3>
                     <form action = "" method = "post" style="margin-left: 5%;">
                         {% csrf_token %}
                         <table>
@@ -204,5 +205,6 @@
                 }
             });
         </script>
+     {% include "footer.html" %}
     </body>
 </html>
