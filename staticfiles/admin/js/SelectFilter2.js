@@ -156,16 +156,6 @@ Requires core.js and SelectBox.js.
                 'class', 'filtered'
             );
             const warning_footer = quickElement('div', selector_chosen, '', 'class', 'list-footer-display');
-            Object.assign(warning_footer.style, {
-                position: 'fixed',
-                bottom: '0',
-                left: '0',
-                width: '100%',
-                backgroundColor: '#f8f8f8',
-                borderTop: '1px solid #eee',
-                padding: '5px 10px',
-                zIndex: '1000'
-            });
             quickElement('span', warning_footer, '', 'id', field_id + '_list-footer-display-text');
             quickElement('span', warning_footer, ' ' + gettext('(click to clear)'), 'class', 'list-footer-display__clear');
             const clear_all = quickElement(

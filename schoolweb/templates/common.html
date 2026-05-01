@@ -265,6 +265,31 @@
                 border: 4px solid var(--card-bg);
                 animation: fadeInUp 1.2s ease-out 0.4s both;
             }
+            
+            .profile-actions {
+                text-align: center;
+                padding: 0 30px 30px;
+            }
+
+            .profile-action-btn {
+                display: inline-block;
+                padding: 12px 25px;
+                color: #fff;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                text-decoration: none;
+                font-weight: bold;
+                font-size: 15px;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+                border: none;
+                cursor: pointer;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            }
+            .profile-action-btn:hover {
+                background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            }
 
             @media (max-width: 768px) {
                 .welcome-section {
@@ -343,7 +368,86 @@
                 </div>
             </div>
         </div>
+        <div class="profile-actions">
+            <button class="profile-action-btn" onclick="openChangePasswordModal()">Change Password</button>
+        </div>
     </div>
+
+    <!-- Change Password Modal -->
+    <div id="passwordModal" style="display: none; position: fixed; z-index: 10001; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6);">
+        <div style="background-color: var(--card-bg); margin: 10% auto; padding: 25px; border: 1px solid var(--border-color); width: 90%; max-width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-radius: 12px;">
+            <span onclick="closeChangePasswordModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1;">&times;</span>
+            <h2 style="color: var(--panel-header); margin-top: 0;">Change Password</h2>
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <div class="info-item" style="padding: 0; border: none; margin: 0; flex-direction: row; align-items: center;">
+                    <label class="info-label" style="width: 150px;">Current Password</label>
+                    <input type="password" id="current_password" class="info-value" style="border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; background: var(--input-bg, white); color: var(--input-text, #333);">
+                </div>
+                <div class="info-item" style="padding: 0; border: none; margin: 0; flex-direction: row; align-items: center;">
+                    <label class="info-label" style="width: 150px;">New Password</label>
+                    <input type="password" id="new_password" class="info-value" style="border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; background: var(--input-bg, white); color: var(--input-text, #333);">
+                </div>
+                <div class="info-item" style="padding: 0; border: none; margin: 0; flex-direction: row; align-items: center;">
+                    <label class="info-label" style="width: 150px;">Confirm Password</label>
+                    <input type="password" id="confirm_password" class="info-value" style="border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; background: var(--input-bg, white); color: var(--input-text, #333);">
+                </div>
+                <div class="info-item" style="padding: 0; border: none; margin: 0; flex-direction: row; align-items: center;">
+                    <label class="info-label" style="width: 150px;">2FA Code</label>
+                    <input type="text" id="mfa_otp_change" class="info-value" maxlength="6" inputmode="numeric" placeholder="Leave blank if disabled" style="border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; background: var(--input-bg, white); color: var(--input-text, #333);">
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="profile-action-btn" onclick="submitNewPassword()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openChangePasswordModal() {
+            document.getElementById('passwordModal').style.display = 'block';
+        }
+        function closeChangePasswordModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+            document.getElementById('current_password').value = '';
+            document.getElementById('new_password').value = '';
+            document.getElementById('confirm_password').value = '';
+            if (document.getElementById('mfa_otp_change')) document.getElementById('mfa_otp_change').value = '';
+        }
+        function submitNewPassword() {
+            const newPassword = document.getElementById('new_password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+
+            if (!newPassword || newPassword !== confirmPassword) {
+                alert("New passwords do not match or are empty.");
+                return;
+            }
+
+            const data = {
+                planner_pk: '{{ profile_info.planner_pk }}',
+                planner_sk: '{{ profile_info.planner_sk }}',
+                current_password: document.getElementById('current_password').value,
+                password: newPassword,
+                otp_token: document.getElementById('mfa_otp_change').value
+            };
+
+            fetch("{% url 'change_password' %}", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    closeChangePasswordModal();
+                } else {
+                    alert("Error: " + data.error);
+                }
+            }).catch(err => alert("An error occurred."));
+        }
+
+    </script>
+
     {% include "footer.html" %}
     </body>
 </html>

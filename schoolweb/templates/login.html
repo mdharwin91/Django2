@@ -25,6 +25,19 @@
             .OuterBox { background-color: var(--card-bg) !important; color: var(--text-main) !important; border-radius: 12px; }
             .labelClass { color: var(--text-main) !important; }
 
+            .OuterBox form table input[type="text"]:not(.otp-input),
+            .OuterBox form table input[type="password"] {
+                width: 292px;
+                height: 40px;
+                border-radius: 8px;
+                border: 1px solid var(--border-color, #e2e8f0);
+                padding: 8px 12px;
+                box-sizing: border-box;
+                background-color: var(--card-bg);
+                color: var(--text-main);
+                font-size: 14px;
+            }
+
             .sidebar-link {
                 display: block;
                 padding: 12px 15px;
@@ -99,8 +112,8 @@
      {% include "header.html" %} 
      {% include "navigation.html" %} 
         <div class="login-container" style="width: 100%; display: flex; align-items: center; min-height: 60vh;">
-            <div class="login-split-left" style="width: 50%;">
-
+            <div class="login-split-left" style="width: 50%; display: flex; justify-content: center; align-items: center;">
+                <img src="{% static 'images/Glassed_LOGO_NOBG.png' %}" style="width: 350px; max-width: 80%; opacity: 0.5;" alt="School Logo">
             </div>
             <div class="login-split-right" style="width: 50%; float: right; margin-right: 10%;">
                 <div class="OuterBox" style="height: 25%; width: 70%; float:right;">
@@ -140,17 +153,48 @@
                             </td>
                         </tr>
                         {% endif %}
+                        {% if show_captcha %}
+                        <tr>
+                            <td><label class="labelClass">{{ captcha_question }}</label></td>
+                            <td style="width: 5%;"></td>
+                            <td>
+                                <input type="text" name="captcha_answer" placeholder="Enter answer here" required>
+                            </td>
+                        </tr>
+                        {% endif %}
                         </table>
                         <br>
                         <label for="result01">{{result}}</label><br>
                         <!-- <input type=submit value=Clear class="buttonClass" style="margin-left: 10%; text-align: center;"> -->
                         <input type="submit" value="Login" class="sidebar-link active" style="width: 170px;">
+                        <div style="text-align: center; width: 170px; margin-top: 10px;">
+                            <a href="#" onclick="openForgotPasswordModal(); return false;" style="color: var(--text-main); font-size: 13px; text-decoration: none; opacity: 0.8; font-weight: bold;">Forgot Password?</a>
+                        </div>
                     </form>
                     <br>
                 </div>
             </div>
 
         </div>
+
+        <!-- Forgot Password Modal -->
+        <div id="forgotPasswordModal" style="display: none; position: fixed; z-index: 10001; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6);">
+            <div style="background-color: var(--card-bg); margin: 10% auto; padding: 30px; border: 1px solid var(--border-color, #e2e8f0); width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-radius: 12px; position: relative;">
+                <span onclick="closeForgotPasswordModal()" style="color: #aaa; position: absolute; right: 20px; top: 15px; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1;">&times;</span>
+                <h2 style="color: #e53e3e; margin-top: 0; text-align: center; font-size: 22px;">Forgot Password</h2>
+                <p style="font-size: 14px; color: var(--text-main); text-align: center; margin-bottom: 25px; opacity: 0.8;">Enter your Identification No. to request a password reset from the Administrator.</p>
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
+                        <label style="width: 130px; font-weight: bold; font-size: 14px;">Identification No.</label>
+                        <input type="text" id="forgot_username" style="flex: 1; height: 40px; font-size: 14px; padding: 0 10px; text-align: left; border: 2px solid var(--border-color, #e2e8f0); border-radius: 8px; background-color: var(--card-bg); color: var(--text-main);" placeholder="e.g. SID00001">
+                    </div>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="sidebar-link active" onclick="submitForgotPassword()" style="width: 100%; margin: 0;">Submit Request</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {% if result == "Login Failed" %}
         <script>
             alert("ACCESS DENIED");
@@ -204,6 +248,33 @@
                     }
                 }
             });
+
+            function openForgotPasswordModal() {
+                document.getElementById('forgotPasswordModal').style.display = 'block';
+            }
+
+            function closeForgotPasswordModal() {
+                document.getElementById('forgotPasswordModal').style.display = 'none';
+                document.getElementById('forgot_username').value = '';
+            }
+
+            function submitForgotPassword() {
+                const username = document.getElementById('forgot_username').value;
+                if (!username) { alert("Please enter your Identification No."); return; }
+
+                fetch("{% url 'request_password_reset' %}", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+                    body: JSON.stringify({ username: username })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.message || data.error);
+                    if (data.success) {
+                        closeForgotPasswordModal();
+                    }
+                }).catch(err => alert("An error occurred."));
+            }
         </script>
      {% include "footer.html" %}
     </body>

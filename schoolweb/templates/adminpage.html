@@ -554,7 +554,7 @@
                     overflow: visible !important;
                 }
                 .secondary-nav {
-                    top: 189px; /* Matches desktop height to prevent overlapping top bars */
+                    top: 180px; /* Matches desktop height to prevent overlapping top bars */
                     overflow-x: auto;
                     white-space: nowrap;
                     -webkit-overflow-scrolling: touch;
@@ -640,7 +640,7 @@
         <a href="javascript:void(0)" id="nav-approvals" class="secondary-nav-item" onclick="showVoucherApprovals()">Approvals <span id="voucher-badge" style="position: static; background: red; color: white; border-radius: 50%; padding: 2px 8px; font-size: 10px; display: none; margin-left: 5px;">0</span></a>
         <a href="javascript:void(0)" id="nav-wa" class="secondary-nav-item" onclick="showWAMessage()">WA Message</a>
     </div>
-    <div style="height: 32px;"></div> <!-- Spacer for the fixed secondary-nav -->
+    <div style="height: 60px;"></div> <!-- Spacer to prevent content from being hidden behind fixed secondary nav -->
 
     <div class="dashboard-container">
 
@@ -739,6 +739,10 @@
             <div class="bonafide-form-row">
                 <label class="fee-label-styled" style="width: 140px;">Confirm Password</label>
                 <input type="password" id="confirm_password" class="textBoxClass" style="flex:1;">
+            </div>
+            <div class="bonafide-form-row">
+                <label class="fee-label-styled" style="width: 140px;">2FA Code</label>
+                <input type="text" id="mfa_otp_change" class="textBoxClass" maxlength="6" inputmode="numeric" placeholder="Leave blank if disabled" style="flex:1;">
             </div>
             <div class="action-buttons">
                 <button type="button" class="sidebar-link active" onclick="submitNewPassword()">Submit</button>

@@ -1,11 +1,12 @@
 {% load static %}
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
         <div class="teach-admin-nav">
-            <a href="/common" class="teach-admin-item {% if '/common' in request.path %}active{% endif %}">Home</a>
+            <a href="/common" class="teach-admin-item {% if '/common' in request.path %}active{% endif %}">My Profile</a>
             <a href="/teacher" class="teach-admin-item {% if '/teacher' in request.path %}active{% endif %}">Teacher Dashboard</a>
             {% if request.session.user.pk == 'Admin' %}
             {% url 'adminpage' as admin_url %}
             <a href="{{ admin_url }}" class="teach-admin-item {% if admin_url in request.path %}active{% endif %}">Admin Control Panel</a>
             {% endif %}
         </div>
-        <div class="internal-nav-spacer"></div>
+        <hr style="border: none; border-top: 2px solid var(--border-color, #667eea); margin: 0;">
+        <!-- <div class="internal-nav-spacer"></div> -->

@@ -132,7 +132,18 @@
 
             // Initialize theme on load
             (function() {
-                const savedTheme = localStorage.getItem('theme') || 'light';
+                let savedTheme = localStorage.getItem('theme') || 'light';
+                const sessionTheme = "{{ request.session.user.theme|default:'' }}";
+                const sessionUser = "{{ request.session.user.sk|default:'' }}";
+                
+                if (sessionUser && localStorage.getItem('theme_user') !== sessionUser) {
+                    if (sessionTheme) {
+                        savedTheme = sessionTheme;
+                        localStorage.setItem('theme', savedTheme);
+                    }
+                    localStorage.setItem('theme_user', sessionUser);
+                }
+                
                 document.documentElement.setAttribute('data-theme', savedTheme);
                 updateThemeUI(savedTheme);
             })();

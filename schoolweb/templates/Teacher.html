@@ -497,7 +497,7 @@
         <a href="javascript:void(0)" id="side-voucher" onclick="showVoucher()" class="secondary-nav-item">Voucher Request</a>
         <a href="javascript:void(0)" id="side-request" onclick="showRequest()" class="secondary-nav-item">Bonafide Request</a>
     </div>
-    <div style="height: 32px;"></div>
+    <div style="height: 60px;"></div>
 
     <div class="teacher-wrapper">
         <!-- Right Content Pane -->
@@ -771,6 +771,10 @@
             <div class="bonafide-form-row">
                 <label class="fee-label-styled" style="width: 140px;">Confirm Password</label>
                 <input type="password" id="confirm_password" class="textBoxClass" style="flex:1; background: var(--input-bg); color: var(--input-text);">
+            </div>
+            <div class="bonafide-form-row">
+                <label class="fee-label-styled" style="width: 140px;">2FA Code</label>
+                <input type="text" id="mfa_otp_change" class="textBoxClass" maxlength="6" inputmode="numeric" placeholder="Leave blank if disabled" style="flex:1; background: var(--input-bg); color: var(--input-text);">
             </div>
             <div class="action-buttons">
                 <button type="button" class="sidebar-link active" onclick="submitNewPassword()">Submit</button>

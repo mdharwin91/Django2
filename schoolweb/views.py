@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from django.template import loader
 from .forms import InputForm, LoginForm, StudentInfo, StudentInfoFetch
 from .model import models
@@ -15,6 +15,8 @@ import base64
 import re, html
 import requests
 from urllib.parse import quote
+import os
+import random
 
 def sanitize_str(s):
     if s is None:
@@ -39,7 +41,13 @@ def donation_page(request):
 
 def main_page(request):
     schoolInformation = models.schoolInformation
-    return render(request, 'main.html', {'schoolInformation': schoolInformation})
+    
+    photos_dir = os.path.join(os.path.dirname(__file__), 'static', 'SchoolPhotos')
+    school_photos = []
+    if os.path.exists(photos_dir):
+        school_photos = [f for f in os.listdir(photos_dir) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
+        
+    return render(request, 'main.html', {'schoolInformation': schoolInformation, 'school_photos': school_photos})
 
 def common_page(request):
     user_session = request.session.get('user')
@@ -115,6 +123,7 @@ def login_page(request):
             val_01 = form.data.get('username')
             val_02 = form.data.get('password')
             val_otp = request.POST.get('otp_token')
+            captcha_answer = request.POST.get('captcha_answer')
 
             user_val = loginauth.loginauth.logon(val_01, val_02)
             
@@ -122,6 +131,7 @@ def login_page(request):
                 # Check for 2FA
                 db_user = datacrud.get(user_val['pk'], user_val['sk'])
                 otp_secret = db_user.get('totp_secret')
+                user_val['theme'] = db_user.get('theme', 'light')
 
                 if otp_secret:
                     if not val_otp:
@@ -133,6 +143,30 @@ def login_page(request):
                     if not totp.verify(val_otp):
                         context['result'] = "Invalid 2FA code"
                         return render(request, "login.html", context)
+                else:
+                    # No 2FA - Require CAPTCHA
+                    if not captcha_answer:
+                        num1 = random.randint(1, 9)
+                        num2 = random.randint(1, 9)
+                        request.session['expected_captcha'] = str(num1 + num2)
+                        context['show_captcha'] = True
+                        context['captcha_question'] = f"What is {num1} + {num2}?"
+                        context['result'] = "Please solve the CAPTCHA to continue"
+                        return render(request, "login.html", context)
+                    
+                    expected = request.session.get('expected_captcha')
+                    if not expected or captcha_answer.strip() != expected:
+                        num1 = random.randint(1, 9)
+                        num2 = random.randint(1, 9)
+                        request.session['expected_captcha'] = str(num1 + num2)
+                        context['show_captcha'] = True
+                        context['captcha_question'] = f"What is {num1} + {num2}?"
+                        context['result'] = "Invalid CAPTCHA answer"
+                        return render(request, "login.html", context)
+                    
+                    # Clear captcha from session on success
+                    if 'expected_captcha' in request.session:
+                        del request.session['expected_captcha']
 
                 request.session['user'] = user_val
                 return redirect('/common/')
@@ -274,6 +308,7 @@ def student_details(request):
                     'password': password_to_store,
                     'fees_paid': fees_paid_store,
                     'bonafide': bonafide_store,
+                    'theme': sanitize_str(post.get('theme') or 'light'),
                 }
                 datacrud.put(save_data)
                 # Pass the saved data back to context so fields remain populated
@@ -446,7 +481,8 @@ def studentObjMap(dict):
         "purpose": strip_tags(dict.get('purpose', '')),
         "amount_words": strip_tags(dict.get('amount_words', '')),
         "billed_by": strip_tags(dict.get('billed_by', '')),
-        "voucher_no": strip_tags(dict.get('planner-sk', ''))  # For vouchers, voucher_no is the planner_sk
+        "voucher_no": strip_tags(dict.get('planner-sk', '')),  # For vouchers, voucher_no is the planner_sk
+        "theme": strip_tags(dict.get('theme', 'light'))
     }
     return studentObj
 
@@ -515,7 +551,7 @@ def student_update(request):
             db_data = {k.replace('-', '_'): v for k, v in existing_item.items()}
             
             # Only update fields provided in the request body to prevent data loss
-            updatable_fields = ['name', 'age', 'free_edu', 'status', 'emis', 'mobile', 'std', 'dob', 'doj', 'dol', 'parent_name', 'address']
+            updatable_fields = ['name', 'age', 'free_edu', 'status', 'emis', 'mobile', 'std', 'dob', 'doj', 'dol', 'parent_name', 'address', 'theme']
             for field in updatable_fields:
                 if field in data:
                     db_data[field] = sanitize_str(data[field])
@@ -540,29 +576,54 @@ def student_update(request):
 
 @csrf_exempt
 def change_password(request):
-    user = request.session.get('user')
-    if not user or user == "ACCESS DENIED" or (isinstance(user, dict) and (user.get('user') == "ACCESS DENIED" or not user.get('user'))):
-        return redirect('/login/')
+    user_session = request.session.get('user')
+    if not user_session or user_session == "ACCESS DENIED" or (isinstance(user_session, dict) and (user_session.get('user') == "ACCESS DENIED" or not user_session.get('user'))):
+        return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=401)
+
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
             planner_pk = sanitize_str(data.get('planner_pk'))
             planner_sk = sanitize_str(data.get('planner_sk'))
-            password = sanitize_str(data.get('password'))
+            current_password = data.get('current_password')  # Can be None for admin reset
+            new_password = sanitize_str(data.get('password'))
+            otp_token = data.get('otp_token')
 
-            if not all([planner_pk, planner_sk, password]):
+            if not all([planner_pk, planner_sk, new_password]):
                 return JsonResponse({'success': False, 'error': 'Missing required fields.'}, status=400)
 
             # Fetch the existing item to preserve all other attributes
             existing_item_raw = datacrud.get(planner_pk, planner_sk)
             if not existing_item_raw:
                 return JsonResponse({'success': False, 'error': 'User not found.'}, status=404)
+            
+            is_admin = user_session.get('pk') == 'Admin'
+            is_self_change = user_session.get('pk') == planner_pk and user_session.get('sk') == planner_sk
+
+            # 2FA Verification for the logged-in user making the request
+            logged_in_user_raw = datacrud.get(user_session.get('pk'), user_session.get('sk'))
+            if logged_in_user_raw and logged_in_user_raw.get('totp_secret'):
+                if not otp_token:
+                    return JsonResponse({'success': False, 'error': '2FA code is required to change password.'}, status=400)
+                totp = pyotp.TOTP(logged_in_user_raw.get('totp_secret'))
+                if not totp.verify(otp_token):
+                    return JsonResponse({'success': False, 'error': 'Invalid 2FA code.'}, status=400)
+
+            # If current_password is provided, it's a user changing their own password.
+            if current_password is not None:
+                if not is_self_change and not is_admin:
+                    return JsonResponse({'success': False, 'error': 'Permission denied to change password for another user.'}, status=403)
+                if not check_password(current_password, existing_item_raw.get('password')):
+                    return JsonResponse({'success': False, 'error': 'Current password does not match.'}, status=400)
+            # If current_password is NOT provided, it must be an admin reset.
+            elif not is_admin:
+                return JsonResponse({'success': False, 'error': 'Current password is required.'}, status=400)
 
             # Map db keys (e.g., 'planner-pk') to python-friendly keys ('planner_pk')
             update_data = {k.replace('-', '_'): v for k, v in existing_item_raw.items()}
             
             # Update the password
-            update_data['password'] = make_password(password)
+            update_data['password'] = make_password(new_password)
 
             # Save the entire object back to the database
             response = datacrud.put(update_data)
@@ -570,7 +631,142 @@ def change_password(request):
             if response and response.get('ResponseMetadata', {}).get('HTTPStatusCode') == 200:
                 return JsonResponse({'success': True, 'message': 'Password updated successfully'})
             else:
-                return JsonResponse({'success': False, 'error': 'Database update failed'}, status=500)
+                error_msg = response.get('error', 'Database update failed')
+                return JsonResponse({'success': False, 'error': error_msg}, status=500)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+@csrf_exempt
+def request_password_reset(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            username = sanitize_str(data.get('username') or '').upper()
+            
+            if not username:
+                return JsonResponse({'success': False, 'error': 'User ID is required.'}, status=400)
+
+            planner_pk = None
+            if username.startswith('SID'):
+                planner_pk = 'Student'
+            elif username.startswith('TID'):
+                planner_pk = 'Teacher'
+            elif username.startswith('AID'):
+                planner_pk = 'Admin'
+            
+            if not planner_pk:
+                return JsonResponse({'success': False, 'error': 'Invalid User ID format. It should start with SID, TID, or AID.'}, status=400)
+                
+            planner_sk = username
+
+            # Verify user exists to get their name
+            existing_user = datacrud.get(planner_pk, planner_sk)
+            if not existing_user:
+                return JsonResponse({'success': False, 'error': 'User not found. Please check your ID.'}, status=404)
+                
+            name = existing_user.get('name', 'User')
+            
+            existing_req = datacrud.get('pwdResetReq', planner_sk)
+            previous_resets = []
+            if existing_req:
+                if str(existing_req.get('current_reset_status', '')).strip().lower() == 'pending':
+                    return JsonResponse({'success': False, 'error': 'Previous password reset is still pending.'})
+                
+                previous_resets = existing_req.get('previous_pwd_reset', [])
+                if existing_req.get('current_pwd_reset_date'):
+                    previous_resets.append(existing_req.get('current_pwd_reset_date'))
+            
+            current_date = date.today().strftime('%Y-%m-%d')
+            
+            save_data = {
+                'planner_pk': 'pwdResetReq',
+                'planner_sk': planner_sk,
+                'target_pk': planner_pk,
+                'name': name,
+                'current_reset_status': 'Pending',
+                'current_pwd_reset_date': current_date,
+                'previous_pwd_reset': previous_resets
+            }
+            datacrud.put_pwd_reset(save_data)
+            return JsonResponse({'success': True, 'message': 'Password reset request sent to Admin.'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+@csrf_exempt
+def get_password_resets(request):
+    user = request.session.get('user')
+    if not user or (isinstance(user, dict) and user.get('pk') != 'Admin'):
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+    try:
+        results = datacrud.scan_by_pk("pwdResetReq")
+        pending = []
+        if isinstance(results, list):
+            for r in results:
+                if str(r.get('current_reset_status', '')).strip().lower() == 'pending':
+                    pending.append({
+                        'req_id': r.get('planner-sk') or r.get('planner_sk'),
+                        'target_pk': r.get('target_pk'),
+                        'target_sk': r.get('planner-sk') or r.get('planner_sk'),
+                        'name': r.get('name'),
+                        'date': r.get('current_pwd_reset_date')
+                    })
+        return JsonResponse({'success': True, 'requests': pending})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+@csrf_exempt
+def resolve_password_reset(request):
+    user = request.session.get('user')
+    if not user or (isinstance(user, dict) and user.get('pk') != 'Admin'):
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            req_id = data.get('req_id')
+            action = data.get('action')
+            
+            req_data = datacrud.get('pwdResetReq', req_id)
+            if req_data:
+                if action == 'Reset':
+                    target_sk = req_data.get('planner-sk') or req_data.get('planner_sk')
+                    target_pk = req_data.get('target_pk')
+                    
+                    if not target_pk and target_sk:
+                        if target_sk.startswith('SID'): target_pk = 'Student'
+                        elif target_sk.startswith('TID'): target_pk = 'Teacher'
+                        elif target_sk.startswith('AID'): target_pk = 'Admin'
+
+                    target_user = datacrud.get(target_pk, target_sk) if target_pk and target_sk else None
+
+                    if target_user:
+                        raw_name = sanitize_str(target_user.get('name', ''))
+                        dob_str = target_user.get('dob', '')
+                        
+                        password_to_store = make_password('')
+                        if raw_name and dob_str:
+                            name_part = re.sub(r'[^a-zA-Z]', '', raw_name)[:4].upper()
+                            year_part = dob_str.split('-')[0]
+                            password_to_store = make_password(name_part + year_part)
+                        
+                        update_user = {k.replace('-', '_'): v for k, v in target_user.items()}
+                        update_user['password'] = password_to_store
+                        datacrud.put(update_user)
+                        
+                        req_data['current_reset_status'] = 'Resolved'
+                        update_data = {k.replace('-', '_'): v for k, v in req_data.items()}
+                        datacrud.put_pwd_reset(update_data)
+                        
+                        return JsonResponse({'success': True, 'message': 'Password reset to default successfully.'})
+                    else:
+                        return JsonResponse({'success': False, 'error': 'Target user not found.'})
+
+                req_data['current_reset_status'] = action
+                update_data = {k.replace('-', '_'): v for k, v in req_data.items()}
+                datacrud.put_pwd_reset(update_data)
+                return JsonResponse({'success': True, 'message': f'Request {action.lower()} successfully.'})
+            return JsonResponse({'success': False, 'error': 'Request not found.'}, status=404)
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)}, status=400)
     return JsonResponse({'error': 'Invalid request method'}, status=405)

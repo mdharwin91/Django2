@@ -34,5 +34,8 @@ urlpatterns = [
     path('get_vouchers_by_mobile/', views.get_vouchers_by_mobile, name='get_vouchers_by_mobile'),
     path('bonafide_request_save/', views.bonafide_request_save, name='bonafide_request_save'),
     path('get_my_requests/', views.get_my_requests, name='get_my_requests'),
+    path('request_password_reset/', views.request_password_reset, name='request_password_reset'),
+    path('get_password_resets/', views.get_password_resets, name='get_password_resets'),
+    path('resolve_password_reset/', views.resolve_password_reset, name='resolve_password_reset'),
 ]
 urlpatterns += staticfiles_urlpatterns()

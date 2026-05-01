@@ -266,6 +266,13 @@
                     {% endfor %}
                 </select>
             </div>
+            <div class="form-row">
+                <label class="labelClass">Theme</label>
+                <select id="cell-theme" name="theme" class="textBoxClass">
+                    <option value="light" {% if user_info.theme == 'light' %}selected{% endif %}>Light</option>
+                    <option value="dark" {% if user_info.theme == 'dark' %}selected{% endif %}>Dark</option>
+                </select>
+            </div>
             <div class="button-group">
                 <button id="btn-update" type="button" class="sidebar-link active" onclick="update_student(event)" style="display:none">Update</button>
                 <button id="btn-save" type="submit" class="sidebar-link active">Save</button>
@@ -369,6 +376,7 @@
                                         if (document.getElementById('cell-age')) document.getElementById('cell-age').value = info.age || '';
                                         if (document.getElementById('cell-dol')) document.getElementById('cell-dol').value = info.dol || '';
                                         if (document.getElementById('cell-status')) document.getElementById('cell-status').value = info.status || '';
+                                        if (document.getElementById('cell-theme')) document.getElementById('cell-theme').value = info.theme || 'light';
 
                                         if (document.getElementById('stored_current_password')) document.getElementById('stored_current_password').value = info.password || '';
                                         document.getElementById('cell-planner_pk').readOnly = true;
@@ -382,6 +390,7 @@
                                         document.getElementById('cell-dol').readOnly = true;
                                         document.getElementById('cell-status').readOnly = true; 
                                         document.getElementById('cell-std').readOnly = true;
+                                        document.getElementById('cell-theme').readOnly = true;
                             SchoolUtils.showPopup(document.getElementById('planner_pk').value + " data fetched successfully!", "success");
                                         // Show Edit button after successful fetch
                                         var editBtn = document.getElementById('edit-button');
@@ -450,6 +459,7 @@
                                 document.getElementById('cell-age').readOnly = false;
                                 document.getElementById('cell-dol').readOnly = false;
                                 document.getElementById('cell-status').readOnly = false;
+                                document.getElementById('cell-theme').readOnly = false;
                                 var updBtn = document.getElementById('btn-update');
                                 if (updBtn) updBtn.style.display = 'inline-block';
                                 // Show Edit button after successful fetch
@@ -507,7 +517,8 @@
                                     free_edu: document.getElementById('cell-free_edu').value,
                                     age: document.getElementById('cell-age').value,
                                     dol: document.getElementById('cell-dol').value,
-                                    status: document.getElementById('cell-status').value
+                                    status: document.getElementById('cell-status').value,
+                                    theme: document.getElementById('cell-theme').value
                                 };
 
                                 // Gather list of edited labels
@@ -608,6 +619,7 @@
                                 document.getElementById('verification_tick').style.display = 'none';
                                 document.getElementById('new_password').value = '';
                                 document.getElementById('confirm_password').value = '';
+                                if (document.getElementById('mfa_otp_change')) document.getElementById('mfa_otp_change').value = '';
                             }
 
                             function submitNewPassword() {
@@ -631,6 +643,9 @@
                                     planner_sk: document.getElementById('modal_planner_sk').value,
                                     password: newPassword,
                                 };
+                                if (document.getElementById('mfa_otp_change')) {
+                                    data.otp_token = document.getElementById('mfa_otp_change').value;
+                                }
 
                                 fetch("{% url 'change_password' %}", {
                                     method: "POST",
@@ -664,7 +679,7 @@
                                 const ids = [
                                     'cell-planner_pk', 'cell-planner_sk', 'cell-name', 
                                     'cell-std', 'cell-dob', 'cell-emis', 'cell-doj', 'cell-mobile', 
-                                    'cell-free_edu', 'cell-age', 'cell-dol', 'cell-status'
+                                    'cell-free_edu', 'cell-age', 'cell-dol', 'cell-status', 'cell-theme'
                                 ];
                                 ids.forEach(id => {
                                     const el = document.getElementById(id);
@@ -722,6 +737,10 @@
                     <div class="form-row">
                         <label for="confirm_password" class="labelClass">Confirm Password</label>
                         <input type="password" id="confirm_password" name="confirm_password" class="textBoxClass" required>
+                    </div>
+                    <div class="form-row">
+                        <label for="mfa_otp_change" class="labelClass">2FA Code</label>
+                        <input type="text" id="mfa_otp_change" name="mfa_otp_change" class="textBoxClass" maxlength="6" inputmode="numeric" placeholder="If enabled">
                     </div>
                     <div class="button-group">
                         <button type="submit" class="sidebar-link active">Submit</button>

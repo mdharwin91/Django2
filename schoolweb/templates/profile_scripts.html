@@ -1,8 +1,64 @@
 <script>
     // --- Unified Profile Logic (Shared) ---
-    function profile_student_get() {
-        const pk = document.getElementById('fetch_planner_pk').value;
-        let sk = document.getElementById('fetch_planner_sk').value;
+    function fetchPasswordResetRequests() {
+        fetch("{% url 'get_password_resets' %}")
+        .then(res => res.json())
+        .then(data => {
+            const list = document.getElementById('pwd-reset-list');
+            if (data.success && data.requests && data.requests.length > 0) {
+                let html = '';
+                data.requests.forEach(req => {
+                    let displayName = (req.name && req.name !== 'null' && req.name !== 'None' && req.name.trim() !== '') ? req.name : req.target_sk;
+                    let displayDate = (req.date && req.date !== 'null' && req.date !== 'None') ? req.date : 'N/A';
+                    if (displayDate === 'N/A' && req.req_id) {
+                        let parts = req.req_id.split('_');
+                        if (parts.length === 3) displayDate = new Date(parseInt(parts[2]) * 1000).toLocaleDateString('en-GB');
+                    }
+                    
+                    html += `
+                        <div style="border: 1px solid var(--border-color); padding: 10px; margin-bottom: 8px; border-radius: 8px; background: var(--table-even-row);">
+                            <div style="font-weight: bold; color: var(--panel-header); margin-bottom: 4px;">${displayName} (${req.target_sk})</div>
+                            <div style="font-size: 0.85em; opacity: 0.8; margin-bottom: 8px;">Date: ${displayDate}</div>
+                            <div style="display: flex; gap: 5px;">
+                                <button type="button" class="sidebar-link active" style="margin:0; padding: 4px; font-size: 11px; flex: 1;" onclick="resolvePasswordReset('${req.req_id}', 'Reset')">Reset</button>
+                                <button type="button" class="sidebar-link active" style="margin:0; padding: 4px; font-size: 11px; flex: 1; background: #6c757d;" onclick="resolvePasswordReset('${req.req_id}', 'Dismissed')">Dismiss</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                list.innerHTML = html;
+            } else {
+                list.innerHTML = '<p style="opacity: 0.7; text-align: center; font-style: italic;">No pending requests.</p>';
+            }
+        }).catch(err => console.error(err));
+    }
+
+    function resolvePasswordReset(reqId, action) {
+        let confirmMsg = `Are you sure you want to mark this request as ${action}?`;
+        if (action === 'Reset') {
+            confirmMsg = `Are you sure you want to reset the password to Default password?`;
+        }
+        if (!confirm(confirmMsg)) return;
+        
+        fetch("{% url 'resolve_password_reset' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+            body: JSON.stringify({ req_id: reqId, action: action })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                SchoolUtils.showPopup(data.message, "success");
+                fetchPasswordResetRequests();
+            } else {
+                SchoolUtils.showPopup(data.error, "error");
+            }
+        });
+    }
+
+    function profile_student_get(optPk, optSk) {
+        const pk = (typeof optPk === 'string' && optPk) ? optPk : document.getElementById('fetch_planner_pk').value;
+        let sk = (typeof optSk === 'string' && optSk) ? optSk : document.getElementById('fetch_planner_sk').value;
         if (!pk || !sk) { SchoolUtils.showPopup("Select profile and enter ID", "error"); return; }
 
         fetch("{% url 'student_get' %}", {
@@ -30,7 +86,7 @@
                 document.getElementById('fetch_planner_pk').disabled = true;
                 document.getElementById('fetch_planner_sk').disabled = true;
 
-                const fields = ['planner_pk', 'planner_sk', 'name', 'std', 'dob', 'emis', 'doj', 'mobile', 'free_edu', 'age', 'dol', 'status', 'parent_name', 'address'];
+                const fields = ['planner_pk', 'planner_sk', 'name', 'std', 'dob', 'emis', 'doj', 'mobile', 'free_edu', 'age', 'dol', 'status', 'parent_name', 'address', 'theme'];
                 fields.forEach(f => {
                     const el = document.getElementById('prof-cell-' + f);
                     if (el) el.value = info[f] || '';
@@ -191,7 +247,7 @@
 
     function profile_get_form_data() {
         const data = {};
-        const fields = ['planner_pk', 'planner_sk', 'name', 'std', 'dob', 'emis', 'doj', 'mobile', 'free_edu', 'age', 'dol', 'status', 'parent_name', 'address'];
+        const fields = ['planner_pk', 'planner_sk', 'name', 'std', 'dob', 'emis', 'doj', 'mobile', 'free_edu', 'age', 'dol', 'status', 'parent_name', 'address', 'theme'];
         fields.forEach(f => {
             const el = document.getElementById('prof-cell-' + f);
             if (el) data[f] = el.value;
@@ -235,16 +291,18 @@
         const resetPwdBtn = document.getElementById('reset-password-btn');
         const mfaButtonsRow = document.getElementById('mfa-buttons-row');
 
+        const isCommonPage = window.location.pathname.includes('/common');
+
         if (p === 'Student') {
             if (changePwdBtn) changePwdBtn.style.display = 'none';
             if (resetPwdBtn) resetPwdBtn.style.display = 'none';
             if (mfaButtonsRow) mfaButtonsRow.style.display = 'none';
         } else if (p === 'Teacher') {
-            if (changePwdBtn) changePwdBtn.style.display = 'block';
+            if (changePwdBtn) changePwdBtn.style.display = isCommonPage ? 'block' : 'none';
             if (resetPwdBtn) resetPwdBtn.style.display = 'none';
             if (mfaButtonsRow) mfaButtonsRow.style.display = 'none';
         } else { // Admin
-            if (changePwdBtn) changePwdBtn.style.display = 'block';
+            if (changePwdBtn) changePwdBtn.style.display = isCommonPage ? 'block' : 'none';
             if (resetPwdBtn) resetPwdBtn.style.display = 'block';
             if (mfaButtonsRow) mfaButtonsRow.style.display = 'flex';
         }
@@ -267,6 +325,7 @@
         document.getElementById('current_entered_password').value = '';
         document.getElementById('new_password').value = '';
         document.getElementById('confirm_password').value = '';
+        if (document.getElementById('mfa_otp_change')) document.getElementById('mfa_otp_change').value = '';
     }
 
     function submitNewPassword() {
@@ -279,6 +338,14 @@
             planner_sk: document.getElementById('prof-cell-planner_sk').value,
             password: newP
         };
+        
+        const currentP = document.getElementById('current_entered_password');
+        if (currentP && currentP.value) {
+            payload.current_password = currentP.value;
+        }
+        if (document.getElementById('mfa_otp_change')) {
+            payload.otp_token = document.getElementById('mfa_otp_change').value;
+        }
 
         fetch("{% url 'change_password' %}", {
             method: "POST",
@@ -315,6 +382,9 @@
                     ageInput.dispatchEvent(new Event('change'));
                 }
             });
+        }
+        if (document.getElementById('pwd-reset-requests-container')) {
+            fetchPasswordResetRequests();
         }
     }
 
