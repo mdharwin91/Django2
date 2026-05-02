@@ -1,0 +1,6 @@
+Add Dark and Light theme aware for Welcome message on Commons page.
+Add IP display on the Footer.htmls
+Increase the Font size of the username and password text boxes to match the 6 digit code box font size
+
+Navigating bar on login page is not visible on mobile view
+Change password is going behind the footer.

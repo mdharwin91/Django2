@@ -21,6 +21,20 @@
             [data-theme="dark"] .nav-container {
                 background-color: var(--sidebar-bg, #2d3748) !important;
             }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                margin-top: 35px;
+                flex-wrap: wrap;
+                justify-content: center;
+                position: sticky;
+                top: 85px;
+                z-index: 1999;
+            }
+            .nav-item {
+                padding: 8px 15px;
+            }
+        }
         </style>
         <div class="nav-container">
             <a href="/" class="nav-item">Main</a>

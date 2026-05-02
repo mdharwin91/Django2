@@ -46,6 +46,7 @@ def put(in_data):
         'bonafide': in_data.get('bonafide') or [],
         'totp_secret': in_data.get('totp_secret', ''),
         'theme': in_data.get('theme', 'light'),
+        'designation': in_data.get('designation', ''),
     }
 
     response = None

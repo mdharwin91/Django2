@@ -1,5 +1,25 @@
 {% load static %}
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        <style>
+            @media (max-width: 768px) {
+                .teach-admin-nav { 
+                    top: 87px !important;
+                    height: 36px !important;
+                    margin: 0 !important;
+                    box-sizing: border-box !important;
+                    padding: 0 10px !important; 
+                    align-items: center !important;
+                    /* gap: 8px !important;  */
+                    justify-content: flex-start !important;
+                    overflow-x: auto !important;
+                    white-space: nowrap !important;
+                    -webkit-overflow-scrolling: touch !important;
+                }
+                .teach-admin-nav::-webkit-scrollbar { display: none; }
+                .teach-admin-item { font-size: 11px !important; padding: 6px 10px !important; flex-shrink: 0 !important; }
+                .internal-nav-spacer { height: 36px !important; }
+            }
+        </style>
         <div class="teach-admin-nav">
             <a href="/common" class="teach-admin-item {% if '/common' in request.path %}active{% endif %}">My Profile</a>
             <a href="/teacher" class="teach-admin-item {% if '/teacher' in request.path %}active{% endif %}">Teacher Dashboard</a>
@@ -8,5 +28,4 @@
             <a href="{{ admin_url }}" class="teach-admin-item {% if admin_url in request.path %}active{% endif %}">Admin Control Panel</a>
             {% endif %}
         </div>
-        <hr style="border: none; border-top: 2px solid var(--border-color, #667eea); margin: 0;">
-        <!-- <div class="internal-nav-spacer"></div> -->
+        <div class="internal-nav-spacer"></div>

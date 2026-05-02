@@ -4,8 +4,8 @@
         background-color: var(--panel-header, #014458);
         color: #ffffff;
         text-align: center;
-        padding: 20px 10px;
-        margin-top: 5px;
+        padding: 5px 10px;
+        margin-top: 0;
         border-top: 3px solid var(--border-color, #667eea);
         font-size: 10px;
         width: 100%;
@@ -18,7 +18,7 @@
         background-color: var(--sidebar-bg, #2d3748) !important;
     }
     .site-footer p {
-        margin: 5px 0;
+        margin: 2px 0;
         color: #ffffff;
     }
     [data-theme="dark"] .site-footer p {
@@ -27,5 +27,5 @@
 </style>
 <div class="site-footer">
     <p><b>{{schoolInformation.schoolName}}</b> | Managed by {{schoolInformation.trustName}} | {{schoolInformation.trustAddress}}</p>
-    <p>&copy; {% now "Y" %} {{schoolInformation.vasantham}} {{schoolInformation.school}}. All rights reserved.</p>
+    <p>&copy; {% now "Y" %} {{schoolInformation.vasantham}} {{schoolInformation.school}}. All rights reserved. | IP: {{ request.META.REMOTE_ADDR }}</p>
 </div>

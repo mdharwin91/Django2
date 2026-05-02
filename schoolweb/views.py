@@ -98,7 +98,8 @@ def admin_page(request):
         'profiles': models.profile, 
         'bonafide_msg': models.bonafide_msg,
         'statuses': models.Status,
-        'free_edu_choices': models.free_edu
+        'free_edu_choices': models.free_edu,
+        'designations': models.designation
     })
   
 def contact_us(request):
@@ -127,7 +128,7 @@ def login_page(request):
 
             user_val = loginauth.loginauth.logon(val_01, val_02)
             
-            if (user_val.get('user') and user_val['user'] != "ACCESS DENIED"):
+            if (user_val.get('user') and user_val['user'] not in ["ACCESS DENIED", "INACTIVE ACCOUNT"]):
                 # Check for 2FA
                 db_user = datacrud.get(user_val['pk'], user_val['sk'])
                 otp_secret = db_user.get('totp_secret')
@@ -171,7 +172,10 @@ def login_page(request):
                 request.session['user'] = user_val
                 return redirect('/common/')
             else:
-                context['result'] = "Login Failed"
+                if user_val.get('user') == "INACTIVE ACCOUNT":
+                    context['result'] = "Account is Inactive. Please contact Admin."
+                else:
+                    context['result'] = "Login Failed"
                 return render(request, "login.html", context)
         except Exception as e:
             pass
@@ -205,6 +209,7 @@ def student_details(request):
     context['statuses'] = models.Status
     context['standards'] = models.SchoolStandard
     context['free_edu_choices'] = models.free_edu
+    context['designations'] = models.designation
     context['schoolInformation'] = models.schoolInformation
     user_session = request.session.get('user')
     if user_session and isinstance(user_session, dict):
@@ -290,15 +295,21 @@ def student_details(request):
                     else:
                         password_to_store = make_password('')
 
+                p_name = sanitize_str(post.get('parent_name_only') or post.get('parent_name') or '')
+                p_rel = sanitize_str(post.get('parent_relation') or '')
+                if p_name and p_rel and p_rel not in p_name:
+                    p_name = f"{p_name} {p_rel}".strip()
+
                 save_data = {
                     'planner_pk': planner_pk,
                     'planner_sk': planner_sk,
                     'name': sanitize_str(post.get('name') or ''),
-                    'parent_name': sanitize_str(post.get('parent_name') or ''),
+                    'parent_name': p_name,
                     'address': sanitize_str(post.get('address') or ''),
                     'age': sanitize_str(post.get('age') or ''),
                     'free_edu': sanitize_str(post.get('free_edu') or post.get('free-edu') or ''),
                     'status': sanitize_str(post.get('status') or ''),
+                    'designation': sanitize_str(post.get('designation') or ''),
                     'emis': sanitize_str(post.get('emis') or ''),
                     'mobile': sanitize_str(post.get('mobile') or ''),
                     'std': sanitize_str(post.get('std') or ''),
@@ -455,6 +466,16 @@ def studentObjMap(dict):
 
     if not dict:
         return {}
+        
+    parent_name_full = strip_tags(dict.get('parent_name', ''))
+    parent_name_only = parent_name_full
+    parent_relation = ""
+    for rel in ["(Father)", "(Mother)", "(Guardian)"]:
+        if rel in parent_name_full:
+            parent_name_only = parent_name_full.replace(rel, "").strip()
+            parent_relation = rel
+            break
+            
     studentObj = {
         "planner_pk": strip_tags(dict.get('planner-pk', dict.get('planner_pk', ''))),
         "planner_sk": strip_tags(dict.get('planner-sk', dict.get('planner_sk', ''))),
@@ -466,6 +487,7 @@ def studentObjMap(dict):
         "status": strip_tags(dict.get('status', '')),
         "emis": strip_tags(dict.get('emis', '')),
         "mobile": strip_tags(dict.get('mobile', '')),
+        "designation": strip_tags(dict.get('designation', '')),
         "std": strip_tags(dict.get('std', '')),
         "dob": strip_tags(dict.get('dob', '')),
         "doj": strip_tags(dict.get('doj', '')),
@@ -473,7 +495,9 @@ def studentObjMap(dict):
         "password": strip_tags(dict.get('password', '')),
         "fees_paid": dict.get('fees_paid', []),
         "bonafide": dict.get('bonafide', []),
-        "parent_name": strip_tags(dict.get('parent_name', '')),
+        "parent_name": parent_name_full,
+        "parent_name_only": parent_name_only,
+        "parent_relation": parent_relation,
         "address": strip_tags(dict.get('address', '')),
         "date": strip_tags(dict.get('date', '')),
         "type": strip_tags(dict.get('type', '')),
@@ -482,7 +506,8 @@ def studentObjMap(dict):
         "amount_words": strip_tags(dict.get('amount_words', '')),
         "billed_by": strip_tags(dict.get('billed_by', '')),
         "voucher_no": strip_tags(dict.get('planner-sk', '')),  # For vouchers, voucher_no is the planner_sk
-        "theme": strip_tags(dict.get('theme', 'light'))
+        "theme": strip_tags(dict.get('theme', 'light')),
+        "mfa_enabled": bool(dict.get('totp_secret'))
     }
     return studentObj
 
@@ -551,10 +576,18 @@ def student_update(request):
             db_data = {k.replace('-', '_'): v for k, v in existing_item.items()}
             
             # Only update fields provided in the request body to prevent data loss
-            updatable_fields = ['name', 'age', 'free_edu', 'status', 'emis', 'mobile', 'std', 'dob', 'doj', 'dol', 'parent_name', 'address', 'theme']
+            updatable_fields = ['name', 'age', 'free_edu', 'status', 'emis', 'mobile', 'std', 'dob', 'doj', 'dol', 'address', 'theme', 'designation']
             for field in updatable_fields:
                 if field in data:
                     db_data[field] = sanitize_str(data[field])
+            
+            if 'parent_name_only' in data or 'parent_name' in data:
+                p_name = sanitize_str(data.get('parent_name_only') or data.get('parent_name') or '')
+                p_rel = sanitize_str(data.get('parent_relation') or '')
+                if p_name and p_rel and p_rel not in p_name:
+                    db_data['parent_name'] = f"{p_name} {p_rel}".strip()
+                else:
+                    db_data['parent_name'] = p_name
             
             # Handle updating the bill history list
             if 'fees_paid' in data:
@@ -786,6 +819,7 @@ def teacher(request):
     context['terms'] = models.term
     context['statuses'] = models.Status
     context['free_edu_choices'] = models.free_edu
+    context['designations'] = models.designation
     context['schoolInformation'] = models.schoolInformation
     context['schoolName'] = schoolInformation.get('schoolName')
     context['vasantham'] = schoolInformation.get('vasantham')
@@ -852,6 +886,7 @@ def studentObjMap2(dict):
         "free_edu": strip_tags(dict.get('free-edu', "N/A")),
         "status": strip_tags(dict.get('status', '')),
         # "emis": strip_tags(dict.get('emis', '')),
+        "designation": strip_tags(dict.get('designation', '')),
         "mobile": strip_tags(dict.get('mobile', '')),
         "std": strip_tags(dict.get('std', '')),
         "fees_paid": dict.get('fees_paid', []),
@@ -1586,6 +1621,40 @@ def setup_mfa(request):
             uri = totp.provisioning_uri(name=sk, issuer_name=issuer)
 
             return JsonResponse({'success': True, 'secret': new_secret, 'uri': uri})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+@csrf_exempt
+def get_changes(request):
+    user = request.session.get('user')
+    if not user or (isinstance(user, dict) and user.get('pk') != 'Admin'):
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+    
+    file_path = os.path.join(os.path.dirname(__file__), 'changes.txt')
+    text = ""
+    if os.path.exists(file_path):
+        with open(file_path, 'r', encoding='utf-8') as f:
+            text = f.read()
+    return JsonResponse({'success': True, 'text': text})
+
+@csrf_exempt
+def save_changes(request):
+    user = request.session.get('user')
+    if not user or (isinstance(user, dict) and user.get('pk') != 'Admin'):
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+    
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            text = data.get('text', '')[:1000] # Limit to 1000 chars
+            
+            file_path = os.path.join(os.path.dirname(__file__), 'changes.txt')
+            with open(file_path, 'a', encoding='utf-8') as f:
+                if text.strip():
+                    f.write("\n" + text.strip() + "\n")
+                
+            return JsonResponse({'success': True, 'message': 'Changes saved'})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)}, status=400)
     return JsonResponse({'error': 'Invalid request method'}, status=405)

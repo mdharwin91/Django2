@@ -90,20 +90,21 @@
                 text-align: center;
                 margin-top: 80px;
                 margin-bottom: 40px;
-                color: var(--text-main);
+                color: #ffffff;
                 position: relative;
                 z-index: 1;
                 animation: fadeInUp 0.8s ease-out;
+            }
+
+            [data-theme="dark"] .welcome-section {
+                color: var(--text-main);
             }
 
             .welcome-section h2 {
                 font-weight: 700;
                 font-size: 36px;
                 margin-bottom: 12px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
+                color: #ffffff;
                 letter-spacing: -0.5px;
             }
 
@@ -115,18 +116,23 @@
             }
 
             .welcome-section p {
-                opacity: 0.8;
+                opacity: 0.9;
                 font-size: 17px;
                 max-width: 600px;
                 margin: 0 auto;
                 line-height: 1.6;
             }
 
+            [data-theme="dark"] .welcome-section p {
+                opacity: 0.8;
+            }
+
             .profile-card {
                 background: var(--card-bg);
                 border-radius: 20px;
                 box-shadow: var(--shadow-lg);
-                max-width: 900px;
+                width: 95%;
+                max-width: 1200px;
                 margin: 0 auto 60px;
                 border: 1px solid var(--border-color);
                 overflow: hidden;
@@ -180,15 +186,63 @@
                 border-radius: 2px;
             }
 
-            .profile-content { 
-                padding: 40px; 
-                display: flex; 
-                gap: 30px;
-                position: relative;
+            .profile-info-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 20px;
+                width: 100%;
+            }
+            
+            .info-card {
+                background: var(--card-bg);
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                padding: 20px;
+                transition: all 0.3s ease;
+                animation: fadeInUp 0.6s ease-out both;
+            }
+            
+            .info-card:nth-child(1) { animation-delay: 0.1s; }
+            .info-card:nth-child(2) { animation-delay: 0.2s; }
+            .info-card:nth-child(3) { animation-delay: 0.3s; }
+            .info-card:nth-child(4) { animation-delay: 0.4s; }
+            .info-card:nth-child(5) { animation-delay: 0.5s; }
+            .info-card:nth-child(6) { animation-delay: 0.6s; }
+            .info-card:nth-child(7) { animation-delay: 0.7s; }
+            .info-card:nth-child(8) { animation-delay: 0.8s; }
+            .info-card:nth-child(9) { animation-delay: 0.9s; }
+            .info-card:nth-child(10) { animation-delay: 1.0s; }
+
+            .info-card:hover {
+                transform: translateY(-4px) scale(1.01);
+                box-shadow: var(--shadow-md);
+                border-color: var(--accent-color);
+                background: linear-gradient(135deg, var(--card-bg) 0%, rgba(102, 126, 234, 0.05) 100%);
+            }
+            
+            .info-card-label {
+                font-size: 13px;
+                color: var(--accent-color);
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 8px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .info-card-value {
+                font-size: 16px;
+                color: var(--text-main);
+                font-weight: 500;
+                word-wrap: break-word;
+                word-break: break-word;
             }
 
-            .profile-info-list { 
-                flex: 1;
+            .profile-content { 
+                padding: 40px; 
+                position: relative;
             }
 
             .info-item { 
@@ -321,6 +375,12 @@
                 .info-value {
                     padding-left: 0;
                 }
+                .profile-info-grid {
+                    grid-template-columns: 1fr;
+                }
+                .info-card {
+                    grid-column: 1 / -1 !important;
+                }
                 .profile-badge {
                     width: 60px;
                     height: 60px;
@@ -334,7 +394,7 @@
 
     <body>
         <!-- COMMON HEADER -->
-        {% include "header.html" %} 
+        {% include "Header2.html" %} 
         {% include "logout.html" %} 
         {% include "navig2.html" %} 
 
@@ -347,25 +407,73 @@
         <div class="profile-badge">👤</div>
         <div class="profile-header">My Profile Information</div>
         <div class="profile-content">
-            <div class="profile-info-list">
-                <div class="info-item">
-                    <div class="info-label">Name</div><div class="info-value">{{ profile_info.name|default:"N/A" }}</div>
+            <div class="profile-info-grid">
+                <div class="info-card">
+                    <div class="info-card-label">👤 Full Name</div>
+                    <div class="info-card-value">{{ profile_info.name|default:"N/A" }}</div>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">User ID</div><div class="info-value">{{ profile_info.planner_sk|default:"N/A" }}</div>
+                <div class="info-card">
+                    <div class="info-card-label">🆔 User ID</div>
+                    <div class="info-card-value">{{ profile_info.planner_sk|default:"N/A" }}</div>
                 </div>
-                <div class="info-item" style="display: none;">
-                    <div class="info-label">Standard</div><div class="info-value">{{ profile_info.std|default:"N/A" }}</div>
+                {% if profile_info.planner_pk == 'Student' %}
+                <div class="info-card">
+                    <div class="info-card-label">🎓 Standard</div>
+                    <div class="info-card-value">{{ profile_info.std|default:"N/A" }}</div>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">Date of Birth</div><div class="info-value">{{ profile_info.dob|default:"N/A" }}</div>
+                <div class="info-card">
+                    <div class="info-card-label">🏷️ Free Education</div>
+                    <div class="info-card-value">{{ profile_info.free_edu|default:"NO" }}</div>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">EMIS Number</div><div class="info-value">{{ profile_info.emis|default:"N/A" }}</div>
+                {% endif %}
+                <div class="info-card">
+                    <div class="info-card-label">🎂 Date of Birth</div>
+                    <div class="info-card-value">{{ profile_info.dob|default:"N/A" }} {% if profile_info.age %}({{ profile_info.age }} yrs){% endif %}</div>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">Mobile Number</div><div class="info-value">{{ profile_info.mobile|default:"N/A" }}</div>
+                <div class="info-card">
+                    <div class="info-card-label">🏫 EMIS Number</div>
+                    <div class="info-card-value">{{ profile_info.emis|default:"N/A" }}</div>
                 </div>
+                <div class="info-card">
+                    <div class="info-card-label">📱 Mobile Number</div>
+                    <div class="info-card-value">{{ profile_info.mobile|default:"N/A" }}</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-label">👨‍👩‍👧 Parent/Guardian</div>
+                    <div class="info-card-value">{{ profile_info.parent_name|default:"N/A" }}</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-label">📅 Date of Joining</div>
+                    <div class="info-card-value">{{ profile_info.doj|default:"N/A" }}</div>
+                </div>
+                <div class="info-card" style="grid-column: 1 / -1;">
+                    <div class="info-card-label">📍 Address</div>
+                    <div class="info-card-value">{{ profile_info.address|default:"N/A" }}</div>
+                </div>
+                {% if profile_info.planner_pk != 'Student' %}
+                <div class="info-card">
+                    <div class="info-card-label">💼 Designation</div>
+                    <div class="info-card-value">{{ profile_info.designation|default:"N/A" }}</div>
+                </div>
+                {% endif %}
+                <div class="info-card">
+                    <div class="info-card-label">🟢 Status</div>
+                    <div class="info-card-value">
+                        <span style="padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; {% if profile_info.status == 'Active' %}background: #48bb78;{% else %}background: #a0aec0;{% endif %} color: white;">
+                            {{ profile_info.status|default:"N/A" }}
+                        </span>
+                    </div>
+                </div>
+                {% if profile_info.planner_pk != 'Student' %}
+                <div class="info-card">
+                    <div class="info-card-label">🔒 MFA Status</div>
+                    <div class="info-card-value">
+                        <span id="common-mfa-badge" style="padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; {% if profile_info.mfa_enabled %}background: #48bb78;{% else %}background: #a0aec0;{% endif %} color: white;">
+                            {% if profile_info.mfa_enabled %}Enabled{% else %}Disabled{% endif %}
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
         <div class="profile-actions">
@@ -403,49 +511,7 @@
     </div>
 
     <script>
-        function openChangePasswordModal() {
-            document.getElementById('passwordModal').style.display = 'block';
-        }
-        function closeChangePasswordModal() {
-            document.getElementById('passwordModal').style.display = 'none';
-            document.getElementById('current_password').value = '';
-            document.getElementById('new_password').value = '';
-            document.getElementById('confirm_password').value = '';
-            if (document.getElementById('mfa_otp_change')) document.getElementById('mfa_otp_change').value = '';
-        }
-        function submitNewPassword() {
-            const newPassword = document.getElementById('new_password').value;
-            const confirmPassword = document.getElementById('confirm_password').value;
-
-            if (!newPassword || newPassword !== confirmPassword) {
-                alert("New passwords do not match or are empty.");
-                return;
-            }
-
-            const data = {
-                planner_pk: '{{ profile_info.planner_pk }}',
-                planner_sk: '{{ profile_info.planner_sk }}',
-                current_password: document.getElementById('current_password').value,
-                password: newPassword,
-                otp_token: document.getElementById('mfa_otp_change').value
-            };
-
-            fetch("{% url 'change_password' %}", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-                body: JSON.stringify(data)
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    closeChangePasswordModal();
-                } else {
-                    alert("Error: " + data.error);
-                }
-            }).catch(err => alert("An error occurred."));
-        }
-
+var _E=i=>document.getElementById(i);function openChangePasswordModal(){_E('passwordModal').style.display='block'}function closeChangePasswordModal(){_E('passwordModal').style.display='none';_E('current_password').value='';_E('new_password').value='';_E('confirm_password').value='';if(_E('mfa_otp_change'))_E('mfa_otp_change').value=''}function submitNewPassword(){let n=_E('new_password').value,c=_E('confirm_password').value;if(!n||n!==c)return alert("New passwords do not match or are empty.");fetch("{% url 'change_password' %}",{method:"POST",headers:{"Content-Type":"application/json","X-CSRFToken":"{{ csrf_token }}"},body:JSON.stringify({planner_pk:'{{ profile_info.planner_pk }}',planner_sk:'{{ profile_info.planner_sk }}',current_password:_E('current_password').value,password:n,otp_token:_E('mfa_otp_change').value})}).then(r=>r.json()).then(d=>{if(d.success){alert(d.message);closeChangePasswordModal()}else alert("Error: "+d.error)}).catch(e=>alert("An error occurred."))}
     </script>
 
     {% include "footer.html" %}

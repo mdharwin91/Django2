@@ -137,7 +137,7 @@
                 padding: 0 20px;
                 border-bottom: 2px solid #667eea;
                 position: fixed;
-                top: 189px;
+                top: 174px;
                 left: 0;
                 width: 100%;
                 z-index: 1997;
@@ -381,7 +381,7 @@
             @media (max-width: 768px) {
                 html, body { overflow: auto; }
                 .secondary-nav {
-                    top: 189px;
+                    top: 123px !important; /* Stack precisely below navig2 */
                     overflow-x: auto;
                     white-space: nowrap;
                     -webkit-overflow-scrolling: touch;
@@ -485,13 +485,13 @@
     <body>
     <div id="popup-message"></div>
     <!-- COMMON HEADER -->
-    {% include "header.html" %} 
+    {% include "Header2.html" %} 
     {% include "logout.html" %} 
     {% include "navig2.html" %} 
 
     <div class="secondary-nav">
         <a href="javascript:void(0)" id="side-dash" onclick="showDashboard()" class="secondary-nav-item active">Dashboard</a>
-        <a href="javascript:void(0)" id="side-profile" onclick="showProfile()" class="secondary-nav-item">Student / Teacher Information</a>
+        <a href="javascript:void(0)" id="side-profile" onclick="showProfile()" class="secondary-nav-item">Profile Information</a>
         <a href="javascript:void(0)" id="side-fee" onclick="showFeePayment()" class="secondary-nav-item">Fee Payment</a>
         <a href="javascript:void(0)" id="side-enquiry" onclick="showEnquiry()" class="secondary-nav-item">Enquiry</a>
         <a href="javascript:void(0)" id="side-voucher" onclick="showVoucher()" class="secondary-nav-item">Voucher Request</a>
@@ -782,581 +782,38 @@
         </div>
     </div>
 
-            <script>
-                function showDashboard() {
-                    document.getElementById('teacherInfoSection').style.display = 'block';
-                    document.getElementById('feePaymentSection').style.display = 'none';
-                    document.getElementById('enquirySection').style.display = 'none';
-                    document.getElementById('profileSection').style.display = 'none';
-                    document.getElementById('voucherSection').style.display = 'none';
-                    document.getElementById('requestSection').style.display = 'none';
-                    document.getElementById('side-dash').classList.add('active');
-                    document.getElementById('side-fee').classList.remove('active');
-                    document.getElementById('side-enquiry').classList.remove('active');
-                    document.getElementById('side-profile').classList.remove('active');
-                    document.getElementById('side-request').classList.remove('active');
-                    document.getElementById('side-voucher').classList.remove('active');
-                }
-
-                function showFeePayment() {
-                    document.getElementById('teacherInfoSection').style.display = 'none';
-                    document.getElementById('feePaymentSection').style.display = 'block';
-                    document.getElementById('enquirySection').style.display = 'none';
-                    document.getElementById('profileSection').style.display = 'none';
-                    document.getElementById('voucherSection').style.display = 'none';
-                    document.getElementById('requestSection').style.display = 'none';
-                    document.getElementById('side-dash').classList.remove('active');
-                    document.getElementById('side-fee').classList.add('active');
-                    document.getElementById('side-enquiry').classList.remove('active');
-                    document.getElementById('side-profile').classList.remove('active');
-                    document.getElementById('side-request').classList.remove('active');
-                    document.getElementById('side-voucher').classList.remove('active');
-                }
-
-                function showEnquiry() {
-                    document.getElementById('teacherInfoSection').style.display = 'none';
-                    document.getElementById('feePaymentSection').style.display = 'none';
-                    document.getElementById('enquirySection').style.display = 'block';
-                    document.getElementById('profileSection').style.display = 'none';
-                    document.getElementById('voucherSection').style.display = 'none';
-                    document.getElementById('requestSection').style.display = 'none';
-                    document.getElementById('side-dash').classList.remove('active');
-                    document.getElementById('side-fee').classList.remove('active');
-                    document.getElementById('side-enquiry').classList.add('active');
-                    document.getElementById('side-profile').classList.remove('active');
-                    document.getElementById('side-request').classList.remove('active');
-                    document.getElementById('side-voucher').classList.remove('active');
-                    if (!document.getElementById('enq_date').value) {
-                        document.getElementById('enq_date').valueAsDate = new Date();
-                    }
-                }
-
-                function showProfile() {
-                    document.getElementById('teacherInfoSection').style.display = 'none';
-                    document.getElementById('feePaymentSection').style.display = 'none';
-                    document.getElementById('enquirySection').style.display = 'none';
-                    document.getElementById('profileSection').style.display = 'block';
-                    document.getElementById('voucherSection').style.display = 'none';
-                    document.getElementById('requestSection').style.display = 'none';
-                    document.getElementById('side-dash').classList.remove('active');
-                    document.getElementById('side-fee').classList.remove('active');
-                    document.getElementById('side-enquiry').classList.remove('active');
-                    document.getElementById('side-profile').classList.add('active');
-                    document.getElementById('side-request').classList.remove('active');
-                    document.getElementById('side-voucher').classList.remove('active');
-                }
-
-                function showVoucher() {
-                    document.getElementById('teacherInfoSection').style.display = 'none';
-                    document.getElementById('feePaymentSection').style.display = 'none';
-                    document.getElementById('enquirySection').style.display = 'none';
-                    document.getElementById('profileSection').style.display = 'none';
-                    document.getElementById('voucherSection').style.display = 'block';
-                    document.getElementById('requestSection').style.display = 'none';
-                    document.getElementById('side-dash').classList.remove('active');
-                    document.getElementById('side-fee').classList.remove('active');
-                    document.getElementById('side-enquiry').classList.remove('active');
-                    document.getElementById('side-profile').classList.remove('active');
-                    document.getElementById('side-voucher').classList.add('active');
-                    document.getElementById('side-request').classList.remove('active');
-                    if (!document.getElementById('v_date').value) {
-                        document.getElementById('v_date').valueAsDate = new Date();
-                    }
-                    updateVoucherPreview();
-                }
-
-                function toggleTheme() {
-                    const currentTheme = document.documentElement.getAttribute('data-theme');
-                    const targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                    document.documentElement.setAttribute('data-theme', targetTheme);
-                    localStorage.setItem('theme', targetTheme);
-                }
-
-                function showRequest() {
-                    document.getElementById('teacherInfoSection').style.display = 'none';
-                    document.getElementById('feePaymentSection').style.display = 'none';
-                    document.getElementById('enquirySection').style.display = 'none';
-                    document.getElementById('profileSection').style.display = 'none';
-                    document.getElementById('voucherSection').style.display = 'none';
-                    document.getElementById('requestSection').style.display = 'block';
-                    document.getElementById('side-dash').classList.remove('active');
-                    document.getElementById('side-fee').classList.remove('active');
-                    document.getElementById('side-enquiry').classList.remove('active');
-                    document.getElementById('side-profile').classList.remove('active');
-                    document.getElementById('side-voucher').classList.remove('active');
-                    document.getElementById('side-request').classList.add('active');
-                    fetchMyRequests();
-                }
-
-                document.addEventListener('DOMContentLoaded', function() {
-                    initProfileScripts();
-                });
-                function sendBonafideRequest() {
-                    const data = {
-                        profile: document.getElementById('req_profile').value,
-                        id: document.getElementById('req_target_id').value,
-                        mobile: document.getElementById('req_mobile').value,
-                        purpose: document.getElementById('req_purpose').value
-                    };
-                    if(!data.id || !data.mobile || !data.purpose) { SchoolUtils.showPopup("All fields are required.", "error"); return; }
-                    fetch("{% url 'bonafide_request_save' %}", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-                        body: JSON.stringify(data)
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if(data.success) {
-                            SchoolUtils.showPopup(data.message, "success");
-                            resetRequest();
-                            fetchMyRequests();
-                        } else SchoolUtils.showPopup(data.error, "error");
-                    })
-                    .catch(err => SchoolUtils.showPopup("Error sending request", "error"));
-                }
-
-                function fetchMyRequests() {
-                    fetch("{% url 'get_my_requests' %}")
-                    .then(res => res.json())
-                    .then(data => {
-                        const display = document.getElementById('request-status-display');
-                        display.innerHTML = `<h4 style="color: var(--panel-header); margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">My Pending Requests</h4>`;
-                        if (data.success && data.requests && data.requests.length > 0) {
-                            data.requests.forEach(req => {
-                                const statusLower = req.status.toLowerCase();
-                                const statusColor = statusLower.startsWith('in progress') ? '#ed8936' : (statusLower.includes('pending') ? '#FFD700' : '#a0aec0');
-                                const textColor = statusLower.includes('pending') ? '#333' : 'white';
-                                const card = document.createElement('div');
-                                card.className = 'card';
-                                card.style.marginBottom = '10px';
-                                card.style.borderLeft = `5px solid ${statusColor}`;
-                                card.innerHTML = `
-                                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                                        <b style="color: var(--panel-header);">${req.req_id}</b>
-                                        <span style="font-size: 0.7em; background: ${statusColor}; color: ${textColor}; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">${req.status}</span>
-                                    </div>
-                                    <div style="font-size: 0.85em; margin-top: 8px; color: var(--text-main); opacity: 0.9;">
-                                        <b>Name:</b> ${req.name || 'N/A'}<br>
-                                        <b>ID:</b> ${req.target_id} (${req.profile})<br>
-                                        <b>Purpose:</b> ${req.purpose}<br>
-                                        <small style="color: #888; display:block; margin-top:4px;">Requested on: ${req.date}</small>
-                                    </div>`;
-                                display.appendChild(card);
-                            });
-                        } else {
-                            display.innerHTML += '<p style="color: var(--text-main); opacity: 0.6; font-style: italic; font-size: 0.9em; text-align:center; padding: 20px;">No pending requests found.</p>';
-                        }
-                    })
-                    .catch(err => console.error("Error fetching requests:", err));
-                }
-
-                function resetRequest() {
-                    document.getElementById('req_target_id').value = '';
-                    document.getElementById('req_mobile').value = '';
-                    document.getElementById('req_purpose').value = '';
-                }
-
-        function verifyMFA() {
-            const pk = document.getElementById('prof-cell-planner_pk').value;
-            const sk = document.getElementById('prof-cell-planner_sk').value;
-            const token = prompt("Enter code to verify:");
-            if (!token) return;
-            
-            if (!/^\d{6}$/.test(token)) {
-                alert("Please enter exactly 6 digits.");
-                return;
-            }
-            
-            fetch("{% url 'setup_mfa' %}", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-                body: JSON.stringify({ planner_pk: pk, planner_sk: sk, action: 'verify', otp_token: token })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success) SchoolUtils.showPopup(data.message, "success");
-                else SchoolUtils.showPopup(data.error, "error");
-            });
-        }
-
-        function removeMFA() {
-            const pk = document.getElementById('prof-cell-planner_pk').value;
-            const sk = document.getElementById('prof-cell-planner_sk').value;
-            if(!confirm("Remove MFA?")) return;
-            
-            fetch("{% url 'setup_mfa' %}", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-                body: JSON.stringify({ planner_pk: pk, planner_sk: sk, action: 'remove' })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success) SchoolUtils.showPopup(data.message, "success");
-                else SchoolUtils.showPopup(data.error, "error");
-            });
-        }
-                let fetchedEnquiryData = null;
-
-                function resetEnquiry() {
-                     document.getElementById('enq_id_hidden').value = '';
-                     document.getElementById('enq_name').value = '';
-                     document.getElementById('enq_parent').value = '';
-                     document.getElementById('enq_std').value = '';
-                     document.getElementById('enq_mobile').value = '';
-                     document.getElementById('enq_address').value = '';
-                     document.getElementById('enq_date').valueAsDate = new Date();
-                     document.getElementById('enq-fetch-display').style.display = 'none';
-                     document.getElementById('enq-placeholder').style.display = 'block';
-                     fetchedEnquiryData = null;
-                 }
- 
-                 function saveEnquiry() {
-                     const data = {
-                         enq_id: document.getElementById('enq_id_hidden').value,
-                         name: document.getElementById('enq_name').value,
-                         parent_name: document.getElementById('enq_parent').value,
-                         std: document.getElementById('enq_std').value,
-                         mobile: document.getElementById('enq_mobile').value,
-                         address: document.getElementById('enq_address').value,
-                         date: document.getElementById('enq_date').value
-                     };
-                     if(!data.name || !data.mobile) { SchoolUtils.showPopup("Name and Mobile are required.", "error"); return; }
- 
-                     fetch("{% url 'enquiry_save' %}", {
-                         method: "POST",
-                         headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-                         body: JSON.stringify(data)
-                     })
-                     .then(res => res.json())
-                     .then(data => {
-                         if(data.success) { 
-                             SchoolUtils.showPopup(data.message + " (ID: " + data.enq_id + ")", "success"); 
-                             resetEnquiry(); 
-                         } else SchoolUtils.showPopup("Error: " + data.error, "error");
-                     });
-                 }
- 
-                 function fetchEnquiry() {
-                     const input = document.getElementById('search_enq_id').value.trim();
-                     if(!input) return;
-                     
-                     let payload = { planner_pk: "Enquiry" };
-                     // Smart detection: if input is 10 digits, search by mobile
-                     if (/^\d{10}$/.test(input)) {
-                         payload.mobile = input;
-                     } else {
-                         payload.planner_sk = input;
-                     }
- 
-                     fetch("{% url 'student_get' %}", {
-                         method: "POST",
-                         headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-                         body: JSON.stringify(payload)
-                     })
-                     .then(res => res.json())
-                     .then(data => {
-                         if(data.user_info) {
-                             fetchedEnquiryData = data.user_info;
-                             document.getElementById('enq-fetch-display').style.display = 'block';
-                             document.getElementById('enq-placeholder').style.display = 'none';
-                             document.getElementById('enq-display-summary').innerHTML = `<b>Name:</b> ${fetchedEnquiryData.name}<br><b>Parent:</b> ${fetchedEnquiryData.parent_name || 'N/A'}<br><b>Mobile:</b> ${fetchedEnquiryData.mobile}<br><b>Std:</b> ${fetchedEnquiryData.std}<br><b>Address:</b> ${fetchedEnquiryData.address || 'N/A'}`;
-                         } else SchoolUtils.showPopup("Enquiry not found.", "error");
-                     });
-                 }
- 
-                 function editEnquiry() {
-                     if(!fetchedEnquiryData) return;
-                     document.getElementById('enq_id_hidden').value = fetchedEnquiryData.planner_sk;
-                     document.getElementById('enq_name').value = fetchedEnquiryData.name || '';
-                     document.getElementById('enq_parent').value = fetchedEnquiryData.parent_name || '';
-                     document.getElementById('enq_std').value = fetchedEnquiryData.std || '';
-                     document.getElementById('enq_mobile').value = fetchedEnquiryData.mobile || '';
-                     document.getElementById('enq_address').value = fetchedEnquiryData.address || '';
-                     document.getElementById('enq_date').value = fetchedEnquiryData.date || '';
-                 }
- 
-                 function deleteEnquiry() {
-                     if(!confirm("Are you sure you want to delete this enquiry?")) return;
-                     fetch("{% url 'enquiry_delete' %}", {
-                         method: "POST",
-                         headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-                         body: JSON.stringify({ enq_id: fetchedEnquiryData.planner_sk })
-                     })
-                     .then(res => res.json())
-                     .then(data => { 
-                         if(data.success) { 
-                             SchoolUtils.showPopup(data.message, "success"); 
-                             resetEnquiry(); 
-                         } else {
-                             SchoolUtils.showPopup(data.error, "error"); 
-                         }
-                     });
-                 }
- 
-                 // Voucher Logic
-                 function updateVoucherPreview(status = 'Pending') {
-                     const date = document.getElementById('v_date').value;
-                     const type = document.getElementById('v_type').value;
-                     const name = document.getElementById('v_name').value;
-                     const mobile = document.getElementById('v_mobile').value;
-                     const amount = document.getElementById('v_amount').value;
-                     const purpose = document.getElementById('v_purpose').value;
- 
-                     document.getElementById('pre_date').innerText = date ? date.split('-').reverse().join('/') : '--/--/----';
-                     document.getElementById('pre_type').innerText = type.toUpperCase();
-                     document.getElementById('pre_relation').innerText = type === 'Payment' ? 'Paid to' : 'Received from';
-                     document.getElementById('pre_name').innerText = name || '____________________';
-                     document.getElementById('pre_mobile').innerText = mobile || '__________';
-                     document.getElementById('pre_amount').innerText = amount ? parseFloat(amount).toLocaleString('en-IN', {minimumFractionDigits: 2}) : '0.00';
-                     document.getElementById('pre_purpose').innerText = purpose || '____________________';
-                     document.getElementById('pre_words').innerText = amount ? numToWords(amount) : '________________________________________';
-                     const upperStatus = status.toUpperCase();
-                     document.getElementById('pre_status').innerText = upperStatus;
-                     document.getElementById('pre_status').style.color = upperStatus.includes('SIGNED') ? 'blue' : 
-                                                                      ((upperStatus.startsWith('APPROVED') || upperStatus.startsWith('COMPLETED')) ? 'green' : 
-                                                                      (upperStatus.startsWith('REJECTED') ? 'red' : 'orange'));
-                 }
- 
-                 function resetVoucher() {
-                     document.getElementById('v_no').value = '';
-                     document.getElementById('v_name').value = '';
-                     document.getElementById('v_mobile').value = '';
-                     document.getElementById('v_amount').value = '';
-                     document.getElementById('v_purpose').value = '';
-                     document.getElementById('v_date').valueAsDate = new Date();
-                     document.getElementById('pre_no').innerText = '-----';
-                     document.getElementById('pre_billed_by').innerText = "({{ request.session.user.user }})";
-                     document.getElementById('btn-pdf-v').style.display = 'none';
-                     updateVoucherPreview();
-                     SchoolUtils.showPopup("Voucher form reset successfully", "success");
-                 }
- 
-                 function saveVoucher() {
-                     const data = {
-                         voucher_no: document.getElementById('v_no').value,
-                         date: document.getElementById('v_date').value,
-                         type: document.getElementById('v_type').value,
-                         name: document.getElementById('v_name').value,
-                         mobile: document.getElementById('v_mobile').value,
-                         amount: document.getElementById('v_amount').value,
-                         purpose: document.getElementById('v_purpose').value,
-                         amount_words: numToWords(document.getElementById('v_amount').value)
-                     };
-                     
-                     if(!data.name || !data.amount) { SchoolUtils.showPopup("Name and Amount are required.", "error"); return; }
- 
-                     SchoolUtils.showPopup("Saving voucher data...", "success");
- 
-                     fetch("{% url 'voucher_save' %}", {
-                         method: "POST",
-                         headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-                         body: JSON.stringify(data)
-                     })
-                     .then(res => res.json())
-                     .then(data => {
-                         if(data.success) {
-                             SchoolUtils.showPopup(data.message, "success");
-                             document.getElementById('v_no').value = data.voucher_no;
-                             document.getElementById('pre_no').innerText = data.voucher_no;
-                             document.getElementById('btn-pdf-v').style.display = 'none';
-                         } else SchoolUtils.showPopup(data.error, "error");
-                     });
-                 }
- 
-                 function fetchVoucher() {
-                     const input = document.getElementById('search_v_no').value.trim();
-                     if(!input) {
-                         SchoolUtils.showPopup("Please enter a Voucher No or Mobile to search", "error");
-                         return;
-                     }
- 
-                     // If input is exactly 10 digits, search by mobile and show list
-                     if (/^\d{10}$/.test(input)) {
-                         fetchVouchersByMobile(input);
-                     } else {
-                         // Search by voucher number and show single voucher
-                         fetchSingleVoucher(input);
-                     }
-                 }
- 
-                 function fetchVouchersByMobile(mobile) {
-                     fetch("{% url 'get_vouchers_by_mobile' %}", {
-                         method: "POST",
-                         headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-                         body: JSON.stringify({ mobile: mobile })
-                     })
-                     .then(res => res.json())
-                     .then(data => {
-                         if(data.success && data.vouchers && data.vouchers.length > 0) {
-                             // Show the voucher list
-                             showVoucherList(mobile, data.vouchers);
-                         } else {
-                             SchoolUtils.showPopup("No vouchers found for this mobile number", "error");
-                         }
-                     })
-                     .catch(err => {
-                         console.error("Error fetching vouchers:", err);
-                         SchoolUtils.showPopup("Error fetching voucher data", "error");
-                     });
-                 }
- 
-                 function showVoucherList(mobile, vouchers) {
-                     document.getElementById('list-mobile-number').innerText = mobile;
-                     const listContainer = document.getElementById('voucher-list');
-                     listContainer.innerHTML = '';
- 
-                     vouchers.forEach(voucher => {
-                         const voucherCard = document.createElement('div');
-                         voucherCard.className = 'card';
-                         voucherCard.style.cursor = 'pointer';
-                         voucherCard.style.marginBottom = '10px';
-                         voucherCard.style.padding = '15px';
-                         voucherCard.style.borderLeft = '4px solid #667eea';
-                         
-                         const status = voucher.status || 'Pending';
-                         const statusLower = status.toLowerCase();
-                         const statusColor = statusLower.includes('signed') ? 'blue' : 
-                                           (statusLower.includes('approved') || statusLower.includes('completed') ? 'green' : 
-                                           (statusLower.includes('rejected') ? 'red' : 'orange'));
-                         
-                         voucherCard.innerHTML = `
-                             <div style="display: flex; justify-content: space-between; align-items: center;">
-                                 <div style="color: var(--text-main);">
-                                     <strong style="color: var(--panel-header);">${voucher.voucher_no || voucher.planner_sk}</strong>
-                                     <span style="background: ${statusColor}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8em; margin-left: 10px;">${status}</span>
-                                     <br>
-                                     <small style="opacity: 0.7;">${voucher.date} | ₹${voucher.amount}</small>
-                                     <br>
-                                     <small style="opacity: 0.7;">${voucher.name} - ${voucher.purpose}</small>
-                                 </div>
-                                 <div style="font-size: 1.2em; font-weight: bold; color: #764ba2;">
-                                     ₹${voucher.amount}
-                                 </div>
-                             </div>
-                         `;
-                         
-                         voucherCard.onclick = () => loadVoucherDetails(voucher);
-                         listContainer.appendChild(voucherCard);
-                     });
- 
-                     // Show the list and hide the slip
-                     document.getElementById('voucher-list-container').style.display = 'block';
-                     document.getElementById('voucher-slip-container').style.display = 'none';
-                     
-                     SchoolUtils.showPopup(`Found ${vouchers.length} voucher(s) for mobile ${mobile}`, "success");
-                 }
- 
-                 function fetchSingleVoucher(voucherNo) {
-                     fetch("{% url 'student_get' %}", {
-                         method: "POST",
-                         headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-                         body: JSON.stringify({ planner_pk: "vouchers", planner_sk: voucherNo })
-                     })
-                     .then(res => res.json())
-                     .then(data => {
-                         if(data.user_info) {
-                             loadVoucherDetails(data.user_info);
-                         } else {
-                             SchoolUtils.showPopup("Voucher not found", "error");
-                         }
-                     })
-                     .catch(err => {
-                         console.error("Error fetching voucher:", err);
-                         SchoolUtils.showPopup("Error fetching voucher data", "error");
-                     });
-                 }
- 
-                 function loadVoucherDetails(info) {
-                     document.getElementById('v_no').value = info.voucher_no || info.planner_sk;
-                     document.getElementById('pre_no').innerText = info.voucher_no || info.planner_sk;
-                     document.getElementById('v_date').value = info.date;
-                     document.getElementById('v_type').value = info.type;
-                     document.getElementById('v_name').value = info.name;
-                     document.getElementById('v_mobile').value = info.mobile || '';
-                     document.getElementById('v_amount').value = info.amount;
-                     document.getElementById('v_purpose').value = info.purpose;
-                     document.getElementById('pre_billed_by').innerText = "(" + (info.billed_by || "{{ request.session.user.user }}") + ")";
-                     SchoolUtils.showPopup("Voucher details loaded!", "success");
-                     updateVoucherPreview(info.status || 'Pending');
-                     
-                     const statusVal = (info.status || '').toUpperCase();
-                     const isApproved = (statusVal.startsWith('APPROVED') || statusVal.startsWith('COMPLETED'));
-                     const isSigned = statusVal.includes('SIGNED');
- 
-                     // Hide print options if already signed
-                     document.getElementById('btn-pdf-v').style.display = (isApproved && !isSigned) ? 'inline-block' : 'none';
-                     document.getElementById('btn-signed-v').style.display = 'none'; // Reset signed button on load
-                     
-                     // Show the voucher slip container and hide the list
-                     document.getElementById('voucher-slip-container').style.display = 'block';
-                     document.getElementById('voucher-list-container').style.display = 'none';
-                     
-                     if (isSigned) {
-                         SchoolUtils.showPopup("This voucher has been Signed. Printing is now restricted.", "error");
-                     } else if (!isApproved) {
-                         SchoolUtils.showPopup("This voucher is " + (info.status || 'Pending') + ". Printing is disabled until approved.", "error");
-                     }
-                 }
- 
-                 function markVoucherSigned() {
-                     const vNo = document.getElementById('v_no').value;
-                     if (!vNo) return;
-                     
-                     if(!confirm("Once marked as Signed, this voucher cannot be printed or edited again. Continue?")) return;
- 
-                     fetch("{% url 'approve_voucher' %}", {
-                         method: "POST",
-                         headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-                         body: JSON.stringify({ 
-                             voucher_no: vNo, 
-                             action: 'Signed', 
-                             type: 'Voucher' 
-                         })
-                     })
-                     .then(res => res.json())
-                     .then(data => {
-                         if(data.success) {
-                             SchoolUtils.showPopup("Voucher successfully marked as Signed", "success");
-                             fetchSingleVoucher(vNo); // Refresh to apply restrictions
-                         } else {
-                             SchoolUtils.showPopup(data.error, "error");
-                         }
-                     })
-                     .catch(err => SchoolUtils.showPopup("Error updating voucher status", "error"));
-                 }
- 
-                 function hideVoucherList() {
-                     document.getElementById('voucher-list-container').style.display = 'none';
-                     document.getElementById('voucher-slip-container').style.display = 'block';
-                 }
- 
-                 function downloadVoucherPDF() {
-                     const { jsPDF } = window.jspdf;
-                     const element = document.getElementById("voucher-slip");
-                     
-                     html2canvas(element, {
-                         scale: 2,
-                         useCORS: true,
-                         backgroundColor: '#ffffff'
-                     }).then(canvas => {
-                         const imgData = canvas.toDataURL('image/jpeg', 0.8);
-                         const pdf = new jsPDF('l', 'mm', 'a5'); // Landscape A5 matches voucher dimensions
-                         
-                         const pdfWidth = pdf.internal.pageSize.getWidth();
-                         const pdfHeight = pdf.internal.pageSize.getHeight();
-                         
-                         pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-                         
-                         const vNo = document.getElementById('v_no').value || "VOUCHER";
-                         const vDate = document.getElementById('v_date').value || "DATE";
-                         pdf.save(`VOUCHER_${vNo}_${vDate}.pdf`);
- 
-                         // Show Signed button after PDF is generated
-                         document.getElementById('btn-signed-v').style.display = 'inline-block';
-                         SchoolUtils.showPopup("After saving the PDF, please click the 'Signed' button to finalize the record.", "success");
-                     });
-                 }
-             </script>
+    <script>
+var _E=i=>document.getElementById(i),_S=q=>document.querySelectorAll(q),_P=(m,t)=>SchoolUtils.showPopup(m,t),_F=(u,b)=>fetch(u,{method:"POST",headers:{"Content-Type":"application/json","X-CSRFToken":"{{ csrf_token }}"},body:JSON.stringify(b)});
+function _shS(s,n){['teacherInfoSection','feePaymentSection','enquirySection','profileSection','voucherSection','requestSection'].forEach(x=>_E(x).style.display=x===s?'block':'none');['side-dash','side-fee','side-enquiry','side-profile','side-request','side-voucher'].forEach(x=>_E(x).classList[x===n?'add':'remove']('active'))}
+function showDashboard(){_shS('teacherInfoSection','side-dash')}
+function showFeePayment(){_shS('feePaymentSection','side-fee')}
+function showEnquiry(){_shS('enquirySection','side-enquiry');if(!_E('enq_date').value)_E('enq_date').valueAsDate=new Date()}
+function showProfile(){_shS('profileSection','side-profile')}
+function showVoucher(){_shS('voucherSection','side-voucher');if(!_E('v_date').value)_E('v_date').valueAsDate=new Date();updateVoucherPreview()}
+function toggleTheme(){let c=document.documentElement.getAttribute('data-theme'),t=c==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',t);localStorage.setItem('theme',t)}
+function showRequest(){_shS('requestSection','side-request');fetchMyRequests()}
+document.addEventListener('DOMContentLoaded',function(){initProfileScripts()});
+function sendBonafideRequest(){let d={profile:_E('req_profile').value,id:_E('req_target_id').value,mobile:_E('req_mobile').value,purpose:_E('req_purpose').value};if(!d.id||!d.mobile||!d.purpose)return _P("All fields are required.","error");_F("{% url 'bonafide_request_save' %}",d).then(r=>r.json()).then(d=>{if(d.success){_P(d.message,"success");resetRequest();fetchMyRequests()}else _P(d.error,"error")}).catch(e=>_P("Error sending request","error"))}
+function fetchMyRequests(){fetch("{% url 'get_my_requests' %}").then(r=>r.json()).then(d=>{let m=_E('request-status-display');m.innerHTML=`<h4 style="color: var(--panel-header); margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">My Pending Requests</h4>`;if(d.success&&d.requests&&d.requests.length>0){d.requests.forEach(r=>{let s=r.status.toLowerCase(),c=s.startsWith('in progress')?'#ed8936':s.includes('pending')?'#FFD700':'#a0aec0',t=s.includes('pending')?'#333':'white',v=document.createElement('div');v.className='card';v.style.marginBottom='10px';v.style.borderLeft=`5px solid ${c}`;v.innerHTML=`<div style="display:flex; justify-content:space-between; align-items:center;"><b style="color: var(--panel-header);">${r.req_id}</b><span style="font-size: 0.7em; background: ${c}; color: ${t}; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">${r.status}</span></div><div style="font-size: 0.85em; margin-top: 8px; color: var(--text-main); opacity: 0.9;"><b>Name:</b> ${r.name||'N/A'}<br><b>ID:</b> ${r.target_id} (${r.profile})<br><b>Purpose:</b> ${r.purpose}<br><small style="color: #888; display:block; margin-top:4px;">Requested on: ${r.date}</small></div>`;m.appendChild(v)})}else m.innerHTML+='<p style="color: var(--text-main); opacity: 0.6; font-style: italic; font-size: 0.9em; text-align:center; padding: 20px;">No pending requests found.</p>'}).catch(e=>console.error("Error fetching requests:",e))}
+function resetRequest(){_E('req_target_id').value='';_E('req_mobile').value='';_E('req_purpose').value=''}
+var fetchedEnquiryData=null;
+function resetEnquiry(){_E('enq_id_hidden').value='';_E('enq_name').value='';_E('enq_parent').value='';_E('enq_std').value='';_E('enq_mobile').value='';_E('enq_address').value='';_E('enq_date').valueAsDate=new Date();_E('enq-fetch-display').style.display='none';_E('enq-placeholder').style.display='block';fetchedEnquiryData=null}
+function saveEnquiry(){let d={enq_id:_E('enq_id_hidden').value,name:_E('enq_name').value,parent_name:_E('enq_parent').value,std:_E('enq_std').value,mobile:_E('enq_mobile').value,address:_E('enq_address').value,date:_E('enq_date').value};if(!d.name||!d.mobile)return _P("Name and Mobile are required.","error");_F("{% url 'enquiry_save' %}",d).then(r=>r.json()).then(d=>{if(d.success){_P(d.message+" (ID: "+d.enq_id+")","success");resetEnquiry()}else _P("Error: "+d.error,"error")})}
+function fetchEnquiry(){let i=_E('search_enq_id').value.trim();if(!i)return;let p={planner_pk:"Enquiry"};if(/^\d{10}$/.test(i))p.mobile=i;else p.planner_sk=i;_F("{% url 'student_get' %}",p).then(r=>r.json()).then(d=>{if(d.user_info){fetchedEnquiryData=d.user_info;_E('enq-fetch-display').style.display='block';_E('enq-placeholder').style.display='none';_E('enq-display-summary').innerHTML=`<b>Name:</b> ${fetchedEnquiryData.name}<br><b>Parent:</b> ${fetchedEnquiryData.parent_name||'N/A'}<br><b>Mobile:</b> ${fetchedEnquiryData.mobile}<br><b>Std:</b> ${fetchedEnquiryData.std}<br><b>Address:</b> ${fetchedEnquiryData.address||'N/A'}`}else _P("Enquiry not found.","error")})}
+function editEnquiry(){if(!fetchedEnquiryData)return;_E('enq_id_hidden').value=fetchedEnquiryData.planner_sk;_E('enq_name').value=fetchedEnquiryData.name||'';_E('enq_parent').value=fetchedEnquiryData.parent_name||'';_E('enq_std').value=fetchedEnquiryData.std||'';_E('enq_mobile').value=fetchedEnquiryData.mobile||'';_E('enq_address').value=fetchedEnquiryData.address||'';_E('enq_date').value=fetchedEnquiryData.date||''}
+function deleteEnquiry(){if(!confirm("Are you sure you want to delete this enquiry?"))return;_F("{% url 'enquiry_delete' %}",{enq_id:fetchedEnquiryData.planner_sk}).then(r=>r.json()).then(d=>{if(d.success){_P(d.message,"success");resetEnquiry()}else _P(d.error,"error")})}
+function updateVoucherPreview(s='Pending'){let d=_E('v_date').value,t=_E('v_type').value,n=_E('v_name').value,m=_E('v_mobile').value,a=_E('v_amount').value,p=_E('v_purpose').value;_E('pre_date').innerText=d?d.split('-').reverse().join('/'):'--/--/----';_E('pre_type').innerText=t.toUpperCase();_E('pre_relation').innerText=t==='Payment'?'Paid to':'Received from';_E('pre_name').innerText=n||'____________________';_E('pre_mobile').innerText=m||'__________';_E('pre_amount').innerText=a?parseFloat(a).toLocaleString('en-IN',{minimumFractionDigits:2}):'0.00';_E('pre_purpose').innerText=p||'____________________';_E('pre_words').innerText=a?numToWords(a):'________________________________________';let u=s.toUpperCase();_E('pre_status').innerText=u;_E('pre_status').style.color=u.includes('SIGNED')?'blue':(u.startsWith('APPROVED')||u.startsWith('COMPLETED'))?'green':u.startsWith('REJECTED')?'red':'orange'}
+function resetVoucher(){_E('v_no').value='';_E('v_name').value='';_E('v_mobile').value='';_E('v_amount').value='';_E('v_purpose').value='';_E('v_date').valueAsDate=new Date();_E('pre_no').innerText='-----';_E('pre_billed_by').innerText="({{ request.session.user.user }})";_E('btn-pdf-v').style.display='none';updateVoucherPreview();_P("Voucher form reset successfully","success")}
+function saveVoucher(){let d={voucher_no:_E('v_no').value,date:_E('v_date').value,type:_E('v_type').value,name:_E('v_name').value,mobile:_E('v_mobile').value,amount:_E('v_amount').value,purpose:_E('v_purpose').value,amount_words:numToWords(_E('v_amount').value)};if(!d.name||!d.amount)return _P("Name and Amount are required.","error");_P("Saving voucher data...","success");_F("{% url 'voucher_save' %}",d).then(r=>r.json()).then(d=>{if(d.success){_P(d.message,"success");_E('v_no').value=d.voucher_no;_E('pre_no').innerText=d.voucher_no;_E('btn-pdf-v').style.display='none'}else _P(d.error,"error")})}
+function fetchVoucher(){let i=_E('search_v_no').value.trim();if(!i)return _P("Please enter a Voucher No or Mobile to search","error");if(/^\d{10}$/.test(i))fetchVouchersByMobile(i);else fetchSingleVoucher(i)}
+function fetchVouchersByMobile(m){_F("{% url 'get_vouchers_by_mobile' %}",{mobile:m}).then(r=>r.json()).then(d=>{if(d.success&&d.vouchers&&d.vouchers.length>0)showVoucherList(m,d.vouchers);else _P("No vouchers found for this mobile number","error")}).catch(e=>{console.error("Error fetching vouchers:",e);_P("Error fetching voucher data","error")})}
+function showVoucherList(m,v){_E('list-mobile-number').innerText=m;let l=_E('voucher-list');l.innerHTML='';v.forEach(v=>{let c=document.createElement('div');c.className='card';c.style.cursor='pointer';c.style.marginBottom='10px';c.style.padding='15px';c.style.borderLeft='4px solid #667eea';let s=v.status||'Pending',u=s.toLowerCase(),k=u.includes('signed')?'blue':(u.includes('approved')||u.includes('completed'))?'green':u.includes('rejected')?'red':'orange';c.innerHTML=`<div style="display: flex; justify-content: space-between; align-items: center;"><div style="color: var(--text-main);"><strong style="color: var(--panel-header);">${v.voucher_no||v.planner_sk}</strong><span style="background: ${k}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8em; margin-left: 10px;">${s}</span><br><small style="opacity: 0.7;">${v.date} | ₹${v.amount}</small><br><small style="opacity: 0.7;">${v.name} - ${v.purpose}</small></div><div style="font-size: 1.2em; font-weight: bold; color: #764ba2;">₹${v.amount}</div></div>`;c.onclick=()=>loadVoucherDetails(v);l.appendChild(c)});_E('voucher-list-container').style.display='block';_E('voucher-slip-container').style.display='none';_P(`Found ${v.length} voucher(s) for mobile ${m}`,"success")}
+function fetchSingleVoucher(v){_F("{% url 'student_get' %}",{planner_pk:"vouchers",planner_sk:v}).then(r=>r.json()).then(d=>{if(d.user_info)loadVoucherDetails(d.user_info);else _P("Voucher not found","error")}).catch(e=>{console.error("Error fetching voucher:",e);_P("Error fetching voucher data","error")})}
+function loadVoucherDetails(i){_E('v_no').value=i.voucher_no||i.planner_sk;_E('pre_no').innerText=i.voucher_no||i.planner_sk;_E('v_date').value=i.date;_E('v_type').value=i.type;_E('v_name').value=i.name;_E('v_mobile').value=i.mobile||'';_E('v_amount').value=i.amount;_E('v_purpose').value=i.purpose;_E('pre_billed_by').innerText="("+(i.billed_by||"{{ request.session.user.user }}")+")";_P("Voucher details loaded!","success");updateVoucherPreview(i.status||'Pending');let s=(i.status||'').toUpperCase(),a=s.startsWith('APPROVED')||s.startsWith('COMPLETED'),g=s.includes('SIGNED');_E('btn-pdf-v').style.display=(a&&!g)?'inline-block':'none';_E('btn-signed-v').style.display='none';_E('voucher-slip-container').style.display='block';_E('voucher-list-container').style.display='none';if(g)_P("This voucher has been Signed. Printing is now restricted.","error");else if(!a)_P("This voucher is "+(i.status||'Pending')+". Printing is disabled until approved.","error")}
+function markVoucherSigned(){let v=_E('v_no').value;if(!v)return;if(!confirm("Once marked as Signed, this voucher cannot be printed or edited again. Continue?"))return;_F("{% url 'approve_voucher' %}",{voucher_no:v,action:'Signed',type:'Voucher'}).then(r=>r.json()).then(d=>{if(d.success){_P("Voucher successfully marked as Signed","success");fetchSingleVoucher(v)}else _P(d.error,"error")}).catch(e=>_P("Error updating voucher status","error"))}
+function hideVoucherList(){_E('voucher-list-container').style.display='none';_E('voucher-slip-container').style.display='block'}
+function downloadVoucherPDF(){let{jsPDF:j}=window.jspdf,e=_E("voucher-slip");html2canvas(e,{scale:2,useCORS:!0,backgroundColor:'#ffffff'}).then(c=>{let i=c.toDataURL('image/jpeg',0.8),p=new j('l','mm','a5'),w=p.internal.pageSize.getWidth(),h=p.internal.pageSize.getHeight();p.addImage(i,'JPEG',0,0,w,h);let n=_E('v_no').value||"VOUCHER",d=_E('v_date').value||"DATE";p.save(`VOUCHER_${n}_${d}.pdf`);_E('btn-signed-v').style.display='inline-block';_P("After saving the PDF, please click the 'Signed' button to finalize the record.","success")})}
+    </script>
      {% include "footer.html" %}
      </body>
  </html>

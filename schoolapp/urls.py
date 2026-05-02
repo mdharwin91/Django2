@@ -34,5 +34,7 @@ urlpatterns = [
     path('get_pending_vouchers/', views.get_pending_vouchers, name='get_pending_vouchers'),
     path('approve_voucher/', views.approve_voucher, name='approve_voucher'),
     path('bonafide_request_save/', views.bonafide_request_save, name='bonafide_request_save'),
+    path('get_changes/', views.get_changes, name='get_changes'),
+    path('save_changes/', views.save_changes, name='save_changes'),
     path('', include('schoolweb.urls')),
 ]

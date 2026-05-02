@@ -89,6 +89,18 @@ bonafide_msg = {
     "Student": "This is to certify that [Name], [SID] ([EMIS No: ]), is a bonafide student of [School Name] studying in [Class] standard for the academic year [Year].",
     "Teacher": "This is to certify that [Name], [TID] ([EMIS No: ]) is a bonafide teacher at [School Name] since [Joining Date]."
 }
+
+designation = [
+    "Principal",
+    "Vice Principal",
+    "Teacher",
+    "Admin",
+    "Office Assist",
+    "Manager",
+    "Correspondent",
+    "Supervisor"
+
+]
     
 
 # Create your models here.

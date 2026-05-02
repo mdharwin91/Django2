@@ -93,7 +93,7 @@
     padding: 0 20px;
     border-bottom: 2px solid #667eea;
     position: fixed;
-    top: 189px; /* Adjusted to clear the header (130px) + logout bar */
+    top: 157px; /* Adjusted to clear the header (130px) + logout bar */
     left: 0;
     width: 100%;
     z-index: 1997;
@@ -130,7 +130,7 @@
     padding: 0 20px;
     border-bottom: 2px solid #667eea;
     position: fixed;
-    top: 160px; /* Adjusted to clear the header (130px) + logout bar */
+    top: 115px; /* Adjusted to clear the header (130px) + logout bar */
     left: 0;
     width: 100%;
     z-index: 1997;
