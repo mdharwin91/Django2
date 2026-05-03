@@ -137,7 +137,7 @@
                 padding: 0 20px;
                 border-bottom: 2px solid #667eea;
                 position: fixed;
-                top: 174px;
+                top: 173px;
                 left: 0;
                 width: 100%;
                 z-index: 1997;
@@ -792,7 +792,7 @@ function showProfile(){_shS('profileSection','side-profile')}
 function showVoucher(){_shS('voucherSection','side-voucher');if(!_E('v_date').value)_E('v_date').valueAsDate=new Date();updateVoucherPreview()}
 function toggleTheme(){let c=document.documentElement.getAttribute('data-theme'),t=c==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',t);localStorage.setItem('theme',t)}
 function showRequest(){_shS('requestSection','side-request');fetchMyRequests()}
-document.addEventListener('DOMContentLoaded',function(){initProfileScripts()});
+document.addEventListener('DOMContentLoaded',function(){initProfileScripts();function a(){let n=_S('.teach-admin-nav')[0],s=_S('.secondary-nav')[0];if(n&&s&&window.innerWidth>768)s.style.top=Math.floor(n.getBoundingClientRect().bottom)+'px';else if(s)s.style.top=''}a();window.addEventListener('resize',a)});
 function sendBonafideRequest(){let d={profile:_E('req_profile').value,id:_E('req_target_id').value,mobile:_E('req_mobile').value,purpose:_E('req_purpose').value};if(!d.id||!d.mobile||!d.purpose)return _P("All fields are required.","error");_F("{% url 'bonafide_request_save' %}",d).then(r=>r.json()).then(d=>{if(d.success){_P(d.message,"success");resetRequest();fetchMyRequests()}else _P(d.error,"error")}).catch(e=>_P("Error sending request","error"))}
 function fetchMyRequests(){fetch("{% url 'get_my_requests' %}").then(r=>r.json()).then(d=>{let m=_E('request-status-display');m.innerHTML=`<h4 style="color: var(--panel-header); margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">My Pending Requests</h4>`;if(d.success&&d.requests&&d.requests.length>0){d.requests.forEach(r=>{let s=r.status.toLowerCase(),c=s.startsWith('in progress')?'#ed8936':s.includes('pending')?'#FFD700':'#a0aec0',t=s.includes('pending')?'#333':'white',v=document.createElement('div');v.className='card';v.style.marginBottom='10px';v.style.borderLeft=`5px solid ${c}`;v.innerHTML=`<div style="display:flex; justify-content:space-between; align-items:center;"><b style="color: var(--panel-header);">${r.req_id}</b><span style="font-size: 0.7em; background: ${c}; color: ${t}; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">${r.status}</span></div><div style="font-size: 0.85em; margin-top: 8px; color: var(--text-main); opacity: 0.9;"><b>Name:</b> ${r.name||'N/A'}<br><b>ID:</b> ${r.target_id} (${r.profile})<br><b>Purpose:</b> ${r.purpose}<br><small style="color: #888; display:block; margin-top:4px;">Requested on: ${r.date}</small></div>`;m.appendChild(v)})}else m.innerHTML+='<p style="color: var(--text-main); opacity: 0.6; font-style: italic; font-size: 0.9em; text-align:center; padding: 20px;">No pending requests found.</p>'}).catch(e=>console.error("Error fetching requests:",e))}
 function resetRequest(){_E('req_target_id').value='';_E('req_mobile').value='';_E('req_purpose').value=''}

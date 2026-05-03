@@ -86,10 +86,19 @@
                 100% { background-position: 1000px 0; }
             }
 
+            .common-layout {
+                display: flex;
+                flex-direction: row;
+                gap: 40px;
+                max-width: 1200px;
+                margin: 40px auto 80px auto;
+                padding: 0 20px;
+                align-items: center;
+            }
+
             .welcome-section {
-                text-align: center;
-                margin-top: 80px;
-                margin-bottom: 40px;
+                flex: 1;
+                text-align: left;
                 color: #ffffff;
                 position: relative;
                 z-index: 1;
@@ -118,8 +127,8 @@
             .welcome-section p {
                 opacity: 0.9;
                 font-size: 17px;
-                max-width: 600px;
-                margin: 0 auto;
+                max-width: 100%;
+                margin: 0;
                 line-height: 1.6;
             }
 
@@ -128,12 +137,11 @@
             }
 
             .profile-card {
+                flex: 2;
                 background: var(--card-bg);
                 border-radius: 20px;
                 box-shadow: var(--shadow-lg);
-                width: 95%;
-                max-width: 1200px;
-                margin: 0 auto 60px;
+                width: 100%;
                 border: 1px solid var(--border-color);
                 overflow: hidden;
                 position: relative;
@@ -346,18 +354,25 @@
             }
 
             @media (max-width: 768px) {
+                .common-layout {
+                    flex-direction: column;
+                    margin: 20px auto 60px auto;
+                    gap: 30px;
+                }
                 .welcome-section {
-                    margin-top: 60px;
+                    text-align: center;
+                    margin-top: 20px;
                     padding: 0 20px;
                 }
                 .welcome-section h2 {
                     font-size: 28px;
                 }
                 .welcome-section p {
+                    margin: 0 auto;
                     font-size: 15px;
                 }
                 .profile-card { 
-                    margin: 0 15px 40px; 
+                    margin: 0; 
                     border-radius: 16px;
                 }
                 .profile-content {
@@ -398,6 +413,7 @@
         {% include "logout.html" %} 
         {% include "navig2.html" %} 
 
+    <div class="common-layout">
     <div class="welcome-section">
         <h2>Welcome, {{ request.session.user.user }}!</h2>
         <p>You are now logged into the school portal. Your profile details are listed below.</p>
@@ -405,7 +421,7 @@
 
     <div class="profile-card">
         <div class="profile-badge">👤</div>
-        <div class="profile-header">My Profile Information</div>
+        <div class="profile-header">Profile Information</div>
         <div class="profile-content">
             <div class="profile-info-grid">
                 <div class="info-card">
@@ -479,6 +495,7 @@
         <div class="profile-actions">
             <button class="profile-action-btn" onclick="openChangePasswordModal()">Change Password</button>
         </div>
+    </div>
     </div>
 
     <!-- Change Password Modal -->

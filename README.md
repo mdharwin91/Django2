@@ -31,6 +31,8 @@ SchoolBill is a powerful and user-friendly school management system built with D
 16. Navigation bar only half visible on mobile view, brought further down to fully clear the header. [FIXED]
 17. While on Mobile view, fix the visual gap between navig2 and secondary nav bar. [FIXED]
 18. Place this logout on admipage right after the Header2.html. [FIXED]
+19. There is a small gap between navig2 and secondary-nav bar on desktop view, analysis and fix [FIXED]
+20. Extract Assets: Move all minified inline JavaScript and CSS into dedicated .js and .css files served via Django's static files.
 
 ## Coding Guidelines & Security
 - **Secured Website & Zero Vulnerability:** Ensure all code adheres to strict security practices to prevent potential vulnerabilities (e.g., XSS, CSRF, SQLi).

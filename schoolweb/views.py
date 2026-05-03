@@ -216,6 +216,11 @@ def student_details(request):
         context['current_user_role'] = user_session.get('pk')
 
     if request.method == 'POST':
+        # Backend Verification: Prevent unauthorized profile creation
+        if context.get('current_user_role') not in ['Admin', 'Teacher']:
+            context['result'] = "Unauthorized: Invalid permissions to create or modify profiles."
+            return render(request, "studentprofile.html", context)
+
         try:
             val_01 = request.POST.get('name')
             val_02 = request.POST.get('planner_sk')
@@ -525,6 +530,14 @@ def student_update(request):
             planner_sk = data.get('planner_sk')
             if not planner_pk or not planner_sk:
                 return JsonResponse({'success': False, 'error': 'planner_pk and planner_sk are required'}, status=400)
+
+            # Backend Verification: Ensure users can only update their own profile unless Admin
+            if isinstance(user, dict):
+                logged_in_pk = user.get('pk')
+                logged_in_sk = user.get('sk')
+                if logged_in_pk != 'Admin':
+                    if logged_in_pk != planner_pk or logged_in_sk != planner_sk:
+                        return JsonResponse({'success': False, 'error': 'Unauthorized to modify this profile'}, status=403)
 
             # Coerce to strings to avoid NULL being sent to DynamoDB and sanitize
             planner_pk = sanitize_str(str(planner_pk))
@@ -998,6 +1011,10 @@ def voucher_save(request):
     if not user or user == "ACCESS DENIED":
         return JsonResponse({'error': 'Unauthorized'}, status=401)
     
+    # Backend Verification: Only Admins and Teachers can create/modify vouchers
+    if isinstance(user, dict) and user.get('pk') not in ['Admin', 'Teacher']:
+        return JsonResponse({'error': 'Unauthorized to manage vouchers'}, status=403)
+
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
@@ -1024,12 +1041,20 @@ def voucher_save(request):
             if existing and existing.get('status'):
                 status_to_save = existing.get('status')
 
+            # Backend Verification: Validate amount is positive
+            try:
+                amount = float(data.get('amount', 0))
+                if amount <= 0:
+                    return JsonResponse({'success': False, 'error': 'Voucher amount must be greater than zero.'}, status=400)
+            except ValueError:
+                return JsonResponse({'success': False, 'error': 'Invalid amount format.'}, status=400)
+
             save_data = {
                 'date': data.get('date'),
                 'type': data.get('type'), # Payment or Receipt
                 'name': sanitize_str(data.get('name')),
                 'mobile': sanitize_str(data.get('mobile')),
-                'amount': str(data.get('amount')),
+                'amount': str(amount),
                 'purpose': sanitize_str(data.get('purpose')),
                 'billed_by': user.get('user', 'Teacher'),
                 'status': status_to_save,
@@ -1226,6 +1251,11 @@ def save_fees(request):
     user = request.session.get('user')
     if not user or user == "ACCESS DENIED" or (isinstance(user, dict) and (user.get('user') == "ACCESS DENIED" or not user.get('user'))):
         return redirect('/login/')
+        
+    # Backend Verification: Only Admins and Teachers should process fee payments
+    if isinstance(user, dict) and user.get('pk') not in ['Admin', 'Teacher']:
+        return JsonResponse({'success': False, 'error': 'Unauthorized to process fee payments'}, status=403)
+
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
@@ -1245,8 +1275,21 @@ def save_fees(request):
             if not all([sid, std, term, payment_date, billed_by, bill_no_str, payment_type]) or amount_paid is None:
                 return JsonResponse({'success': False, 'error': 'Missing required fields.'}, status=400)
 
+            # Backend Verification: Recalculate financial totals to prevent client-side tampering
+            try:
+                frontend_amount = float(amount_paid)
+                if frontend_amount < 0:
+                    return JsonResponse({'success': False, 'error': 'Amount paid cannot be negative.'}, status=400)
+                
+                if isinstance(fee_particulars, dict):
+                    calculated_total = sum(float(val) for val in fee_particulars.values() if val)
+                    if abs(frontend_amount - calculated_total) > 0.01:
+                        return JsonResponse({'success': False, 'error': 'Financial mismatch: The sum of particulars does not match the amount paid.'}, status=400)
+            except ValueError:
+                return JsonResponse({'success': False, 'error': 'Invalid amount format.'}, status=400)
+
             # Convert amount_paid to string to prevent boto3 float error
-            data['amount_paid'] = str(amount_paid)
+            data['amount_paid'] = str(frontend_amount)
 
             datacrud.update(data)
             # Here you would implement logic to save the payment details to your database
@@ -1278,6 +1321,10 @@ def get_fee_details(request):
     if not user or user == "ACCESS DENIED" or (isinstance(user, dict) and (user.get('user') == "ACCESS DENIED" or not user.get('user'))):
         return JsonResponse({'error': 'Unauthorized'}, status=401)
     
+    # Backend Verification: Only Admins can modify fee structures
+    if isinstance(user, dict) and user.get('pk') != 'Admin':
+        return JsonResponse({'error': 'Unauthorized to modify fee structures'}, status=403)
+
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
