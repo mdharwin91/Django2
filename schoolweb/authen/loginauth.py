@@ -17,6 +17,10 @@ class loginauth:
 
        loginDict = dbResponse
        
+       if str(loginDict.get("status", "")).strip().lower() == "inactive":
+           userInfo['user'] = "INACTIVE ACCOUNT"
+           return userInfo
+
        stored_password = loginDict.get("password")
        # Check if password matches (Supports both Hashed and Legacy Plain Text)
        is_valid_password = (stored_password and check_password(b, stored_password)) or (b == stored_password)

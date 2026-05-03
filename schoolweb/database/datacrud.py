@@ -45,6 +45,8 @@ def put(in_data):
         'fees_paid': in_data.get('fees_paid') or [],
         'bonafide': in_data.get('bonafide') or [],
         'totp_secret': in_data.get('totp_secret', ''),
+        'theme': in_data.get('theme', 'light'),
+        'designation': in_data.get('designation', ''),
     }
 
     response = None
@@ -66,6 +68,25 @@ def put_bill(in_data):
     except ClientError as e:
         response = {'error': str(e)}
     return response
+
+# PUT for Password Reset
+def put_pwd_reset(in_data):
+    data = {
+        'planner-pk': in_data.get('planner_pk'),
+        'planner-sk': in_data.get('planner_sk'),
+        'previous_pwd_reset': in_data.get('previous_pwd_reset', []),
+        'current_pwd_reset_date': in_data.get('current_pwd_reset_date'),
+        'current_reset_status': in_data.get('current_reset_status'),
+        'name': in_data.get('name'),
+        'target_pk': in_data.get('target_pk')
+    }
+    response = None
+    try:
+        response = table.put_item(Item = data)
+    except ClientError as e:
+        response = {'error': str(e)}
+    return response
+
 # PUT for Fee Details
 def put_fee(pk, sk, in_data):
     data = {

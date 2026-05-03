@@ -12,88 +12,525 @@
             :root {
                 --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 --card-bg: #ffffff;
-                --text-main: #333;
-                --header-gradient: linear-gradient(135deg, #014458 0%, #016b8a 100%);
-                --border-color: #eaeaea;
+                --text-main: #2d3748;
+                --header-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                --border-color: #e2e8f0;
+                --accent-color: #667eea;
+                --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+                --shadow-md: 0 8px 24px rgba(0,0,0,0.12);
+                --shadow-lg: 0 16px 48px rgba(0,0,0,0.18);
             }
 
             [data-theme="dark"] {
-                --bg-gradient: #000000;
+                --bg-gradient: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
                 --card-bg: #2d3748;
                 --text-main: #f7fafc;
-                --header-gradient: linear-gradient(135deg, #000000 0%, #1a202c 100%);
+                --header-gradient: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
                 --border-color: #4a5568;
+                --accent-color: #81e6d9;
             }
 
-            body { background: var(--bg-gradient) !important; color: var(--text-main); }
+            * { box-sizing: border-box; }
+            body { 
+                background: var(--bg-gradient) !important; 
+                color: var(--text-main); 
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                min-height: 100vh;
+                position: relative;
+            }
+
+            /* Animated background particles */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+                            radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.1) 0%, transparent 50%);
+                pointer-events: none;
+                z-index: 0;
+                animation: pulse 8s ease-in-out infinite;
+            }
+
+            @keyframes pulse {
+                0%, 100% { opacity: 0.5; }
+                50% { opacity: 1; }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes slideInRight {
+                from {
+                    opacity: 0;
+                    transform: translateX(-20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            @keyframes shimmer {
+                0% { background-position: -1000px 0; }
+                100% { background-position: 1000px 0; }
+            }
+
+            .common-layout {
+                display: flex;
+                flex-direction: row;
+                gap: 40px;
+                max-width: 1200px;
+                margin: 40px auto 80px auto;
+                padding: 0 20px;
+                align-items: center;
+            }
+
+            .welcome-section {
+                flex: 1;
+                text-align: left;
+                color: #ffffff;
+                position: relative;
+                z-index: 1;
+                animation: fadeInUp 0.8s ease-out;
+            }
+
+            [data-theme="dark"] .welcome-section {
+                color: var(--text-main);
+            }
+
+            .welcome-section h2 {
+                font-weight: 700;
+                font-size: 36px;
+                margin-bottom: 12px;
+                color: #ffffff;
+                letter-spacing: -0.5px;
+            }
+
+            [data-theme="dark"] .welcome-section h2 {
+                background: linear-gradient(135deg, #81e6d9 0%, #a0aec0 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .welcome-section p {
+                opacity: 0.9;
+                font-size: 17px;
+                max-width: 100%;
+                margin: 0;
+                line-height: 1.6;
+            }
+
+            [data-theme="dark"] .welcome-section p {
+                opacity: 0.8;
+            }
 
             .profile-card {
+                flex: 2;
                 background: var(--card-bg);
-                border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-                max-width: 800px;
-                margin: 40px auto;
+                border-radius: 20px;
+                box-shadow: var(--shadow-lg);
+                width: 100%;
                 border: 1px solid var(--border-color);
                 overflow: hidden;
+                position: relative;
+                z-index: 1;
+                animation: fadeInUp 1s ease-out 0.2s both;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             }
+
+            .profile-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            }
+
+            .profile-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+                transition: left 0.7s;
+            }
+
+            .profile-card:hover::before {
+                left: 100%;
+            }
+
             .profile-header {
                 background: var(--header-gradient);
                 color: #fff;
-                padding: 25px;
+                padding: 32px 30px;
                 text-align: center;
-                font-size: 22px;
-                font-weight: 600;
+                font-size: 26px;
+                font-weight: 700;
+                letter-spacing: 0.5px;
+                position: relative;
+                overflow: hidden;
             }
-            .profile-content { padding: 30px; display: flex; gap: 20px; }
-            .profile-info-list { flex: 1; }
-            .info-item { display: flex; padding: 15px 0; border-bottom: 1px solid var(--border-color); align-items: center; }
-            .info-item:last-child { border-bottom: none; }
-            .info-label { width: 140px; font-weight: 600; color: var(--text-main); opacity: 0.7; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
-            .info-value { flex: 1; color: var(--text-main); font-size: 16px; font-weight: 500; }
 
-            @media (max-width: 600px) {
-                .profile-card { margin: 20px 10px; }
-                .info-item { flex-direction: column; align-items: flex-start; gap: 5px; }
-                .info-label { width: 100%; }
+            .profile-header::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 80px;
+                height: 4px;
+                background: rgba(255,255,255,0.5);
+                border-radius: 2px;
+            }
+
+            .profile-info-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 20px;
+                width: 100%;
+            }
+            
+            .info-card {
+                background: var(--card-bg);
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                padding: 20px;
+                transition: all 0.3s ease;
+                animation: fadeInUp 0.6s ease-out both;
+            }
+            
+            .info-card:nth-child(1) { animation-delay: 0.1s; }
+            .info-card:nth-child(2) { animation-delay: 0.2s; }
+            .info-card:nth-child(3) { animation-delay: 0.3s; }
+            .info-card:nth-child(4) { animation-delay: 0.4s; }
+            .info-card:nth-child(5) { animation-delay: 0.5s; }
+            .info-card:nth-child(6) { animation-delay: 0.6s; }
+            .info-card:nth-child(7) { animation-delay: 0.7s; }
+            .info-card:nth-child(8) { animation-delay: 0.8s; }
+            .info-card:nth-child(9) { animation-delay: 0.9s; }
+            .info-card:nth-child(10) { animation-delay: 1.0s; }
+
+            .info-card:hover {
+                transform: translateY(-4px) scale(1.01);
+                box-shadow: var(--shadow-md);
+                border-color: var(--accent-color);
+                background: linear-gradient(135deg, var(--card-bg) 0%, rgba(102, 126, 234, 0.05) 100%);
+            }
+            
+            .info-card-label {
+                font-size: 13px;
+                color: var(--accent-color);
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 8px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .info-card-value {
+                font-size: 16px;
+                color: var(--text-main);
+                font-weight: 500;
+                word-wrap: break-word;
+                word-break: break-word;
+            }
+
+            .profile-content { 
+                padding: 40px; 
+                position: relative;
+            }
+
+            .info-item { 
+                display: flex; 
+                padding: 18px 20px; 
+                border-bottom: 1px solid var(--border-color); 
+                align-items: center;
+                transition: all 0.3s ease;
+                border-radius: 8px;
+                margin-bottom: 4px;
+                animation: slideInRight 0.5s ease-out both;
+            }
+
+            .info-item:nth-child(1) { animation-delay: 0.1s; }
+            .info-item:nth-child(2) { animation-delay: 0.2s; }
+            .info-item:nth-child(3) { animation-delay: 0.3s; }
+            .info-item:nth-child(4) { animation-delay: 0.4s; }
+            .info-item:nth-child(5) { animation-delay: 0.5s; }
+            .info-item:nth-child(6) { animation-delay: 0.6s; }
+
+            .info-item:hover {
+                background: linear-gradient(90deg, rgba(102,126,234,0.05), transparent);
+                border-left: 4px solid var(--accent-color);
+                padding-left: 16px;
+                transform: translateX(4px);
+            }
+
+            .info-item:last-child { 
+                border-bottom: none; 
+            }
+
+            .info-label { 
+                width: 160px; 
+                font-weight: 700; 
+                color: var(--accent-color); 
+                text-transform: uppercase; 
+                font-size: 12px; 
+                letter-spacing: 1px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .info-label::before {
+                content: '●';
+                font-size: 8px;
+                color: var(--accent-color);
+            }
+
+            .info-value { 
+                flex: 1; 
+                color: var(--text-main); 
+                font-size: 17px; 
+                font-weight: 500;
+                padding-left: 12px;
+            }
+
+            /* Decorative icon badges */
+            .profile-badge {
+                position: absolute;
+                top: -20px;
+                right: 30px;
+                width: 80px;
+                height: 80px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 32px;
+                font-weight: 700;
+                box-shadow: 0 8px 24px rgba(102,126,234,0.4);
+                border: 4px solid var(--card-bg);
+                animation: fadeInUp 1.2s ease-out 0.4s both;
+            }
+            
+            .profile-actions {
+                text-align: center;
+                padding: 0 30px 30px;
+            }
+
+            .profile-action-btn {
+                display: inline-block;
+                padding: 12px 25px;
+                color: #fff;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                text-decoration: none;
+                font-weight: bold;
+                font-size: 15px;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+                border: none;
+                cursor: pointer;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            }
+            .profile-action-btn:hover {
+                background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            }
+
+            @media (max-width: 768px) {
+                .common-layout {
+                    flex-direction: column;
+                    margin: 20px auto 60px auto;
+                    gap: 30px;
+                }
+                .welcome-section {
+                    text-align: center;
+                    margin-top: 20px;
+                    padding: 0 20px;
+                }
+                .welcome-section h2 {
+                    font-size: 28px;
+                }
+                .welcome-section p {
+                    margin: 0 auto;
+                    font-size: 15px;
+                }
+                .profile-card { 
+                    margin: 0; 
+                    border-radius: 16px;
+                }
+                .profile-content {
+                    padding: 25px 20px;
+                }
+                .info-item { 
+                    flex-direction: column; 
+                    align-items: flex-start; 
+                    gap: 8px;
+                    padding: 15px;
+                }
+                .info-label { 
+                    width: 100%; 
+                }
+                .info-value {
+                    padding-left: 0;
+                }
+                .profile-info-grid {
+                    grid-template-columns: 1fr;
+                }
+                .info-card {
+                    grid-column: 1 / -1 !important;
+                }
+                .profile-badge {
+                    width: 60px;
+                    height: 60px;
+                    font-size: 24px;
+                    top: -15px;
+                    right: 20px;
+                }
             }
         </style>
     </head>
 
     <body>
         <!-- COMMON HEADER -->
-        {% include "header.html" %} 
+        {% include "Header2.html" %} 
         {% include "logout.html" %} 
         {% include "navig2.html" %} 
 
-    <div style="text-align: center; margin-top: 60px; color: var(--text-main);">
-        <h2 style="font-weight: 600; font-size: 28px; margin-bottom: 10px;">Welcome, {{ request.session.user.user }}!</h2>
-        <p style="opacity: 0.8; font-size: 16px;">You are now logged into the school portal. Your profile details are listed below.</p>
+    <div class="common-layout">
+    <div class="welcome-section">
+        <h2>Welcome, {{ request.session.user.user }}!</h2>
+        <p>You are now logged into the school portal. Your profile details are listed below.</p>
     </div>
 
     <div class="profile-card">
-        <div class="profile-header">My Profile Information</div>
+        <div class="profile-badge">👤</div>
+        <div class="profile-header">Profile Information</div>
         <div class="profile-content">
-            <div class="profile-info-list">
-                <div class="info-item">
-                    <div class="info-label">Name</div><div class="info-value">: {{ profile_info.name|default:"N/A" }}</div>
+            <div class="profile-info-grid">
+                <div class="info-card">
+                    <div class="info-card-label">👤 Full Name</div>
+                    <div class="info-card-value">{{ profile_info.name|default:"N/A" }}</div>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">User ID</div><div class="info-value">: {{ profile_info.planner_sk|default:"N/A" }}</div>
+                <div class="info-card">
+                    <div class="info-card-label">🆔 User ID</div>
+                    <div class="info-card-value">{{ profile_info.planner_sk|default:"N/A" }}</div>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">Standard</div><div class="info-value">: {{ profile_info.std|default:"N/A" }}</div>
+                {% if profile_info.planner_pk == 'Student' %}
+                <div class="info-card">
+                    <div class="info-card-label">🎓 Standard</div>
+                    <div class="info-card-value">{{ profile_info.std|default:"N/A" }}</div>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">Date of Birth</div><div class="info-value">: {{ profile_info.dob|default:"N/A" }}</div>
+                <div class="info-card">
+                    <div class="info-card-label">🏷️ Free Education</div>
+                    <div class="info-card-value">{{ profile_info.free_edu|default:"NO" }}</div>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">EMIS Number</div><div class="info-value">: {{ profile_info.emis|default:"N/A" }}</div>
+                {% endif %}
+                <div class="info-card">
+                    <div class="info-card-label">🎂 Date of Birth</div>
+                    <div class="info-card-value">{{ profile_info.dob|default:"N/A" }} {% if profile_info.age %}({{ profile_info.age }} yrs){% endif %}</div>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">Mobile Number</div><div class="info-value">: {{ profile_info.mobile|default:"N/A" }}</div>
+                <div class="info-card">
+                    <div class="info-card-label">🏫 EMIS Number</div>
+                    <div class="info-card-value">{{ profile_info.emis|default:"N/A" }}</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-label">📱 Mobile Number</div>
+                    <div class="info-card-value">{{ profile_info.mobile|default:"N/A" }}</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-label">👨‍👩‍👧 Parent/Guardian</div>
+                    <div class="info-card-value">{{ profile_info.parent_name|default:"N/A" }}</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-label">📅 Date of Joining</div>
+                    <div class="info-card-value">{{ profile_info.doj|default:"N/A" }}</div>
+                </div>
+                <div class="info-card" style="grid-column: 1 / -1;">
+                    <div class="info-card-label">📍 Address</div>
+                    <div class="info-card-value">{{ profile_info.address|default:"N/A" }}</div>
+                </div>
+                {% if profile_info.planner_pk != 'Student' %}
+                <div class="info-card">
+                    <div class="info-card-label">💼 Designation</div>
+                    <div class="info-card-value">{{ profile_info.designation|default:"N/A" }}</div>
+                </div>
+                {% endif %}
+                <div class="info-card">
+                    <div class="info-card-label">🟢 Status</div>
+                    <div class="info-card-value">
+                        <span style="padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; {% if profile_info.status == 'Active' %}background: #48bb78;{% else %}background: #a0aec0;{% endif %} color: white;">
+                            {{ profile_info.status|default:"N/A" }}
+                        </span>
+                    </div>
+                </div>
+                {% if profile_info.planner_pk != 'Student' %}
+                <div class="info-card">
+                    <div class="info-card-label">🔒 MFA Status</div>
+                    <div class="info-card-value">
+                        <span id="common-mfa-badge" style="padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; {% if profile_info.mfa_enabled %}background: #48bb78;{% else %}background: #a0aec0;{% endif %} color: white;">
+                            {% if profile_info.mfa_enabled %}Enabled{% else %}Disabled{% endif %}
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="profile-actions">
+            <button class="profile-action-btn" onclick="openChangePasswordModal()">Change Password</button>
+        </div>
+    </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="passwordModal" style="display: none; position: fixed; z-index: 10001; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6);">
+        <div style="background-color: var(--card-bg); margin: 10% auto; padding: 25px; border: 1px solid var(--border-color); width: 90%; max-width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-radius: 12px;">
+            <span onclick="closeChangePasswordModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1;">&times;</span>
+            <h2 style="color: var(--panel-header); margin-top: 0;">Change Password</h2>
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <div class="info-item" style="padding: 0; border: none; margin: 0; flex-direction: row; align-items: center;">
+                    <label class="info-label" style="width: 150px;">Current Password</label>
+                    <input type="password" id="current_password" class="info-value" style="border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; background: var(--input-bg, white); color: var(--input-text, #333);">
+                </div>
+                <div class="info-item" style="padding: 0; border: none; margin: 0; flex-direction: row; align-items: center;">
+                    <label class="info-label" style="width: 150px;">New Password</label>
+                    <input type="password" id="new_password" class="info-value" style="border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; background: var(--input-bg, white); color: var(--input-text, #333);">
+                </div>
+                <div class="info-item" style="padding: 0; border: none; margin: 0; flex-direction: row; align-items: center;">
+                    <label class="info-label" style="width: 150px;">Confirm Password</label>
+                    <input type="password" id="confirm_password" class="info-value" style="border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; background: var(--input-bg, white); color: var(--input-text, #333);">
+                </div>
+                <div class="info-item" style="padding: 0; border: none; margin: 0; flex-direction: row; align-items: center;">
+                    <label class="info-label" style="width: 150px;">2FA Code</label>
+                    <input type="text" id="mfa_otp_change" class="info-value" maxlength="6" inputmode="numeric" placeholder="Leave blank if disabled" style="border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; background: var(--input-bg, white); color: var(--input-text, #333);">
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="profile-action-btn" onclick="submitNewPassword()">Submit</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+var _E=i=>document.getElementById(i);function openChangePasswordModal(){_E('passwordModal').style.display='block'}function closeChangePasswordModal(){_E('passwordModal').style.display='none';_E('current_password').value='';_E('new_password').value='';_E('confirm_password').value='';if(_E('mfa_otp_change'))_E('mfa_otp_change').value=''}function submitNewPassword(){let n=_E('new_password').value,c=_E('confirm_password').value;if(!n||n!==c)return alert("New passwords do not match or are empty.");fetch("{% url 'change_password' %}",{method:"POST",headers:{"Content-Type":"application/json","X-CSRFToken":"{{ csrf_token }}"},body:JSON.stringify({planner_pk:'{{ profile_info.planner_pk }}',planner_sk:'{{ profile_info.planner_sk }}',current_password:_E('current_password').value,password:n,otp_token:_E('mfa_otp_change').value})}).then(r=>r.json()).then(d=>{if(d.success){alert(d.message);closeChangePasswordModal()}else alert("Error: "+d.error)}).catch(e=>alert("An error occurred."))}
+    </script>
+
+    {% include "footer.html" %}
     </body>
 </html>

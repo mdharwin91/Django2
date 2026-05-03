@@ -117,7 +117,7 @@
                 padding: 0 20px;
                 border-bottom: 2px solid #667eea;
                 position: fixed;
-                top: 189px; /* Header (132px) + Logout (25px) + Navig2 (32px) = 189px */
+                top: 173px;
                 left: 0;
                 width: 100%;
                 z-index: 1997;
@@ -554,7 +554,7 @@
                     overflow: visible !important;
                 }
                 .secondary-nav {
-                    top: 189px; /* Matches desktop height to prevent overlapping top bars */
+                top: 123px !important; /* Stack precisely below navig2 */
                     overflow-x: auto;
                     white-space: nowrap;
                     -webkit-overflow-scrolling: touch;
@@ -626,21 +626,22 @@
     <body>
     <div id="popup-message"></div>
     <!-- COMMON HEADER -->
-    {% include "header.html" %} 
+    {% include "Header2.html" %} 
     {% include "logout.html" %} 
     {% include "navig2.html" %} 
     <!-- <div class="block-title"><b>Admin Dashboard:</b></div><br><br> -->
     
     <div class="secondary-nav">
         <a href="javascript:void(0)" id="nav-dash" class="secondary-nav-item active" onclick="showSection('adminInfoSection')">Dashboard</a>
-        <a href="javascript:void(0)" id="nav-profile" class="secondary-nav-item" onclick="showStudentProfile()">Profile</a>
+        <!-- <a href="javascript:void(0)" id="nav-profile" class="secondary-nav-item" onclick="showStudentProfile()">Profile</a> -->
         <a href="javascript:void(0)" id="nav-fee" class="secondary-nav-item" onclick="showFeeAdjustment()">Fee Adjustment</a>
         <a href="javascript:void(0)" id="nav-bonafide" class="secondary-nav-item" onclick="showBonafide()">Bonafide <span id="bonafide-badge" style="position: static; background: red; color: white; border-radius: 50%; padding: 2px 8px; font-size: 10px; display: none; margin-left: 5px;">0</span></a>
         <a href="javascript:void(0)" id="nav-bill" class="secondary-nav-item" onclick="showBillAdjustment()">Bill adjustment</a>
         <a href="javascript:void(0)" id="nav-approvals" class="secondary-nav-item" onclick="showVoucherApprovals()">Approvals <span id="voucher-badge" style="position: static; background: red; color: white; border-radius: 50%; padding: 2px 8px; font-size: 10px; display: none; margin-left: 5px;">0</span></a>
         <a href="javascript:void(0)" id="nav-wa" class="secondary-nav-item" onclick="showWAMessage()">WA Message</a>
+        <a href="javascript:void(0)" id="nav-changes" class="secondary-nav-item" onclick="showChanges()">Changes</a>
     </div>
-    <div style="height: 32px;"></div> <!-- Spacer for the fixed secondary-nav -->
+    <div style="height: 60px;"></div> <!-- Spacer to prevent content from being hidden behind fixed secondary nav -->
 
     <div class="dashboard-container">
 
@@ -675,6 +676,10 @@
                 <div class="card" style="border-top: 4px solid #667eea;">
                     <h4 style="color: var(--panel-header); margin-top: 0;">WA Message</h4>
                     <p style="font-size: 0.95em; color: var(--text-main); opacity: 0.9; line-height: 1.5;">Communicate effectively with parents. Send individual custom messages or bulk standard-wise notifications via WhatsApp.</p>
+                </div>
+                <div class="card" style="border-top: 4px solid #667eea;">
+                    <h4 style="color: var(--panel-header); margin-top: 0;">Changes</h4>
+                    <p style="font-size: 0.95em; color: var(--text-main); opacity: 0.9; line-height: 1.5;">Note down bugs, feature requests, or new ideas directly within the application while testing.</p>
                 </div>
             </div>
 
@@ -718,6 +723,22 @@
         <!-- Approvals Section Partial -->
         {% include "approvals_panel.html" %}
 
+        <!-- Changes Section -->
+        <div id="changesSection" style="display: none; height: 100%; overflow: auto; padding: 20px; background: var(--content-bg);">
+            <div class="panel-header">Application Changes & Ideas</div>
+            <div style="max-width: 800px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                <p style="opacity: 0.8; margin-bottom: 20px; color: var(--text-main);">Use this space to note down bugs, feature requests, or new ideas while testing the application. Maximum 1000 characters.</p>
+                <div class="bonafide-form-row" style="align-items: flex-start; margin-bottom: 5px;">
+                    <textarea id="changes_text" class="textBoxClass" maxlength="1000" style="width: 100%; height: 250px; padding: 15px; resize: vertical; line-height: 1.5; font-size: 14px;" placeholder="Type your ideas or bugs here..." oninput="updateCharCount()"></textarea>
+                </div>
+                <div style="text-align: right; font-size: 12px; color: var(--text-main); opacity: 0.7; margin-bottom: 20px;" id="changes_char_count">1000 characters remaining</div>
+                <div class="action-buttons">
+                    <button type="button" class="sidebar-link active" onclick="saveChanges()">Save Notes</button>
+                    <button type="button" class="sidebar-link active" style="background:#f44336" onclick="clearChanges()">Clear</button>
+                </div>
+            </div>
+        </div>
+
         {% include "profile_scripts.html" %}
     </div>
     </div>
@@ -726,7 +747,7 @@
     <div id="passwordModal" style="display: none; position: fixed; z-index: 10001; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6);">
         <div style="background-color: var(--card-bg); margin: 10% auto; padding: 25px; border: 1px solid var(--border-color); width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-radius: 12px;">
             <span onclick="closeChangePasswordModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1;">&times;</span>
-            <h2 id="modal-title" style="color: #014458; margin-top: 0;">Change Password</h2>
+            <h2 id="modal-title" style="color: var(--panel-header); margin-top: 0;">Change Password</h2>
             <div id="row_current_password" class="bonafide-form-row">
                 <label class="fee-label-styled" style="width: 140px;">Current Password</label>
                 <input type="password" id="current_entered_password" class="textBoxClass" style="flex:1;" oninput="verifyCurrentPassword()">
@@ -740,6 +761,10 @@
                 <label class="fee-label-styled" style="width: 140px;">Confirm Password</label>
                 <input type="password" id="confirm_password" class="textBoxClass" style="flex:1;">
             </div>
+            <div class="bonafide-form-row">
+                <label class="fee-label-styled" style="width: 140px;">2FA Code</label>
+                <input type="text" id="mfa_otp_change" class="textBoxClass" maxlength="6" inputmode="numeric" placeholder="Leave blank if disabled" style="flex:1;">
+            </div>
             <div class="action-buttons">
                 <button type="button" class="sidebar-link active" onclick="submitNewPassword()">Submit</button>
             </div>
@@ -747,163 +772,8 @@
     </div>
 
     <script>
-        function setupMFA() {
-            const pk = document.getElementById('prof-cell-planner_pk').value;
-            const sk = document.getElementById('prof-cell-planner_sk').value;
-            if(!confirm("This will generate a new 2FA secret for " + sk + ". Continue?")) return;
-            
-            fetch("{% url 'setup_mfa' %}", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-                body: JSON.stringify({ planner_pk: pk, planner_sk: sk })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.uri)}`;
-                    const modal = document.createElement('div');
-                    modal.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:20000; display:flex; align-items:center; justify-content:center; flex-direction:column; color:white;";
-                    modal.innerHTML = `
-                        <div style="background:white; padding:30px; border-radius:15px; text-align:center; color:#333; max-width:400px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-                            <h2 style="margin-top:0; color:#014458;">MFA Setup</h2>
-                            <p>1. Scan this QR code with Google Authenticator or Authy:</p>
-                            <img src="${qrUrl}" style="margin:10px 0; border:1px solid #ccc; padding:10px; border-radius:8px;">
-                            <p style="font-size:0.85em; margin-bottom:15px;">Manual Secret: <code style="background:#f4f4f4; padding:2px 5px; border-radius:3px; color:#764ba2; font-weight:bold;">${data.secret}</code></p>
-                            
-                            <p>2. Enter the 6-digit code from your app to verify:</p>
-                            <input type="text" id="mfa_otp_verify" class="textBoxClass" placeholder="000000" maxlength="6" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '');" style="width:100%; text-align:center; font-size:1.5em; margin-bottom:20px; letter-spacing:5px;">
-                            
-                            <div style="display:flex; gap:10px;">
-                                <button id="btn-verify-mfa" class="sidebar-link active" style="margin:0; flex:1;">Verify & Enable</button>
-                                <button onclick="this.parentElement.parentElement.parentElement.remove()" class="sidebar-link active" style="margin:0; flex:1; background:#6c757d;">Cancel</button>
-                            </div>
-                        </div>
-                    `;
-                    document.body.appendChild(modal);
-
-                    document.getElementById('btn-verify-mfa').onclick = function() {
-                        const token = document.getElementById('mfa_otp_verify').value;
-                        if(!token) { alert("Please enter the code"); return; }
-                        
-                        fetch("{% url 'setup_mfa' %}", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-                            body: JSON.stringify({ planner_pk: pk, planner_sk: sk, otp_token: token, secret: data.secret })
-                        })
-                        .then(res => res.json())
-                        .then(verifyData => {
-                            if(verifyData.success) {
-                                SchoolUtils.showPopup(verifyData.message, "success");
-                                modal.remove();
-                            } else alert(verifyData.error);
-                        });
-                    };
-                } else {
-                    SchoolUtils.showPopup(data.error, "error");
-                }
-            });
-        }
-        function showFrame() {
-            showSection('profileSection');
-        }
-        function showStudentProfile() {
-            showSection('profileSection');
-        }
-        function showFeeAdjustment() {
-            showSection('feeAdjustment');
-            fetchAllFees();
-        }
-        function showBonafide() {
-            showSection('bonafideSection');
-            fetchPendingVouchers();
-        }
-        function showBillAdjustment() {
-            showSection('billAdjustment');
-        }
-        function showWAMessage() {
-            showSection('waMessageSection');
-            switchWATab('single');
-        }
-        function showVoucherApprovals() {
-            showSection('voucherApprovalSection');
-            fetchPendingVouchers();
-        }
-        function showSection(id) {
-            const sections = ['adminInfoSection', 'profileSection', 'feeAdjustment', 'bonafideSection', 'billAdjustment', 'waMessageSection', 'voucherApprovalSection'];
-            sections.forEach(s => {
-                const el = document.getElementById(s);
-                if (el) {
-                    if (s === id) {
-                        const isLayoutSection = ['profileSection', 'feeAdjustment', 'bonafideSection', 'billAdjustment', 'waMessageSection', 'voucherApprovalSection'].includes(s);
-                        el.style.display = isLayoutSection ? 'flex' : 'block';
-                        if (isLayoutSection) el.style.flexDirection = 'column';
-                    } else el.style.display = 'none';
-                }
-            });
-
-            // Update active state in secondary nav
-            const navItems = {
-                'adminInfoSection': 'nav-dash',
-                'profileSection': 'nav-profile',
-                'feeAdjustment': 'nav-fee',
-                'bonafideSection': 'nav-bonafide',
-                'billAdjustment': 'nav-bill',
-                'voucherApprovalSection': 'nav-approvals',
-                'waMessageSection': 'nav-wa'
-            };
-            
-            Object.values(navItems).forEach(navId => {
-                const navEl = document.getElementById(navId);
-                if (navEl) navEl.classList.remove('active');
-            });
-
-            if (navItems[id]) document.getElementById(navItems[id]).classList.add('active');
-        }
-
-        function verifyMFA() {
-            const pk = document.getElementById('prof-cell-planner_pk').value;
-            const sk = document.getElementById('prof-cell-planner_sk').value;
-            const token = prompt("Enter 6-digit code from your app to verify:");
-            if (!token) return;
-            
-            if (!/^\d{6}$/.test(token)) {
-                alert("Please enter exactly 6 digits.");
-                return;
-            }
-            
-            fetch("{% url 'setup_mfa' %}", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-                body: JSON.stringify({ planner_pk: pk, planner_sk: sk, action: 'verify', otp_token: token })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success) SchoolUtils.showPopup(data.message, "success");
-                else SchoolUtils.showPopup(data.error, "error");
-            });
-        }
-
-        function removeMFA() {
-            const pk = document.getElementById('prof-cell-planner_pk').value;
-            const sk = document.getElementById('prof-cell-planner_sk').value;
-            if(!confirm("Are you sure you want to REMOVE MFA for " + sk + "?")) return;
-            
-            fetch("{% url 'setup_mfa' %}", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-                body: JSON.stringify({ planner_pk: pk, planner_sk: sk, action: 'remove' })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success) SchoolUtils.showPopup(data.message, "success");
-                else SchoolUtils.showPopup(data.error, "error");
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            fetchPendingVouchers();
-            initProfileScripts();
-        });
+function showFrame(){showSection('profileSection')}function showStudentProfile(){showSection('profileSection')}function showFeeAdjustment(){showSection('feeAdjustment');fetchAllFees()}function showBonafide(){showSection('bonafideSection');fetchPendingVouchers()}function showBillAdjustment(){showSection('billAdjustment')}function showWAMessage(){showSection('waMessageSection');switchWATab('single')}function showVoucherApprovals(){showSection('voucherApprovalSection');fetchPendingVouchers()}function showChanges(){showSection('changesSection');fetchChanges()}function showSection(i){['adminInfoSection','profileSection','feeAdjustment','bonafideSection','billAdjustment','waMessageSection','voucherApprovalSection','changesSection'].forEach(s=>{let e=_E(s);if(e){if(s===i){let l=['profileSection','feeAdjustment','bonafideSection','billAdjustment','waMessageSection','voucherApprovalSection'].includes(s);e.style.display=l?'flex':'block';if(l)e.style.flexDirection='column'}else e.style.display='none'}});let n={'adminInfoSection':'nav-dash','profileSection':'nav-profile','feeAdjustment':'nav-fee','bonafideSection':'nav-bonafide','billAdjustment':'nav-bill','voucherApprovalSection':'nav-approvals','waMessageSection':'nav-wa','changesSection':'nav-changes'};Object.values(n).forEach(d=>{let e=_E(d);if(e)e.classList.remove('active')});if(n[i])_E(n[i]).classList.add('active')}function fetchChanges(){fetch("{% url 'get_changes' %}").then(r=>r.json()).then(d=>{if(d.success){_E('changes_text').value=d.text;updateCharCount()}}).catch(e=>console.error("Error fetching changes:",e))}function saveChanges(){_F("{% url 'save_changes' %}",{text:_E('changes_text').value}).then(r=>r.json()).then(d=>{if(d.success)_P("Notes saved successfully!","success");else _P("Error: "+d.error,"error")}).catch(e=>_P("Failed to save changes","error"))}function updateCharCount(){let l=_E('changes_text').value.length;_E('changes_char_count').innerText=(1000-l)+" characters remaining"}function clearChanges(){_E('changes_text').value='';updateCharCount()}document.addEventListener('DOMContentLoaded',function(){fetchPendingVouchers();initProfileScripts();function a(){let n=_S('.teach-admin-nav')[0],s=_S('.secondary-nav')[0];if(n&&s&&window.innerWidth>768)s.style.top=Math.floor(n.getBoundingClientRect().bottom)+'px';else if(s)s.style.top=''}a();window.addEventListener('resize',a)});
     </script>
+    {% include "footer.html" %}
     </body>
 </html>

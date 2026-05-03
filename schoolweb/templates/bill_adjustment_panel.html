@@ -25,108 +25,11 @@
 </div>
 
 <script>
-    let currentAdjStudent = null;
-    let currentBillIndex = -1;
-
-    function resetBillAdjustment() {
-        document.getElementById('adj_student_id').value = '';
-        document.getElementById('adj-display-fetch-name').innerText = '';
-        document.getElementById('adj-fetch-name-display').style.display = 'none';
-        document.getElementById('adj-bill-list').innerHTML = '';
-        document.getElementById('adj-edit-form').style.display = 'none';
-        document.getElementById('adj-placeholder').style.display = 'block';
-        currentAdjStudent = null;
-        currentBillIndex = -1;
-    }
-
-    function getStudentBills() {
-        const sid = document.getElementById('adj_student_id').value;
-        if (!sid) { SchoolUtils.showPopup("Please enter a Student ID", "error"); return; }
-        
-        fetch("{% url 'student_get' %}", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-            body: JSON.stringify({ planner_pk: "Student", planner_sk: sid })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.user_info) {
-                currentAdjStudent = data.user_info;
-                document.getElementById('adj-display-fetch-name').innerText = currentAdjStudent.name || '';
-                document.getElementById('adj-fetch-name-display').style.display = 'block';
-
-                const container = document.getElementById('adj-bill-list');
-                container.innerHTML = '<h4 style="margin-bottom:10px; color:var(--panel-header);">Payment History</h4>';
-                
-                if (!currentAdjStudent.fees_paid || currentAdjStudent.fees_paid.length === 0) {
-                    container.innerHTML += '<p style="color:var(--text-main); opacity: 0.7; font-style:italic;">No payments found.</p>';
-                    return;
-                }
-
-                [...currentAdjStudent.fees_paid].reverse().forEach((bill, idx) => {
-                    const originalIndex = currentAdjStudent.fees_paid.length - 1 - idx;
-                    const div = document.createElement('div');
-                    div.className = 'fee-entry-row';
-                    div.style.cssText = 'cursor: pointer; padding: 12px; border: 1px solid var(--border-color); margin-bottom: 8px; border-radius: 5px; background: var(--card-bg); transition: background 0.2s;';
-                    div.onmouseover = () => div.style.background = 'var(--table-hover-row)';
-                    div.onmouseout = () => div.style.background = 'var(--card-bg)';
-                    div.innerHTML = `<div><b style="color:var(--text-main);">${bill.BILL_NO || 'N/A'}</b><br><small style="color:var(--text-main); opacity:0.8;">${bill.PAYMENT_DATE || ''} | ${bill.STD || ''} | ${bill.TERM || ''}</small></div><div style="font-weight:bold; color:var(--panel-header);">₹${bill.AMOUNT || 0}</div>`;
-                    div.onclick = () => loadBillForEdit(originalIndex);
-                    container.appendChild(div);
-                });
-            } else SchoolUtils.showPopup("Student not found.", "error");
-        })
-        .catch(err => SchoolUtils.showPopup("Error fetching bills", "error"));
-    }
-
-    function loadBillForEdit(index) {
-        currentBillIndex = index;
-        const bill = currentAdjStudent.fees_paid[index];
-        document.getElementById('adj-placeholder').style.display = 'none';
-        const form = document.getElementById('adj-edit-form');
-        form.style.display = 'block';
-        
-        form.innerHTML = `
-            <div class="bonafide-form-row"><label class="fee-label-styled">Bill No</label><input type="text" id="edit_bill_no" class="textBoxClass" value="${bill.BILL_NO || ''}"></div>
-            <div class="bonafide-form-row"><label class="fee-label-styled">Amount Paid</label><input type="number" id="edit_bill_amount" class="textBoxClass" value="${bill.AMOUNT || 0}"></div>
-            <div class="bonafide-form-row"><label class="fee-label-styled">Date</label><input type="text" id="edit_bill_date" class="textBoxClass" value="${bill.PAYMENT_DATE || ''}"></div>
-            <div class="bonafide-form-row"><label class="fee-label-styled">Term</label><input type="text" id="edit_bill_term" class="textBoxClass" value="${bill.TERM || ''}"></div>
-            <div class="bonafide-form-row"><label class="fee-label-styled">Standard</label><input type="text" id="edit_bill_std" class="textBoxClass" value="${bill.STD || ''}"></div>
-            <div class="bonafide-form-row"><label class="fee-label-styled">Billed By</label><input type="text" id="edit_bill_by" class="textBoxClass" value="${bill.BILLED_BY || ''}"></div>
-            <div class="action-buttons" style="display:flex; gap:10px; justify-content:center;">
-                <button class="sidebar-link active" onclick="updateBillData()">Save Changes</button>
-                <button class="sidebar-link active" style="background:#f44336" onclick="deleteBillRecord()">Delete Bill</button>
-            </div>
-        `;
-    }
-
-    function updateBillData() {
-        const bill = currentAdjStudent.fees_paid[currentBillIndex];
-        bill.BILL_NO = document.getElementById('edit_bill_no').value;
-        bill.AMOUNT = document.getElementById('edit_bill_amount').value;
-        bill.PAYMENT_DATE = document.getElementById('edit_bill_date').value;
-        bill.TERM = document.getElementById('edit_bill_term').value;
-        bill.STD = document.getElementById('edit_bill_std').value;
-        bill.BILLED_BY = document.getElementById('edit_bill_by').value;
-        commitStudentBillUpdate("Bill updated successfully");
-    }
-
-    function deleteBillRecord() {
-        if(confirm("Are you sure you want to delete this bill?")) {
-            currentAdjStudent.fees_paid.splice(currentBillIndex, 1);
-            commitStudentBillUpdate("Bill deleted successfully");
-        }
-    }
-
-    function commitStudentBillUpdate(successMsg) {
-         fetch("{% url 'student_update' %}", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-            body: JSON.stringify({ planner_pk: "Student", planner_sk: currentAdjStudent.planner_sk, fees_paid: currentAdjStudent.fees_paid })
-        })
-        .then(res => res.json()).then(data => {
-            if(data.success) { SchoolUtils.showPopup(successMsg, "success"); getStudentBills(); document.getElementById('adj-edit-form').style.display = 'none'; document.getElementById('adj-placeholder').style.display = 'block'; }
-            else SchoolUtils.showPopup("Update failed: " + data.error, "error");
-        });
-    }
+var currentAdjStudent=null,currentBillIndex=-1,_E=i=>document.getElementById(i),_S=q=>document.querySelectorAll(q),_P=(m,t)=>SchoolUtils.showPopup(m,t),_F=(u,b)=>fetch(u,{method:"POST",headers:{"Content-Type":"application/json","X-CSRFToken":"{{ csrf_token }}"},body:JSON.stringify(b)});
+function resetBillAdjustment(){_E('adj_student_id').value='';_E('adj-display-fetch-name').innerText='';_E('adj-fetch-name-display').style.display='none';_E('adj-bill-list').innerHTML='';_E('adj-edit-form').style.display='none';_E('adj-placeholder').style.display='block';currentAdjStudent=null;currentBillIndex=-1}
+function getStudentBills(){let s=_E('adj_student_id').value;if(!s)return _P("Please enter a Student ID","error");_F("{% url 'student_get' %}",{planner_pk:"Student",planner_sk:s}).then(r=>r.json()).then(d=>{if(d.user_info){currentAdjStudent=d.user_info;_E('adj-display-fetch-name').innerText=currentAdjStudent.name||'';_E('adj-fetch-name-display').style.display='block';let c=_E('adj-bill-list');c.innerHTML='';let h4=document.createElement('h4');h4.style.cssText='margin-bottom:10px; color:var(--panel-header);';h4.textContent='Payment History';c.appendChild(h4);if(!currentAdjStudent.fees_paid||currentAdjStudent.fees_paid.length===0){let p=document.createElement('p');p.style.cssText='color:var(--text-main); opacity: 0.7; font-style:italic;';p.textContent='No payments found.';c.appendChild(p);return}[...currentAdjStudent.fees_paid].reverse().forEach((b,i)=>{let o=currentAdjStudent.fees_paid.length-1-i,v=document.createElement('div');v.className='fee-entry-row';v.style.cssText='cursor: pointer; padding: 12px; border: 1px solid var(--border-color); margin-bottom: 8px; border-radius: 5px; background: var(--card-bg); transition: background 0.2s;';v.onmouseover=()=>v.style.background='var(--table-hover-row)';v.onmouseout=()=>v.style.background='var(--card-bg)';let d1=document.createElement('div');let b_el=document.createElement('b');b_el.style.cssText='color:var(--text-main);';b_el.textContent=b.BILL_NO||'N/A';d1.appendChild(b_el);d1.appendChild(document.createElement('br'));let sm=document.createElement('small');sm.style.cssText='color:var(--text-main); opacity:0.8;';sm.textContent=`${b.PAYMENT_DATE||''} | ${b.STD||''} | ${b.TERM||''}`;d1.appendChild(sm);let d2=document.createElement('div');d2.style.cssText='font-weight:bold; color:var(--panel-header);';d2.textContent=`₹${b.AMOUNT||0}`;v.appendChild(d1);v.appendChild(d2);v.onclick=()=>loadBillForEdit(o);c.appendChild(v)})}else _P("Student not found.","error")}).catch(e=>_P("Error fetching bills","error"))}
+function loadBillForEdit(i){currentBillIndex=i;let b=currentAdjStudent.fees_paid[i];_E('adj-placeholder').style.display='none';let f=_E('adj-edit-form');f.style.display='block';f.innerHTML='';const aR=(l,id,ty,v,ro,s)=>{let d=document.createElement('div');d.className='bonafide-form-row';let la=document.createElement('label');la.className='fee-label-styled';la.textContent=l;let inp=document.createElement('input');inp.type=ty;inp.id=id;inp.className='textBoxClass';inp.value=v;if(ro)inp.readOnly=true;if(s)inp.style.cssText=s;d.appendChild(la);d.appendChild(inp);f.appendChild(d)};aR('Bill No','edit_bill_no','text',b.BILL_NO||'',true,'opacity: 0.7; cursor: not-allowed;');aR('Amount Paid','edit_bill_amount','number',b.AMOUNT||0);aR('Date','edit_bill_date','text',b.PAYMENT_DATE||'');aR('Term','edit_bill_term','text',b.TERM||'');aR('Standard','edit_bill_std','text',b.STD||'');aR('Billed By','edit_bill_by','text',b.BILLED_BY||'');let ab=document.createElement('div');ab.className='action-buttons';ab.style.cssText='display:flex; gap:10px; justify-content:center;';let b1=document.createElement('button');b1.className='sidebar-link active';b1.textContent='Save Changes';b1.onclick=updateBillData;let b2=document.createElement('button');b2.className='sidebar-link active';b2.style.background='#f44336';b2.textContent='Delete Bill';b2.onclick=deleteBillRecord;ab.appendChild(b1);ab.appendChild(b2);f.appendChild(ab)}
+function updateBillData(){let b=currentAdjStudent.fees_paid[currentBillIndex];b.BILL_NO=_E('edit_bill_no').value;b.AMOUNT=_E('edit_bill_amount').value;b.PAYMENT_DATE=_E('edit_bill_date').value;b.TERM=_E('edit_bill_term').value;b.STD=_E('edit_bill_std').value;b.BILLED_BY=_E('edit_bill_by').value;commitStudentBillUpdate("Bill updated successfully")}
+function deleteBillRecord(){if(confirm("Are you sure you want to delete this bill?")){currentAdjStudent.fees_paid.splice(currentBillIndex,1);commitStudentBillUpdate("Bill deleted successfully")}}
+function commitStudentBillUpdate(m){_F("{% url 'student_update' %}",{planner_pk:"Student",planner_sk:currentAdjStudent.planner_sk,fees_paid:currentAdjStudent.fees_paid}).then(r=>r.json()).then(d=>{if(d.success){_P(m,"success");getStudentBills();_E('adj-edit-form').style.display='none';_E('adj-placeholder').style.display='block'}else _P("Update failed: "+d.error,"error")})}
 </script>

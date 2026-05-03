@@ -1,0 +1,60 @@
+{% load static %}
+<style>
+    .fixed-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--card-bg, #fff8f0);
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        padding: 10px 40px;
+        box-sizing: border-box;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        border-bottom: 3px solid var(--panel-header, #014458);
+    }
+    .header-logo {
+        width: 55px;
+        height: 65px;
+        flex-shrink: 0;
+        display: block;
+        object-fit: contain;
+    }
+    .header-text {
+        flex-grow: 1;
+        text-align: center;
+        padding-right: 55px; /* Compensate for logo width to center text on screen */
+
+    }
+    .header-title { 
+        font-size: 55px !important; 
+        margin: 0; 
+        line-height: 1; 
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .header-spacer { height: 132px; }
+
+    @media (max-width: 768px) { 
+        .fixed-header {
+            flex-direction: row;
+            height: 25px !important;
+        
+        }
+        .header-logo { width: 25px; height: 35px; }
+        .header-text { line-height: 0.3; padding-right: 0; }
+        .header-title { font-size: 14px !important; margin-bottom: 2px; width: 343px; float: right;  }
+        .header-spacer { height: 45px; }
+    }
+</style>
+
+<div class="fixed-header">
+    <img src="{% static 'images/ECT_GLASS_LOGO_NOBG.png' %}" class="header-logo" alt="Trust Logo">
+    <div class="header-text">
+        <h1 class="header-title"><b>{{schoolInformation.trustName}}</b></h1>
+    </div>
+</div>
+<div class="header-spacer"></div>

@@ -19,6 +19,15 @@
                 <div style="font-size: 0.8em; color: var(--text-main); opacity: 0.6; margin-top: -5px; font-style: italic;">* Default pwd: first 4 char name (CAPS) + YOB <span style="color: var(--panel-header); opacity: 1; font-weight: bold;">(Ex: DHAR1991)</span></div>
             </div>
             
+            {% if request.session.user.pk == 'Admin' %}
+            <div id="pwd-reset-requests-container" style="background: var(--card-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 20px;">
+                <div class="panel-header" style="font-size: 1em; margin-bottom: 15px;">Pwd Reset Requests</div>
+                <div id="pwd-reset-list" style="max-height: 200px; overflow-y: auto; font-size: 0.9em; color: var(--text-main);">
+                    <p style="opacity: 0.7; text-align: center; font-style: italic;">Loading...</p>
+                </div>
+            </div>
+            {% endif %}
+
             <div id="profile-actions" style="display: none;">
                 <div class="panel-header" style="font-size: 1em; margin-bottom: 15px;">Management</div>
                 <div style="display: flex; gap: 5px; margin-bottom: 8px;">
@@ -33,10 +42,6 @@
                 </div>
                 {% endif %}
             </div>
-            <div style="display: flex; gap: 8px; margin-top: 10px;">
-                <button type="button" class="sidebar-link active" style="flex: 1; margin: 0; font-size: 13px;" onclick="profile_reset_student()">Add New</button>
-                <button type="button" class="sidebar-link active" style="flex: 1; margin: 0; background: #6c757d; font-size: 13px;" onclick="profile_clear_view()">Clear</button>
-            </div>
         </div>
 
         <!-- Right Main: Detailed Information -->
@@ -44,6 +49,8 @@
             <div id="prof-header-sticky" style="position: sticky; top: -20px; background: var(--content-bg); z-index: 100; margin: -20px -20px 15px -20px; padding: 12px 20px; border-bottom: 3px solid #667eea; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
                 <div style="font-weight: bold; font-size: 1.1em; color: var(--panel-header); text-transform: uppercase; letter-spacing: 1px;">Profile Details</div>
                 <div style="display: flex; gap: 10px; align-items: center;">
+                    <button type="button" class="sidebar-link active" style="margin: 0; padding: 8px 15px; font-size: 13px; width: auto;" onclick="profile_reset_student()">Add New</button>
+                    <button type="button" class="sidebar-link active" style="margin: 0; padding: 8px 15px; font-size: 13px; background: #6c757d; width: auto;" onclick="profile_clear_view()">Clear</button>
                     <button id="edit-button" type="button" class="sidebar-link active" onclick="profile_edit_student()" style="display: none; margin: 0; padding: 8px 15px; font-size: 13px; width: auto;">Edit Profile</button>
                     <div id="prof-save-container" style="display: none; margin: 0; gap: 10px; align-items: center;">
                     <button id="prof-btn-update" type="button" class="sidebar-link active" onclick="profile_update_student(event)" style="margin: 0; padding: 8px 15px; font-size: 13px; width: auto;">Update Profile</button>
@@ -57,16 +64,33 @@
                         <select id="prof-cell-planner_pk" name="planner_pk" class="textBoxClass" onchange="toggleTeacherFields()" style="background: var(--input-bg); color: var(--input-text);">
                             {% for p in profiles %}{% if request.session.user.pk == 'Admin' or p.0 != 'Admin' %}<option value="{{ p.0 }}">{{ p.1 }}</option>{% endif %}{% endfor %}
                         </select></div>
+                    <div class="bonafide-form-row" id="prof-row-designation" style="display: none;"><label class="fee-label-styled">Designation</label>
+                        <select id="prof-cell-designation" name="designation" class="textBoxClass" style="background: var(--input-bg); color: var(--input-text);">
+                            <option value="">Select</option>
+                            {% for d in designations %}<option value="{{ d }}">{{ d }}</option>{% endfor %}
+                        </select></div>
                     <div class="bonafide-form-row"><label class="fee-label-styled" id="prof-lbl-planner_sk">ID <span style="color:red;">*</span></label>
                         <input id="prof-cell-planner_sk" name="planner_sk" class="textBoxClass" readonly style="background: var(--input-bg); color: var(--input-text);"></div>
                     <div class="bonafide-form-row"><label class="fee-label-styled">Status</label>
                         <select id="prof-cell-status" name="status" class="textBoxClass" style="background: var(--input-bg); color: var(--input-text);">
                             {% for status in statuses %}<option value="{{ status.0 }}">{{ status.1 }}</option>{% endfor %}
                         </select></div>
+                    <div class="bonafide-form-row" id="mfa-status-container" style="display: none;"><label class="fee-label-styled">MFA Status</label>
+                        <span id="prof-cell-mfa-status" style="padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; background: #a0aec0; color: white; display: inline-block; text-align: center;">Disabled</span>
+                    </div>
                     <div class="bonafide-form-row full-width-row"><label class="fee-label-styled" id="prof-lbl-name">Full Name <span style="color:red;">*</span></label>
                         <input id="prof-cell-name" name="name" class="textBoxClass" style="font-weight: bold; background: var(--input-bg); color: var(--input-text);"></div>
                     <div class="bonafide-form-row full-width-row"><label class="fee-label-styled">Parent/Guardian Name</label>
-                        <input id="prof-cell-parent_name" name="parent_name" class="textBoxClass" style="background: var(--input-bg); color: var(--input-text);"></div>
+                        <div style="display: flex; flex: 1; gap: 10px;">
+                            <input id="prof-cell-parent_name_only" name="parent_name_only" class="textBoxClass" style="flex: 2; background: var(--input-bg); color: var(--input-text);">
+                            <select id="prof-cell-parent_relation" name="parent_relation" class="textBoxClass" style="flex: 1; background: var(--input-bg); color: var(--input-text);">
+                                <option value="">Select Relation</option>
+                                <option value="(Father)">Father</option>
+                                <option value="(Mother)">Mother</option>
+                                <option value="(Guardian)">Guardian</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="bonafide-form-row full-width-row"><label class="fee-label-styled">Address</label>
                         <textarea id="prof-cell-address" name="address" class="textBoxClass" style="height: 60px; background: var(--input-bg); color: var(--input-text);"></textarea></div>
                     <div class="bonafide-form-row"><label class="fee-label-styled">Standard / Grade</label>
@@ -84,6 +108,12 @@
                             {% for f in free_edu_choices %}<option value="{{ f.0 }}" {% if f.0 == 'NO' %}selected{% endif %}>{{ f.1 }}</option>{% endfor %}
                         </select></div>
                     <div class="bonafide-form-row"><label class="fee-label-styled">Date of Leaving</label><input type="date" id="prof-cell-dol" name="dol" class="textBoxClass" style="background: var(--input-bg); color: var(--input-text);"></div>
+                    <div class="bonafide-form-row"><label class="fee-label-styled">Theme</label>
+                        <select id="prof-cell-theme" name="theme" class="textBoxClass" style="background: var(--input-bg); color: var(--input-text);">
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                        </select>
+                    </div>
                 </div>
             </form>
 

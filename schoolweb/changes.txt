@@ -1,0 +1,14 @@
+Add Dark and Light theme aware for Welcome message on Commons page.
+Add IP display on the Footer.htmls
+Increase the Font size of the username and password text boxes to match the 6 digit code box font size
+
+Navigating bar on login page is not visible on mobile view
+Change password is going behind the footer.
+
+
+Recommendations for Production Readiness:
+Migrate DB: Switch to PostgreSQL.
+Fix Settings: Hardcode ALLOWED_HOSTS to your domain, set DEBUG = False, and ensure a strong SECRET_KEY is guaranteed.
+Sanitize Data: Use document.createElement and .textContent instead of .innerHTML in JS to safely bind API data to the DOM.
+Extract Assets: Move all minified inline JavaScript and CSS into dedicated .js and .css files served via Django's static files.
+Backend Verification: Ensure that your backend views rigorously recalculate financial totals and strictly verify user permissions independent of the frontend UI.

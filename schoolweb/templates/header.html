@@ -27,38 +27,38 @@
         padding-right: 110px; /* Compensate for logo width to center text on screen */
     }
     .header-title { 
-        font-size: 45px; 
+        font-size: 55px !important; 
         margin: 0; 
-        line-height: 1.2; 
+        line-height: 1; 
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
     }
-    .header-sub { font-size: 16px; color: var(--text-main, #333); margin: 5px 0; }
-    .header-reg { font-size: 13px; color: var(--text-main, #666); opacity: 0.8; font-weight: bold; } 
+    .header-sub { font-size: 16px !important; color: var(--text-main, #333); margin: 5px 0; }
+    .header-reg { font-size: 13px !important; color: var(--text-main, #666); opacity: 0.8; font-weight: bold; } 
     .header-spacer { height: 132px; }
 
     @media (max-width: 768px) {
         .fixed-header {
             flex-direction: row;
-            padding: 10px 15px;
+            padding: 5px 10px;
         }
-        .header-logo { width: 60px; height: 60px; }
-        .header-text { padding-right: 60px; }
-        .header-title { font-size: 20px; }
-        .header-sub { font-size: 12px; }
-        .header-reg { font-size: 10px; }
-        .header-spacer { height: 85px; }
+        .header-logo { width: 45px; height: 45px; }
+        .header-text { padding-right: 45px; line-height: 1.1; }
+        .header-title { font-size: 16px !important; margin-bottom: 2px; }
+        .header-sub { font-size: 11px !important; margin: 2px 0; }
+        .header-reg { font-size: 9px !important; line-height: 1.2; }
+        .header-spacer { height: 60px; }
     }
 </style>
 
 <div class="fixed-header">
-    <img src="{% static 'images/Glassed_LOGO_NOBG.png' %}" class="header-logo" alt="Trust Logo">
+    <img src="{% static 'images/ECT_GLASS_LOGO_NOBG.png' %}" class="header-logo" alt="Trust Logo">
     <div class="header-text">
         <h1 class="header-title"><b>{{schoolInformation.trustName}}</b></h1>
         <p class="header-sub"><b>{{schoolInformation.trustAddress}}</b></p>
-        <div class="header-reg">{{schoolInformation.trustRegistrationNumber}}</div>
+        <div class="header-reg">{{schoolInformation.trustRegistrationNumber}} | Email: {{schoolInformation.trustEmail}} | Mobile: {{schoolInformation.trustMobile}}</div>
     </div>
 </div>
 <div class="header-spacer"></div>

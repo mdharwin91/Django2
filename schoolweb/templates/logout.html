@@ -12,7 +12,7 @@
                 flex-wrap: wrap;
                 border-bottom: 1px solid rgba(255,255,255,0.1);
                 position: fixed;
-                top: 132px;
+                top: 90px;
                 left: 0;
                 width: 100%;
                 z-index: 1999;
@@ -88,8 +88,8 @@
             .utility-spacer { height: 25px; }
 
             @media (max-width: 768px) {
-                .utility-bar { top: 85px; }
-                .utility-spacer { height: 60px; } /* Increased to prevent content overlap */
+                .utility-bar { top: 25px; padding: 4px 10px; width: 100%; }
+                .utility-spacer { height: 62px; } /* Increased to prevent content overlap */
             }
         </style>
         <div class="utility-bar">
@@ -110,30 +110,7 @@
         </div>
         <div class="utility-spacer"></div>
         <script>
-            function updateClock() {
-                const now = new Date();
-                document.getElementById('clock').innerText = now.toLocaleString();
-            }
-            setInterval(updateClock, 1000);
-            updateClock();
-
-            function toggleThemeCheckbox(event) {
-                const html = document.documentElement;
-                const targetTheme = event.target.checked ? 'dark' : 'light';
-                html.setAttribute('data-theme', targetTheme);
-                localStorage.setItem('theme', targetTheme);
-                updateThemeUI(targetTheme);
-            }
-
-            function updateThemeUI(theme) {
-                const checkbox = document.getElementById('theme-toggle-checkbox');
-                if (checkbox) checkbox.checked = theme === 'dark';
-            }
-
-            // Initialize theme on load
-            (function() {
-                const savedTheme = localStorage.getItem('theme') || 'light';
-                document.documentElement.setAttribute('data-theme', savedTheme);
-                updateThemeUI(savedTheme);
-            })();
+function updateClock(){document.getElementById('clock').innerText=new Date().toLocaleString()}setInterval(updateClock,1e3);updateClock();
+function toggleThemeCheckbox(e){var t=e.target.checked?'dark':'light';document.documentElement.setAttribute('data-theme',t);localStorage.setItem('theme',t);updateThemeUI(t)}
+function updateThemeUI(t){var c=document.getElementById('theme-toggle-checkbox');if(c)c.checked=t==='dark'}(function(){var t=localStorage.getItem('theme')||'light',s="{{ request.session.user.theme|default:'' }}",u="{{ request.session.user.sk|default:'' }}";if(u&&localStorage.getItem('theme_user')!==u){if(s){t=s;localStorage.setItem('theme',t)}localStorage.setItem('theme_user',u)}document.documentElement.setAttribute('data-theme',t);updateThemeUI(t)})();
         </script>

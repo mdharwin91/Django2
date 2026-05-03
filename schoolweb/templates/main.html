@@ -1,0 +1,335 @@
+{% load static %}
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+        <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
+        <link rel="apple-touch-icon" href="{% static 'images/favicon.ico' %}">
+        {% block css %}
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        {% endblock %}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <style>
+            .hero-section {
+                text-align: center;
+                padding: 40px 20px;
+                background: linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%);
+                margin-bottom: 30px;
+            }
+            .hero-section h2 {
+                color: var(--panel-header, #014458);
+                font-size: 32px;
+                margin-bottom: 10px;
+            }
+            .hero-section p {
+                font-size: 18px;
+                color: var(--text-main, #333);
+                max-width: 800px;
+                margin: 0 auto 20px auto;
+                line-height: 1.6;
+            }
+            .social-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                color: white;
+                padding: 12px 24px;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: bold;
+                margin: 10px 5px 0 5px;
+                transition: all 0.3s;
+            }
+            .social-link.facebook {
+                background-color: #1877F2;
+            }
+            .social-link.facebook:hover {
+                background-color: #166FE5;
+            }
+            .social-link.instagram {
+                background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            }
+            .social-link.instagram:hover {
+                transform: scale(1.05);
+                box-shadow: 0 4px 10px rgba(220, 39, 67, 0.4);
+            }
+            .social-link.youtube {
+                background-color: #FF0000;
+            }
+            .social-link.youtube:hover {
+                background-color: #CC0000;
+            }
+            .social-link.whatsapp {
+                background-color: #25D366;
+            }
+            .social-link.whatsapp:hover {
+                background-color: #128C7E;
+            }
+            @keyframes slideUpFade {
+                from { opacity: 0; transform: translateY(15px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            .main-grid {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 30px;
+                max-width: 1000px;
+                margin: 0 auto 40px auto;
+                padding: 0 20px;
+                align-items: stretch;
+            }
+            @media (min-width: 768px) {
+                .main-grid {
+                    grid-template-columns: 1fr 1fr;
+                }
+            }
+            .calendar-container {
+                background: var(--card-bg, #fff);
+                border-radius: 12px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                padding: 25px;
+                border-top: 5px solid var(--panel-header, #014458);
+                box-sizing: border-box;
+                animation: slideUpFade 0.6s ease-out forwards;
+            }
+            .calendar-header {
+                text-align: center;
+                color: var(--panel-header, #014458);
+                font-size: 16px;
+                font-weight: bold;
+                margin-bottom: 15px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+            .calendar-days-header {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                text-align: center;
+                font-weight: bold;
+                font-size: 13px;
+                color: var(--text-main, #333);
+                margin-bottom: 10px;
+                opacity: 0.7;
+            }
+            .calendar-grid-days {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                text-align: center;
+                gap: 8px 4px;
+            }
+            .calendar-day {
+                padding: 6px 0;
+                border-radius: 6px;
+                color: var(--text-main, #333);
+                font-size: 14px;
+            }
+            .calendar-day.today {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                font-weight: bold;
+                box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+            }
+            .quote-container {
+                margin: 0;
+                padding: 25px;
+                background: var(--card-bg, #fff);
+                border-radius: 12px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                border-left: 5px solid var(--panel-header, #014458);
+                text-align: center;
+                box-sizing: border-box;
+                animation: slideUpFade 0.6s ease-out forwards;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                height: 100%;
+            }
+            .quote-text {
+                font-size: 20px;
+                font-style: italic;
+                color: var(--text-main, #333);
+                margin-bottom: 15px;
+            }
+            .quote-author {
+                font-size: 16px;
+                font-weight: bold;
+                color: var(--panel-header, #014458);
+            }
+
+            /* --- Image Gallery Styles --- */
+            .gallery-container {
+                max-width: 1200px;
+                margin: 60px auto;
+                padding: 0 20px;
+                text-align: center;
+                animation: slideUpFade 0.8s ease-out 0.2s both;
+            }
+
+            .gallery-title {
+                color: var(--panel-header, #014458);
+                font-size: 28px;
+                margin-bottom: 40px;
+                text-transform: uppercase;
+                letter-spacing: 1.5px;
+                position: relative;
+                display: inline-block;
+                padding-bottom: 10px;
+            }
+
+            .gallery-title::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 70%;
+                height: 4px;
+                background: var(--accent-color, #667eea);
+                border-radius: 2px;
+            }
+
+            .gallery-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 25px;
+            }
+
+            .gallery-item {
+                overflow: hidden;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                position: relative;
+                cursor: pointer;
+                aspect-ratio: 4 / 3;
+                background: var(--card-bg);
+            }
+
+            .gallery-item img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+                transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            }
+
+            .gallery-item:hover img {
+                transform: scale(1.1) rotate(2deg);
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- COMMON HEADER -->
+     {% include "header.html" %} 
+     {% include "navigation.html" %} 
+     
+     <div class="hero-section">
+         <h2>Welcome to {{schoolInformation.schoolName}}</h2>
+         <p>Empowering young minds with quality education, strong values, and a supportive learning environment. Connect with us to see our latest updates, events, and student achievements!</p>
+         <a href="https://www.facebook.com/VasanthamSchool" target="_blank" class="social-link facebook"><i class="fab fa-facebook-f"></i> Facebook</a>
+         <a href="https://www.instagram.com/vasanthamschool?igsh=MXdxbjVkZ2trcDlseQ==" target="_blank" class="social-link instagram"><i class="fab fa-instagram"></i> Instagram</a>
+         <a href="https://youtube.com/@vasanthamschool4240?si=uJCRuwprzry-Lm6W" target="_blank" class="social-link youtube"><i class="fab fa-youtube"></i> YouTube</a>
+         <a href="https://wa.me/917418806888" target="_blank" class="social-link whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+     </div>
+
+     <div class="main-grid">
+         <div class="calendar-container">
+             <div class="calendar-header" id="calendar-month-year"></div>
+             <div class="calendar-days-header">
+                 <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+             </div>
+             <div class="calendar-grid-days" id="calendar-grid-days"></div>
+         </div>
+
+         <div class="quote-container">
+             <h3 style="margin-top: 0; color: var(--panel-header, #014458); font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;">Quote of the Day</h3>
+             <div id="quote-wrapper" style="opacity: 0; transition: opacity 0.8s ease-in-out;">
+                 <div class="quote-text" id="qod-text">"Loading today's inspiration..."</div>
+                 <div class="quote-author" id="qod-author"></div>
+             </div>
+         </div>
+     </div>
+
+     <div class="gallery-container">
+        <h2 class="gallery-title">Our Campus Life</h2>
+        <div class="gallery-grid">
+            {% for photo in school_photos %}
+                <div class="gallery-item"><img src="{% static 'SchoolPhotos/' %}{{ photo }}" alt="Campus Photo"></div>
+            {% empty %}
+                <p style="grid-column: 1 / -1; color: var(--text-main); opacity: 0.7;">No photos found in School Photos directory yet!</p>
+            {% endfor %}
+        </div>
+     </div>
+
+     <br>
+     {% include "footer.html" %}
+
+     <script>
+         document.addEventListener("DOMContentLoaded", function() {
+             // Calendar Rendering
+             const now = new Date();
+             const month = now.getMonth();
+             const year = now.getFullYear();
+             const todayDate = now.getDate();
+             
+             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+             document.getElementById('calendar-month-year').innerText = `${monthNames[month]} ${year}`;
+             
+             const firstDay = new Date(year, month, 1).getDay();
+             const daysInMonth = new Date(year, month + 1, 0).getDate();
+             
+             const grid = document.getElementById('calendar-grid-days');
+             
+             for (let i = 0; i < firstDay; i++) {
+                 const emptyDiv = document.createElement('div');
+                 grid.appendChild(emptyDiv);
+             }
+             
+             for (let i = 1; i <= daysInMonth; i++) {
+                 const dayDiv = document.createElement('div');
+                 dayDiv.className = 'calendar-day';
+                 dayDiv.innerText = i;
+                 if (i === todayDate) {
+                     dayDiv.classList.add('today');
+                 }
+                 grid.appendChild(dayDiv);
+             }
+
+             const quoteTextEl = document.getElementById("qod-text");
+             const quoteAuthorEl = document.getElementById("qod-author");
+             const quoteWrapper = document.getElementById("quote-wrapper");
+             const today = new Date().toDateString();
+             
+             const savedDate = localStorage.getItem("qod_date");
+             const savedQuote = localStorage.getItem("qod_text");
+             const savedAuthor = localStorage.getItem("qod_author");
+
+             if (savedDate === today && savedQuote) {
+                 quoteTextEl.innerText = `"${savedQuote}"`;
+                 quoteAuthorEl.innerText = `- ${savedAuthor}`;
+                 quoteWrapper.style.opacity = 1;
+             } else {
+                 fetch("https://dummyjson.com/quotes/random")
+                     .then(response => response.json())
+                     .then(data => {
+                         if (data && data.quote) {
+                             localStorage.setItem("qod_date", today);
+                             localStorage.setItem("qod_text", data.quote);
+                             localStorage.setItem("qod_author", data.author);
+                             
+                             quoteTextEl.innerText = `"${data.quote}"`;
+                             quoteAuthorEl.innerText = `- ${data.author}`;
+                             quoteWrapper.style.opacity = 1;
+                         }
+                     })
+                     .catch(error => {
+                         console.error("Error fetching quote:", error);
+                         quoteTextEl.innerText = '"Education is the most powerful weapon which you can use to change the world."';
+                         quoteAuthorEl.innerText = "- Nelson Mandela";
+                         quoteWrapper.style.opacity = 1;
+                     });
+             }
+         });
+     </script>
+    </body>
+</html>

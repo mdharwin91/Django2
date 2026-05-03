@@ -25,6 +25,21 @@
             .OuterBox { background-color: var(--card-bg) !important; color: var(--text-main) !important; border-radius: 12px; }
             .labelClass { color: var(--text-main) !important; }
 
+            .OuterBox form table input[type="text"]:not(.otp-input),
+            .OuterBox form table input[type="password"] {
+                width: 100%;
+                max-width: 292px;
+                height: 50px;
+                border-radius: 8px;
+                border: 1px solid var(--border-color, #e2e8f0);
+                padding: 8px 12px;
+                box-sizing: border-box;
+                background-color: var(--card-bg);
+                color: var(--text-main);
+                font-size: 24px;
+                font-weight: 600;
+            }
+
             .sidebar-link {
                 display: block;
                 padding: 12px 15px;
@@ -49,7 +64,7 @@
             }
 
             @media (max-width: 768px) {
-                .login-container { flex-direction: column; }
+                .login-container { flex-direction: column; margin-top: 20px; }
                 .login-split-left { display: none; }
                 .login-split-right { 
                     width: 100% !important; 
@@ -58,6 +73,10 @@
                     justify-content: center;
                 }
                 .OuterBox { width: 90% !important; float: none !important; }
+                .OuterBox form table { width: 100%; }
+                .OuterBox form table tr { display: flex; flex-direction: column; margin-bottom: 12px; }
+                .OuterBox form table td { width: 100%; text-align: left; }
+                .OuterBox form table td[style*="width: 5%"] { display: none; }
             }
 
             /* 2FA OTP Styles */
@@ -99,12 +118,13 @@
      {% include "header.html" %} 
      {% include "navigation.html" %} 
         <div class="login-container" style="width: 100%; display: flex; align-items: center; min-height: 60vh;">
-            <div class="login-split-left" style="width: 50%;">
-
+            <div class="login-split-left" style="width: 50%; display: flex; justify-content: center; align-items: center;">
+                <img src="{% static 'images/Glassed_LOGO_NOBG.png' %}" style="width: 350px; max-width: 80%; opacity: 0.5;" alt="School Logo">
             </div>
             <div class="login-split-right" style="width: 50%; float: right; margin-right: 10%;">
                 <div class="OuterBox" style="height: 25%; width: 70%; float:right;">
                     <br>
+                    <h3 style="text-align: center; color: #e53e3e; margin-top: 0; margin-bottom: 15px;">Official Use Only</h3>
                     <form action = "" method = "post" style="margin-left: 5%;">
                         {% csrf_token %}
                         <table>
@@ -139,17 +159,48 @@
                             </td>
                         </tr>
                         {% endif %}
+                        {% if show_captcha %}
+                        <tr>
+                            <td><label class="labelClass">{{ captcha_question }}</label></td>
+                            <td style="width: 5%;"></td>
+                            <td>
+                                <input type="text" name="captcha_answer" placeholder="Enter answer here" required>
+                            </td>
+                        </tr>
+                        {% endif %}
                         </table>
                         <br>
                         <label for="result01">{{result}}</label><br>
                         <!-- <input type=submit value=Clear class="buttonClass" style="margin-left: 10%; text-align: center;"> -->
                         <input type="submit" value="Login" class="sidebar-link active" style="width: 170px;">
+                        <div style="text-align: center; width: 170px; margin-top: 10px;">
+                            <a href="#" onclick="openForgotPasswordModal(); return false;" style="color: var(--text-main); font-size: 13px; text-decoration: none; opacity: 0.8; font-weight: bold;">Forgot Password?</a>
+                        </div>
                     </form>
                     <br>
                 </div>
             </div>
 
         </div>
+
+        <!-- Forgot Password Modal -->
+        <div id="forgotPasswordModal" style="display: none; position: fixed; z-index: 10001; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6);">
+            <div style="background-color: var(--card-bg); margin: 10% auto; padding: 30px; border: 1px solid var(--border-color, #e2e8f0); width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-radius: 12px; position: relative;">
+                <span onclick="closeForgotPasswordModal()" style="color: #aaa; position: absolute; right: 20px; top: 15px; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1;">&times;</span>
+                <h2 style="color: #e53e3e; margin-top: 0; text-align: center; font-size: 22px;">Forgot Password</h2>
+                <p style="font-size: 14px; color: var(--text-main); text-align: center; margin-bottom: 25px; opacity: 0.8;">Enter your Identification No. to request a password reset from the Administrator.</p>
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
+                        <label style="width: 130px; font-weight: bold; font-size: 14px;">Identification No.</label>
+                        <input type="text" id="forgot_username" style="flex: 1; height: 40px; font-size: 14px; padding: 0 10px; text-align: left; border: 2px solid var(--border-color, #e2e8f0); border-radius: 8px; background-color: var(--card-bg); color: var(--text-main);" placeholder="e.g. SID00001">
+                    </div>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="sidebar-link active" onclick="submitForgotPassword()" style="width: 100%; margin: 0;">Submit Request</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {% if result == "Login Failed" %}
         <script>
             alert("ACCESS DENIED");
@@ -157,52 +208,8 @@
         {% endif %}
 
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const otpInputs = document.querySelectorAll('.otp-input');
-                const hiddenInput = document.getElementById('otp_token_hidden');
-
-                if (otpInputs.length > 0) {
-                    otpInputs.forEach((input, index) => {
-                        // Handle typing digits
-                        input.addEventListener('input', (e) => {
-                            // Ensure only numbers
-                            input.value = input.value.replace(/[^0-9]/g, '');
-                            
-                            if (input.value.length === 1 && index < otpInputs.length - 1) {
-                                otpInputs[index + 1].focus();
-                            }
-                            updateHiddenInput();
-                        });
-
-                        // Handle backspace
-                        input.addEventListener('keydown', (e) => {
-                            if (e.key === 'Backspace' && input.value === '' && index > 0) {
-                                otpInputs[index - 1].focus();
-                            }
-                        });
-
-                        // Handle paste
-                        input.addEventListener('paste', (e) => {
-                            e.preventDefault();
-                            const pasteData = e.clipboardData.getData('text').slice(0, 6).split('');
-                            pasteData.forEach((char, i) => {
-                                if (otpInputs[i] && /^\d$/.test(char)) {
-                                    otpInputs[i].value = char;
-                                }
-                            });
-                            updateHiddenInput();
-                            const nextIndex = Math.min(pasteData.length, otpInputs.length - 1);
-                            otpInputs[nextIndex].focus();
-                        });
-                    });
-
-                    function updateHiddenInput() {
-                        let code = '';
-                        otpInputs.forEach(input => code += input.value);
-                        hiddenInput.value = code;
-                    }
-                }
-            });
+var _E=i=>document.getElementById(i),_S=q=>document.querySelectorAll(q),_P=(m,t)=>alert(m);document.addEventListener('DOMContentLoaded',function(){let un=_S('input[name="username"]')[0];if(un)un.addEventListener('input',function(){this.value=this.value.toUpperCase()});let fu=_E('forgot_username');if(fu)fu.addEventListener('input',function(){this.value=this.value.toUpperCase()});let o=_S('.otp-input'),h=_E('otp_token_hidden');if(o.length>0){o.forEach((i,x)=>{i.addEventListener('input',e=>{i.value=i.value.replace(/[^0-9]/g,'');if(i.value.length===1&&x<o.length-1)o[x+1].focus();u()});i.addEventListener('keydown',e=>{if(e.key==='Backspace'&&i.value===''&&x>0)o[x-1].focus()});i.addEventListener('paste',e=>{e.preventDefault();let p=e.clipboardData.getData('text').slice(0,6).split('');p.forEach((c,j)=>{if(o[j]&&/^\d$/.test(c))o[j].value=c});u();o[Math.min(p.length,o.length-1)].focus()})});function u(){let c='';o.forEach(i=>c+=i.value);h.value=c}}});function openForgotPasswordModal(){_E('forgotPasswordModal').style.display='block'}function closeForgotPasswordModal(){_E('forgotPasswordModal').style.display='none';_E('forgot_username').value=''}function submitForgotPassword(){let u=_E('forgot_username').value;if(!u)return alert("Please enter your Identification No.");fetch("{% url 'request_password_reset' %}",{method:"POST",headers:{"Content-Type":"application/json","X-CSRFToken":"{{ csrf_token }}"},body:JSON.stringify({username:u})}).then(r=>r.json()).then(d=>{alert(d.message||d.error);if(d.success)closeForgotPasswordModal()}).catch(e=>alert("An error occurred."))}
         </script>
+     {% include "footer.html" %}
     </body>
 </html>
