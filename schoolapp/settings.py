@@ -40,19 +40,20 @@ else:
 # CSRF Trusted Origins for Intranet Access
 # Add your machine's local IP address here (e.g., "http://192.168.1.5:8000")
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:8000"
+    "http://localhost:8000",
+    "http://13.206.204.218"
 ]
 
 # Production Security Settings
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    SECURE_HSTS_SECONDS = 31536000  # 1 year
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
+    # SECURE_HSTS_SECONDS = 31536000  # 1 year
+    # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    # SECURE_HSTS_PRELOAD = True
 
 # Application definition
 
