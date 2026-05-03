@@ -41,8 +41,11 @@ else:
 # Add your machine's local IP address here (e.g., "http://192.168.1.5:8000")
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
-    "http://13.234.71.8"
 ]
+
+for host in ALLOWED_HOSTS:
+    CSRF_TRUSTED_ORIGINS.append(f"http://{host}")
+    CSRF_TRUSTED_ORIGINS.append(f"https://{host}")
 
 # Production Security Settings
 if not DEBUG:
