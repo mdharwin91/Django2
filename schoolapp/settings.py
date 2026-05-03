@@ -41,7 +41,7 @@ else:
 # Add your machine's local IP address here (e.g., "http://192.168.1.5:8000")
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
-    "http://13.206.204.218"
+    "http://13.234.71.8"
 ]
 
 # Production Security Settings
